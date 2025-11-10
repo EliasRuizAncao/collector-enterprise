@@ -1,0 +1,557 @@
+# Collector Enterprise - Cursor AI Rules
+# Sistema de Gestión para Amaranto Constructora
+
+## 🎯 Contexto del Proyecto
+
+Este es un monorepo que contiene:
+- **Frontend**: React 18 + TypeScript + Vite + shadcn/ui
+- **Backend**: Node.js + Express + TypeScript + Prisma
+- **Database**: PostgreSQL en Railway
+- **Auth**: Firebase Authentication
+
+El proyecto es un panel administrativo web (PWA) para gestionar formularios dinámicos, usuarios y generar reportes para una constructora mediana (Amaranto).
+
+---
+
+## 📁 Estructura del Proyecto
+
+```
+collector-enterprise/
+├── frontend/          # React + Vite + TypeScript
+├── backend/           # Express + Prisma + TypeScript
+├── shared/            # Tipos compartidos (opcional)
+└── docker-compose.yml
+```
+
+---
+
+## 🎨 Stack y Tecnologías
+
+### Frontend
+- Framework: React 18 con TypeScript
+- Build Tool: Vite (NO Create React App)
+- UI Library: shadcn/ui + Tailwind CSS
+- State Management: Zustand (NO Redux)
+- Routing: React Router v6
+- Forms: React Hook Form + Zod validation
+- Drag & Drop: @dnd-kit
+- Charts: Recharts
+- HTTP: Axios con interceptors
+- Auth: Firebase Auth (client-side)
+- PWA: vite-plugin-pwa
+
+### Backend
+- Runtime: Node.js 20+ con TypeScript
+- Framework: Express.js
+- ORM: Prisma (PostgreSQL)
+- Validation: Zod
+- Auth: Firebase Admin SDK + JWT
+- Security: Helmet, CORS, Rate Limiting
+- Error Monitoring: Sentry
+
+---
+
+## 🔧 Reglas de Código
+
+### General
+- **SIEMPRE** usar TypeScript (NO JavaScript puro)
+- **SIEMPRE** usar imports absolutos con @ alias: `@/components/...`
+- **NUNCA** usar `any` type, siempre tipar correctamente
+- **SIEMPRE** manejar errores con try-catch
+- **SIEMPRE** usar async/await (NO callbacks)
+- Nombres de variables en inglés, comentarios en español si es necesario
+- Usar const por defecto, let solo si es necesario, NUNCA var
+
+### Frontend (React)
+
+#### Componentes
+- **SIEMPRE** usar Functional Components con Hooks
+- **NUNCA** usar Class Components
+- **SIEMPRE** exportar componentes con `export default`
+- Nombrar componentes en PascalCase: `FormBuilder.tsx`
+- Usar arrow functions para componentes:
+  ```typescript
+  const MyComponent = () => {
+    return <div>...</div>
+  }
+  export default MyComponent
+  ```
+
+#### Hooks
+- Usar hooks en el orden correcto (useState, useEffect, custom hooks)
+- Custom hooks SIEMPRE empiezan con "use": `useFormBuilder`
+- NO llamar hooks dentro de condicionales o loops
+
+#### Estilos
+- **SIEMPRE** usar Tailwind CSS utility classes
+- **NUNCA** crear archivos CSS separados a menos que sea absolutamente necesario
+- Usar componentes de shadcn/ui cuando sea posible
+- Para estilos condicionales, usar `clsx` o `cn` utility:
+  ```typescript
+  import { cn } from "@/lib/utils"
+  <div className={cn("base-class", isActive && "active-class")} />
+  ```
+
+#### State Management (Zustand)
+- Crear stores separados por dominio: `authStore.ts`, `formStore.ts`
+- Usar persist middleware para datos que deben sobrevivir refresh:
+  ```typescript
+  import { create } from 'zustand'
+  import { persist } from 'zustand/middleware'
+  
+  export const useAuthStore = create<AuthState>()(
+    persist(
+      (set) => ({
+        user: null,
+        setUser: (user) => set({ user }),
+      }),
+      { name: 'auth-storage' }
+    )
+  )
+  ```
+
+#### API Calls
+- **SIEMPRE** usar el cliente Axios configurado: `import api from '@/lib/api'`
+- **NUNCA** usar fetch directamente
+- Manejar loading y error states:
+  ```typescript
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  
+  try {
+    setLoading(true)
+    const { data } = await api.get('/endpoint')
+    // handle data
+  } catch (err) {
+    setError(err.message)
+  } finally {
+    setLoading(false)
+  }
+  ```
+
+#### Formularios
+- **SIEMPRE** usar React Hook Form + Zod
+- Definir schema de validación primero:
+  ```typescript
+  import { z } from 'zod'
+  import { useForm } from 'react-hook-form'
+  import { zodResolver } from '@hookform/resolvers/zod'
+  
+  const formSchema = z.object({
+    email: z.string().email('Email inválido'),
+    name: z.string().min(2, 'Mínimo 2 caracteres'),
+  })
+  
+  type FormData = z.infer<typeof formSchema>
+  
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+  })
+  ```
+
+#### Routing
+- Usar React Router v6 con nuevas APIs
+- Rutas protegidas con componente wrapper:
+  ```typescript
+  <Route element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
+    <Route path="/admin" element={<Dashboard />} />
+  </Route>
+  ```
+
+### Backend (Express + Prisma)
+
+#### Estructura de Archivos
+- Controllers: Manejan requests/responses
+- Services: Lógica de negocio
+- Routes: Definición de endpoints
+- Middleware: Auth, validation, error handling
+- **NUNCA** poner lógica de negocio en controllers
+
+#### Prisma
+- **SIEMPRE** usar Prisma Client para queries
+- **NUNCA** escribir SQL raw a menos que sea absolutamente necesario
+- Usar transactions para operaciones múltiples:
+  ```typescript
+  await prisma.$transaction([
+    prisma.user.create(...),
+    prisma.auditLog.create(...),
+  ])
+  ```
+- Generar cliente después de cada cambio en schema:
+  ```bash
+  npx prisma generate
+  ```
+
+#### API Routes
+- Usar estructura RESTful:
+  - GET /api/users - Listar
+  - GET /api/users/:id - Ver uno
+  - POST /api/users - Crear
+  - PUT /api/users/:id - Actualizar
+  - DELETE /api/users/:id - Eliminar
+
+#### Middleware
+- **SIEMPRE** validar inputs con Zod antes de procesar
+- **SIEMPRE** usar middleware de auth en rutas protegidas
+- Orden de middleware es importante:
+  ```typescript
+  app.use(helmet())
+  app.use(cors())
+  app.use(express.json())
+  app.use('/api', rateLimiter)
+  app.use('/api/protected', authenticate)
+  ```
+
+#### Error Handling
+- **SIEMPRE** usar try-catch en async functions
+- Usar error handler middleware:
+  ```typescript
+  app.use((err, req, res, next) => {
+    console.error(err)
+    Sentry.captureException(err)
+    res.status(err.status || 500).json({
+      error: err.message || 'Internal Server Error'
+    })
+  })
+  ```
+
+#### Autenticación
+- Verificar token de Firebase en cada request protegido
+- Adjuntar user a request object:
+  ```typescript
+  export interface AuthRequest extends Request {
+    user?: {
+      id: string
+      email: string
+      role: string
+    }
+  }
+  ```
+
+---
+
+## 🚨 Reglas Críticas de Seguridad
+
+### NUNCA hacer:
+- ❌ Exponer secrets o API keys en el código
+- ❌ Commit archivos `.env` al repositorio
+- ❌ Deshabilitar CORS en producción
+- ❌ Permitir SQL injection (usar Prisma correctamente)
+- ❌ Aceptar inputs sin validar
+- ❌ Loggear información sensible (passwords, tokens)
+- ❌ Usar `eval()` o `Function()` constructor
+- ❌ Confiar en datos del cliente sin verificar
+
+### SIEMPRE hacer:
+- ✅ Validar TODOS los inputs con Zod
+- ✅ Sanitizar outputs para prevenir XSS
+- ✅ Usar HTTPS en producción (TLS 1.3)
+- ✅ Implementar rate limiting
+- ✅ Usar tokens JWT con expiración
+- ✅ Encriptar datos sensibles
+- ✅ Implementar auditoría de accesos
+- ✅ Mantener dependencias actualizadas
+
+---
+
+## 📦 Instalación de Paquetes
+
+### Cuando necesites instalar algo:
+
+**Frontend:**
+```bash
+cd frontend
+npm install <paquete>
+```
+
+**Backend:**
+```bash
+cd backend
+npm install <paquete>
+```
+
+### shadcn/ui Components
+Para añadir componentes de shadcn/ui:
+```bash
+cd frontend
+npx shadcn-ui@latest add <component-name>
+```
+
+Ejemplos: button, card, dialog, table, form, input, select
+
+---
+
+## 🎯 Patrones Específicos del Proyecto
+
+### Landing Page
+- Usar diseño moderno con gradients
+- Responsive mobile-first
+- Hero section impactante
+- CTAs claros y visibles
+- Datos de Amaranto:
+  - 10+ años en el mercado
+  - 50-150 trabajadores
+  - 3-5 obras simultáneas
+  - 25.000 UF facturación anual
+
+### Dashboard
+- KPIs en cards grandes
+- Gráficos interactivos con Recharts
+- Diseño limpio y profesional
+- Drill-down en datos
+- Filtros por fecha y proyecto
+- Comparativas entre obras
+
+### Form Builder (Drag & Drop)
+- Usar @dnd-kit para drag and drop
+- Mínimo 15 tipos de campos:
+  - Texto corto, Texto largo, Número
+  - Email, Teléfono, URL
+  - Fecha, Hora, Fecha y Hora
+  - Select, Multi-select
+  - Radio, Checkbox
+  - Firma digital
+  - Foto/Video
+- Vista previa en tiempo real
+- Guardado automático
+- Versionado de formularios
+
+### Gestión de Usuarios
+- CRUD completo
+- Roles: ADMIN, MANAGER, SUPERVISOR, OPERATOR
+- Permisos granulares por módulo
+- Desactivar usuarios (NO eliminar)
+- Auditoría de cambios
+
+---
+
+## 🧪 Testing
+
+### Frontend
+- Usar Testing Library
+- NO usar Enzyme
+- Tests en `__tests__` folders
+- Mock de APIs con MSW o fetch-mock
+
+### Backend
+- Usar Jest + Supertest
+- Mockear Prisma Client
+- Tests de integración para APIs
+- Tests unitarios para services
+
+---
+
+## 🐳 Docker
+
+### Comandos útiles:
+```bash
+# Levantar todo
+docker-compose up -d
+
+# Ver logs
+docker-compose logs -f backend
+docker-compose logs -f frontend
+
+# Rebuild
+docker-compose up --build
+
+# Detener
+docker-compose down
+
+# Limpiar todo
+docker-compose down -v
+docker system prune -a
+```
+
+---
+
+## 🔄 Git Workflow
+
+### Branches:
+- `main` - Producción (protegida)
+- `develop` - Desarrollo (principal)
+- `feature/*` - Nuevas features
+- `fix/*` - Bugfixes
+- `hotfix/*` - Fixes urgentes en producción
+
+### Commits:
+Usar conventional commits:
+```
+feat: agregar constructor de formularios
+fix: corregir validación de email
+docs: actualizar README
+style: formatear código
+refactor: refactorizar authService
+test: agregar tests para formController
+```
+
+---
+
+## 📊 Performance
+
+### Frontend
+- Lazy load routes con React.lazy()
+- Memoizar componentes pesados con React.memo()
+- Usar useMemo y useCallback apropiadamente
+- Optimizar imágenes (WebP, lazy loading)
+- Code splitting automático con Vite
+- Objetivo: First Load < 3 segundos
+
+### Backend
+- Usar indexes en Prisma schema
+- Paginar resultados grandes
+- Cache con Redis si es necesario
+- Optimizar queries N+1
+- Objetivo: Response time < 200ms
+
+---
+
+## 📱 PWA
+
+### Service Worker
+- Configurado automáticamente con vite-plugin-pwa
+- Estrategia: Network First para APIs, Cache First para assets
+- Offline fallback page
+
+### Manifest
+- Nombre: Collector Enterprise - Amaranto
+- Short name: Collector
+- Theme color: #0f172a
+- Icons: 192x192 y 512x512
+
+---
+
+## 🌐 Variables de Entorno
+
+### Frontend (.env)
+```
+VITE_API_URL=http://localhost:3000/api
+VITE_FIREBASE_API_KEY=...
+VITE_FIREBASE_AUTH_DOMAIN=...
+VITE_FIREBASE_PROJECT_ID=...
+```
+
+### Backend (.env)
+```
+NODE_ENV=development
+PORT=3000
+DATABASE_URL=postgresql://...
+FIREBASE_PROJECT_ID=...
+JWT_SECRET=...
+SENTRY_DSN=...
+```
+
+**NUNCA** commitear archivos .env
+
+---
+
+## 🎨 Diseño UI/UX
+
+### Paleta de Colores (Tailwind)
+- Primary: slate-900 (#0f172a)
+- Secondary: blue-600
+- Success: green-600
+- Warning: yellow-600
+- Error: red-600
+- Muted: slate-500
+
+### Tipografía
+- Font: Inter (default de Tailwind)
+- Headings: font-bold
+- Body: font-normal
+
+### Espaciado
+- Usar escala de Tailwind: p-4, p-6, p-8
+- Consistencia en margins y paddings
+
+### Componentes
+- Bordes redondeados: rounded-lg
+- Sombras sutiles: shadow-sm, shadow-md
+- Transiciones suaves: transition-all duration-200
+
+---
+
+## 🚀 Deployment
+
+### Railway (Backend)
+- Root Directory: `backend`
+- Build: `npm run build && npx prisma migrate deploy`
+- Start: `npm start`
+- Auto-deploy on push to main
+
+### Vercel (Frontend)
+- Root Directory: `frontend`
+- Framework: Vite
+- Build: `npm run build`
+- Output: `dist`
+- Auto-deploy on push to main
+
+---
+
+## 🆘 Troubleshooting Común
+
+### "Module not found @/..."
+Verificar alias en tsconfig.json y vite.config.ts
+
+### "Prisma Client not generated"
+```bash
+cd backend && npx prisma generate
+```
+
+### CORS Error
+Verificar FRONTEND_URL en backend/.env
+
+### Firebase Auth Error
+Verificar credenciales en Firebase Console
+
+---
+
+## 💡 Tips para Cursor AI
+
+Cuando me pidas generar código:
+
+1. **Especifica el tipo de archivo**: "Crea un componente React...", "Crea un endpoint Express..."
+
+2. **Indica la ubicación**: "En frontend/src/pages/..." o "En backend/src/controllers/..."
+
+3. **Menciona dependencias**: "Usando shadcn/ui Button", "Con Prisma Client"
+
+4. **Pide imports completos**: Siempre incluye todos los imports necesarios
+
+5. **Valida según estas reglas**: Si genero código que rompe estas reglas, corrígeme
+
+---
+
+## 📚 Documentación de Referencia
+
+- React: https://react.dev
+- TypeScript: https://www.typescriptlang.org
+- Vite: https://vitejs.dev
+- shadcn/ui: https://ui.shadcn.com
+- Tailwind: https://tailwindcss.com
+- Zustand: https://docs.pmnd.rs/zustand
+- React Router: https://reactrouter.com
+- React Hook Form: https://react-hook-form.com
+- Zod: https://zod.dev
+- Prisma: https://www.prisma.io/docs
+- Express: https://expressjs.com
+- Firebase: https://firebase.google.com/docs
+
+---
+
+## ✅ Checklist Antes de Commit
+
+- [ ] Código compila sin errores TypeScript
+- [ ] No hay console.log olvidados
+- [ ] Imports organizados y sin usar
+- [ ] Componentes tipados correctamente
+- [ ] Validaciones con Zod implementadas
+- [ ] Error handling adecuado
+- [ ] Responsive design verificado
+- [ ] Variables de entorno NO en el código
+- [ ] Tests pasan (si existen)
+- [ ] Código formateado (Prettier)
+
+---
+
+**Recuerda: Este archivo .cursorrules debe estar en la RAÍZ del proyecto (collector-enterprise/.cursorrules)**
