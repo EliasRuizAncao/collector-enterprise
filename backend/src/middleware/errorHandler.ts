@@ -22,7 +22,7 @@ export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
   if (err instanceof ZodError) {
     status = 400
     message = 'Error de validación'
-    details = err.errors
+    details = err.issues
   }
 
   // Errores conocidos de Prisma (por ejemplo, violaciones de constraints)
@@ -75,8 +75,15 @@ export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
   }
 
   if (isDev) {
+    const existingDetails =
+      response.details && typeof response.details === 'object'
+        ? (response.details as Record<string, unknown>)
+        : response.details !== undefined
+          ? { data: response.details }
+          : {}
+
     response.details = {
-      ...(response.details as Record<string, unknown> | undefined),
+      ...existingDetails,
       stack: err.stack,
     }
   }
