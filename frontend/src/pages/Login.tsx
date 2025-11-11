@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { z } from 'zod'
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import logo from '@/assets/collector-mark.svg'
+import { useAuth } from '@/hooks/useAuth'
 
 // Esquema de validación para el formulario de inicio de sesión
 const loginSchema = z.object({
@@ -35,10 +36,11 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>
 
-// Página de login solamente con UI. La integración con Firebase se hará más adelante.
 const Login = () => {
   const [error, setError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const navigate = useNavigate()
+  const { login } = useAuth()
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -49,15 +51,27 @@ const Login = () => {
     },
   })
 
-  const onSubmit = async (_values: LoginFormValues) => {
+  const onSubmit = async ({ email, password }: LoginFormValues) => {
     setError(null)
     setIsSubmitting(true)
     try {
-      // Placeholder de autenticación: se reemplazará con Firebase
-      await new Promise((resolve) => setTimeout(resolve, 1200))
-      setError('Credenciales inválidas. Verifica tu email y contraseña.')
+      await login(email, password)
+      navigate('/admin/dashboard')
     } catch (err) {
-      setError('Ocurrió un error inesperado. Intenta nuevamente.')
+      if (err instanceof Error) {
+        const message = err.message.toLowerCase()
+        if (message.includes('auth/user-not-found')) {
+          setError('El usuario no existe. Contacta al administrador.')
+        } else if (message.includes('auth/wrong-password')) {
+          setError('Credenciales inválidas. Verifica tu email y contraseña.')
+        } else if (message.includes('network') || message.includes('timeout')) {
+          setError('Problema de conexión. Intenta nuevamente en unos minutos.')
+        } else {
+          setError('Ocurrió un error inesperado. Intenta nuevamente.')
+        }
+      } else {
+        setError('Ocurrió un error inesperado. Intenta nuevamente.')
+      }
     } finally {
       setIsSubmitting(false)
     }
