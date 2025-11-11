@@ -1,13 +1,13 @@
-import { initializeApp, type FirebaseOptions, type FirebaseApp } from 'firebase/app'
+import {
+  getApps,
+  initializeApp,
+  type FirebaseOptions,
+  type FirebaseApp,
+} from 'firebase/app'
 import { getAuth } from 'firebase/auth'
-import { getAnalytics, type Analytics } from 'firebase/analytics'
 
-// Configuración de Firebase para el frontend, usando variables de entorno
-const measurementId =
-  import.meta.env.VITE_FIREBASE_MEASUREMENT_ID &&
-  import.meta.env.VITE_FIREBASE_MEASUREMENT_ID.length > 0
-    ? import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
-    : undefined
+// Configuración de Firebase para el frontend usando variables de entorno
+// Se asegura de reutilizar la app si ya fue inicializada previamente
 
 const firebaseConfig: FirebaseOptions = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -16,18 +16,15 @@ const firebaseConfig: FirebaseOptions = {
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
-  measurementId,
 }
 
-const app: FirebaseApp = initializeApp(firebaseConfig)
+const app: FirebaseApp =
+  getApps().length > 0 ? getApps()[0]! : initializeApp(firebaseConfig)
 
-// Exporta instancias comunes para reutilizar en la app
+// Exportar instancias reutilizables en toda la aplicación
 export const auth = getAuth(app)
 
-const analytics: Analytics | null =
-  typeof window !== 'undefined' && measurementId ? getAnalytics(app) : null
-
-export { app, analytics }
-
 export default app
+
+export { app }
 

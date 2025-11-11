@@ -6,6 +6,9 @@ import Landing from '@/pages/Landing'
 import About from '@/pages/About'
 import Contact from '@/pages/Contact'
 import Login from '@/pages/Login'
+import CollectorLanding from '@/pages/collector/CollectorLanding'
+import CollectorAbout from '@/pages/collector/CollectorAbout'
+import CollectorContact from '@/pages/collector/CollectorContact'
 
 // Admin Pages
 import Dashboard from '@/pages/admin/Dashboard'
@@ -16,6 +19,7 @@ import Users from '@/pages/admin/Users'
 // Layouts
 import LandingLayout from '@/components/layout/LandingLayout'
 import AdminLayout from '@/components/layout/AdminLayout'
+import CollectorLandingLayout from '@/components/layout/CollectorLandingLayout'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
@@ -31,6 +35,13 @@ function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/nosotros" element={<About />} />
           <Route path="/contacto" element={<Contact />} />
+        </Route>
+
+        {/* Collector Landing */}
+        <Route element={<CollectorLandingLayout />}>
+          <Route path="/collector" element={<CollectorLanding />} />
+          <Route path="/collector/nosotros" element={<CollectorAbout />} />
+          <Route path="/collector/contacto" element={<CollectorContact />} />
         </Route>
 
         {/* Auth Routes */}
