@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
-import admin from '../config/firebase'
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, Role } from '@prisma/client'
+
+import admin from '@/config/firebase'
 
 const prisma = new PrismaClient()
 
@@ -9,54 +10,65 @@ export interface AuthRequest extends Request {
     id: string
     firebaseUid: string
     email: string
-    role: string
+    role: Role
   }
 }
 
-export const authenticate = async (
-  req: AuthRequest,
-  res: Response,
-  next: NextFunction
-) => {
+// Middleware de autenticación basado en Firebase
+export const authenticate = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const token = req.headers.authorization?.split('Bearer ')[1]
+    const authorization = req.headers.authorization
+    const token = authorization?.startsWith('Bearer ') ? authorization.slice(7) : undefined
 
     if (!token) {
-      return res.status(401).json({ error: 'No token provided' })
+      return res.status(401).json({ error: 'Token no proporcionado' })
     }
 
     // Verificar token con Firebase
     const decodedToken = await admin.auth().verifyIdToken(token)
 
-    // Buscar usuario en DB
+    // Buscar usuario asociado en Prisma
     const user = await prisma.user.findUnique({
       where: { firebaseUid: decodedToken.uid },
       select: { id: true, firebaseUid: true, email: true, role: true, isActive: true },
     })
 
-    if (!user || !user.isActive) {
-      return res.status(401).json({ error: 'User not found or inactive' })
+    if (!user) {
+      console.warn('[auth] Usuario no encontrado', decodedToken.uid)
+      return res.status(401).json({ error: 'Usuario no registrado' })
     }
 
-    req.user = user
-    next()
+    if (!user.isActive) {
+      console.warn('[auth] Usuario inactivo', decodedToken.uid)
+      return res.status(401).json({ error: 'Usuario inactivo' })
+    }
+
+    req.user = {
+      id: user.id,
+      firebaseUid: user.firebaseUid,
+      email: user.email,
+      role: user.role,
+    }
+
+    return next()
   } catch (error) {
-    console.error('Auth error:', error)
-    res.status(401).json({ error: 'Invalid token' })
+    console.error('[auth] Error de autenticación:', error)
+    return res.status(401).json({ error: 'Token inválido' })
   }
 }
 
-// Middleware para verificar roles
-export const authorize = (...roles: string[]) => {
+// Middleware para autorizar según roles
+export const authorize = (...roles: Role[]) => {
   return (req: AuthRequest, res: Response, next: NextFunction) => {
     if (!req.user) {
-      return res.status(401).json({ error: 'Unauthorized' })
+      return res.status(401).json({ error: 'No autenticado' })
     }
 
-    if (!roles.includes(req.user.role)) {
-      return res.status(403).json({ error: 'Forbidden' })
+    if (roles.length > 0 && !roles.includes(req.user.role)) {
+      console.warn('[auth] Acceso denegado', req.user.email, 'rol', req.user.role)
+      return res.status(403).json({ error: 'Acceso no autorizado' })
     }
 
-    next()
+    return next()
   }
 }
