@@ -45,6 +45,7 @@ const MobileFAQ = lazy(() => import('@/mobile/pages/FAQ'))
 const MobileSupport = lazy(() => import('@/mobile/pages/Support'))
 const MobileReport = lazy(() => import('@/mobile/pages/Report'))
 const ReportsDashboard = lazy(() => import('@/mobile/pages/ReportsDashboard'))
+const PersonalReports = lazy(() => import('@/mobile/pages/PersonalReports'))
 
 /**
  * Componente para prefetch de rutas críticas
@@ -333,6 +334,14 @@ const AppRoutes = () => {
             element={
               <Suspense fallback={<RouteSkeleton variant="mobile" />}>
                 <ReportsDashboard />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/mobile/reports/personal"
+            element={
+              <Suspense fallback={<RouteSkeleton variant="mobile" />}>
+                <PersonalReports />
               </Suspense>
             }
           />
