@@ -1,5 +1,5 @@
 import express from 'express'
-import cors from 'cors'
+import cors, { type CorsOptions } from 'cors'
 import helmet from 'helmet'
 import dotenv from 'dotenv'
 import * as Sentry from '@sentry/node'
@@ -9,6 +9,8 @@ import authRoutes from './routes/auth.routes'
 import formRoutes from './routes/form.routes'
 import userRoutes from './routes/user.routes'
 import dashboardRoutes from './routes/dashboard.routes'
+import assignmentRoutes from './routes/assignment.routes'
+import responseRoutes from './routes/response.routes'
 
 import { errorHandler } from './middleware/errorHandler'
 
@@ -26,10 +28,29 @@ if (process.env.SENTRY_DSN) {
 
 // Middleware de seguridad
 app.use(helmet())
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+const allowedOrigins = (process.env.FRONTEND_URLS ?? process.env.FRONTEND_URL ?? 'http://localhost:5173')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean)
+
+const corsOptions: CorsOptions = {
+  origin: (origin, callback) => {
+    if (!origin) {
+      callback(null, true)
+      return
+    }
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true)
+      return
+    }
+
+    callback(new Error(`Origin ${origin} is not allowed by CORS`))
+  },
   credentials: true,
-}))
+}
+
+app.use(cors(corsOptions))
 
 // Rate limiting
 const limiter = rateLimit({
@@ -52,6 +73,9 @@ app.use('/api/auth', authRoutes)
 app.use('/api/forms', formRoutes)
 app.use('/api/users', userRoutes)
 app.use('/api/dashboard', dashboardRoutes)
+app.use('/api/assignments', assignmentRoutes)
+app.use('/api/responses', responseRoutes) // Ruta principal para respuestas
+app.use('/api/form-responses', responseRoutes) // Mantener compatibilidad
 
 // Error handler (debe ser el último middleware)
 app.use(errorHandler)

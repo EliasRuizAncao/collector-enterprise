@@ -26,6 +26,7 @@ enum AssignmentFrequency {
   BIWEEKLY
   MONTHLY
   ONCE
+  CUSTOM
 }
 
 model User {
