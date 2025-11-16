@@ -50,6 +50,9 @@ import { SkeletonCard } from '../components/animated'
 import { useOfflineAssignments } from '../hooks/useOfflineAssignments'
 import FilterSystem, { type FilterConfig } from '../components/FilterSystem'
 import ExportSheet from '../components/ExportSheet'
+import InsightsCarousel from '../components/InsightsCarousel'
+import { insightsEngine, type Insight, type UserData } from '../utils/insightsEngine'
+import { useSyncManager } from '../hooks/useSyncManager'
 import api from '@/shared/lib/api'
 import { useToast } from '@/shared/components/ui/use-toast'
 import { useAuth } from '@/shared/hooks/useAuth'
@@ -167,6 +170,7 @@ const PersonalReports = () => {
   const [searchParams, setSearchParams] = useSearchParams()
   const { toast } = useToast()
   const { assignments, isOnline } = useOfflineAssignments()
+  const { lastSyncDate } = useSyncManager()
 
   const [period, setPeriod] = useState<PeriodType>(
     (searchParams.get('period') as PeriodType) || 'week',
@@ -176,6 +180,7 @@ const PersonalReports = () => {
   const [filterValues, setFilterValues] = useState<Record<string, any>>({})
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [insights, setInsights] = useState<Insight[]>([])
   const exportContentRef = useRef<HTMLDivElement>(null)
   const { user } = useAuth()
 
@@ -379,11 +384,27 @@ const PersonalReports = () => {
     })
   }, [periodAssignments, periodData])
 
+  // Generar insights usando el engine
+  const generateInsights = useCallback(() => {
+    const userData: UserData = {
+      assignments,
+      lastSyncDate: lastSyncDate || undefined,
+      isOnline,
+      activeHours: 0, // TODO: calcular desde datos reales
+    }
+
+    const generatedInsights = insightsEngine.generateInsights(userData)
+    setInsights(generatedInsights)
+  }, [assignments, lastSyncDate, isOnline])
+
   // Cargar datos
   const loadData = useCallback(async () => {
     try {
       setIsLoading(true)
       setError(null)
+
+      // Generar insights
+      generateInsights()
 
       // Intentar obtener datos del servidor
       try {
@@ -403,11 +424,18 @@ const PersonalReports = () => {
     } finally {
       setIsLoading(false)
     }
-  }, [periodData])
+  }, [periodData, generateInsights])
 
   useEffect(() => {
     void loadData()
   }, [loadData])
+
+  // Recalcular insights cuando cambian los datos
+  useEffect(() => {
+    if (!isLoading && assignments.length > 0) {
+      generateInsights()
+    }
+  }, [assignments, lastSyncDate, isOnline, isLoading, generateInsights])
 
   // Pull to refresh
   const handleRefresh = useCallback(async () => {

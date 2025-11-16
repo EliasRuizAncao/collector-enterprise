@@ -7,7 +7,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { format, subDays, startOfDay, isToday, isYesterday } from 'date-fns'
 import { es } from 'date-fns/locale'
-import { MobileBarChart, type MobileBarChartData } from '../components/charts'
+import { MobileBarChart } from '../components/charts'
 import {
   CheckCircle2,
   Clock,
@@ -32,6 +32,9 @@ import { Badge } from '@/shared/components/ui/badge'
 import RefreshContainer from '../components/RefreshContainer'
 import { SkeletonCard } from '../components/animated'
 import { useOfflineAssignments } from '../hooks/useOfflineAssignments'
+import InsightsCarousel from '../components/InsightsCarousel'
+import { insightsEngine, type Insight, type UserData } from '../utils/insightsEngine'
+import { useSyncManager } from '../hooks/useSyncManager'
 import api from '@/shared/lib/api'
 import { useToast } from '@/shared/components/ui/use-toast'
 
@@ -54,17 +57,6 @@ interface ChartDataPoint {
   date: Date
   dateLabel: string
   count: number
-}
-
-/**
- * Tipo para insight rápido
- */
-interface QuickInsight {
-  id: string
-  type: 'improvement' | 'milestone' | 'streak' | 'motivation'
-  message: string
-  icon: React.ReactNode
-  color: string
 }
 
 /**
@@ -119,32 +111,14 @@ const StatsCard = ({
   )
 }
 
-
-/**
- * Componente Quick Insight Card
- */
-const QuickInsightCard = ({ insight }: { insight: QuickInsight }) => {
-  return (
-    <Card className="mobile-card min-w-[280px] border-l-4" style={{ borderLeftColor: insight.color }}>
-      <CardContent className="p-4">
-        <div className="flex items-start gap-3">
-          <div className="mt-0.5" style={{ color: insight.color }}>
-            {insight.icon}
-          </div>
-          <p className="text-sm font-medium flex-1">{insight.message}</p>
-        </div>
-      </CardContent>
-    </Card>
-  )
-}
-
 /**
  * Componente ReportsDashboard
  */
 const ReportsDashboard = () => {
   const navigate = useNavigate()
   const { toast } = useToast()
-  const { assignments, isOnline, syncStatus, pendingChanges } = useOfflineAssignments()
+  const { assignments, isOnline, pendingChanges } = useOfflineAssignments()
+  const { lastSyncDate } = useSyncManager()
 
   const [stats, setStats] = useState<DashboardStats>({
     completedToday: 0,
@@ -154,7 +128,7 @@ const ReportsDashboard = () => {
     hasPendingChanges: false,
   })
   const [chartData, setChartData] = useState<ChartDataPoint[]>([])
-  const [insights, setInsights] = useState<QuickInsight[]>([])
+  const [insights, setInsights] = useState<Insight[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [lastSync, setLastSync] = useState<Date | null>(null)
@@ -235,76 +209,18 @@ const ReportsDashboard = () => {
     setChartData(data)
   }, [assignments])
 
-  // Calcular insights
-  const calculateInsights = useCallback(() => {
-    const newInsights: QuickInsight[] = []
-
-    // Comparar con semana pasada
-    const lastWeekStart = subDays(startOfDay(new Date()), 7)
-    const thisWeekStart = subDays(startOfDay(new Date()), 0)
-    const lastWeekCompleted = assignments.filter(
-      (a) =>
-        a.status === 'completed' &&
-        a.completedAt &&
-        new Date(a.completedAt) >= lastWeekStart &&
-        new Date(a.completedAt) < thisWeekStart,
-    ).length
-    const thisWeekCompleted = assignments.filter(
-      (a) =>
-        a.status === 'completed' &&
-        a.completedAt &&
-        new Date(a.completedAt) >= thisWeekStart,
-    ).length
-
-    if (lastWeekCompleted > 0 && thisWeekCompleted > lastWeekCompleted) {
-      const improvement = Math.round(((thisWeekCompleted - lastWeekCompleted) / lastWeekCompleted) * 100)
-      newInsights.push({
-        id: 'improvement',
-        type: 'improvement',
-        message: `Vas ${improvement}% mejor que la semana pasada`,
-        icon: <TrendingUp className="h-5 w-5" />,
-        color: '#10b981',
-      })
+  // Generar insights usando el engine
+  const generateInsights = useCallback(() => {
+    const userData: UserData = {
+      assignments,
+      lastSyncDate: lastSyncDate || undefined,
+      isOnline,
+      activeHours: 0, // TODO: calcular desde datos reales
     }
 
-    // Racha
-    if (stats.currentStreak > 0) {
-      newInsights.push({
-        id: 'streak',
-        type: 'streak',
-        message: `¡Racha de ${stats.currentStreak} día${stats.currentStreak !== 1 ? 's' : ''}!`,
-        icon: <Flame className="h-5 w-5" />,
-        color: '#f59e0b',
-      })
-    }
-
-    // Récord personal (simulado)
-    const maxDaily = Math.max(...chartData.map((d) => d.count), 0)
-    const todayCount = chartData[chartData.length - 1]?.count || 0
-    if (maxDaily > 0 && todayCount > 0 && todayCount < maxDaily) {
-      const remaining = maxDaily - todayCount
-      newInsights.push({
-        id: 'milestone',
-        type: 'milestone',
-        message: `Completa ${remaining} más para tu récord`,
-        icon: <Target className="h-5 w-5" />,
-        color: '#3b82f6',
-      })
-    }
-
-    // Motivación general
-    if (newInsights.length === 0) {
-      newInsights.push({
-        id: 'motivation',
-        type: 'motivation',
-        message: '¡Sigue así! Cada tarea cuenta',
-        icon: <Sparkles className="h-5 w-5" />,
-        color: '#8b5cf6',
-      })
-    }
-
-    setInsights(newInsights)
-  }, [stats.currentStreak, chartData])
+    const generatedInsights = insightsEngine.generateInsights(userData)
+    setInsights(generatedInsights)
+  }, [assignments, lastSyncDate, isOnline])
 
   // Cargar datos
   const loadData = useCallback(async () => {
@@ -315,6 +231,7 @@ const ReportsDashboard = () => {
       // Calcular estadísticas locales
       calculateStats()
       calculateChartData()
+      generateInsights()
 
       // Intentar obtener datos del servidor
       try {
@@ -355,12 +272,12 @@ const ReportsDashboard = () => {
     }
   }, [assignments, isLoading, calculateStats, calculateChartData])
 
-  // Recalcular insights cuando cambian las stats
+  // Recalcular insights cuando cambian los datos
   useEffect(() => {
-    if (!isLoading && chartData.length > 0) {
-      calculateInsights()
+    if (!isLoading && assignments.length > 0) {
+      generateInsights()
     }
-  }, [stats, chartData, isLoading, calculateInsights])
+  }, [assignments, lastSyncDate, isOnline, isLoading, generateInsights])
 
   // Pull to refresh
   const handleRefresh = useCallback(async () => {
@@ -550,7 +467,7 @@ const ReportsDashboard = () => {
                       }))}
                       height={200}
                       showGrid={true}
-                      onBarTap={(data, index) => {
+                      onBarTap={(_data, index) => {
                         const point = chartData[index]
                         if (point) {
                           handleBarTap(point.date)
@@ -561,16 +478,27 @@ const ReportsDashboard = () => {
                 </CardContent>
               </Card>
 
-              {/* Insights Rápidos */}
+              {/* Insights Automáticos */}
               {insights.length > 0 && (
-                <div>
-                  <h3 className="text-sm font-semibold mb-3 px-1">Insights</h3>
-                  <div className="flex gap-3 overflow-x-auto overscroll-contain scrollbar-hide pb-2">
-                    {insights.map((insight) => (
-                      <QuickInsightCard key={insight.id} insight={insight} />
-                    ))}
-                  </div>
-                </div>
+                <InsightsCarousel
+                  insights={insights}
+                  onDismiss={(insightId) => {
+                    insightsEngine.markAsSeen(insightId)
+                    setInsights((prev) => prev.filter((i) => i.id !== insightId))
+                  }}
+                  onAction={(insight) => {
+                    if (insight.action?.label === 'Ver tareas') {
+                      navigate('/mobile/assignments')
+                    } else if (insight.action?.label === 'Sincronizar' || insight.action?.label === 'Sincronizar ahora') {
+                      // TODO: trigger sync
+                      toast({
+                        title: 'Sincronizando...',
+                        description: 'Los datos se están sincronizando',
+                      })
+                    }
+                  }}
+                  maxVisible={5}
+                />
               )}
 
               {/* Accesos Rápidos */}
