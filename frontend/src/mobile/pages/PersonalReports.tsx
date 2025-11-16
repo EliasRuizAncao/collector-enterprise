@@ -3,7 +3,7 @@
  * Métricas, visualizaciones y gamificación
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { format, startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subDays, subWeeks, subMonths, eachDayOfInterval, isSameDay } from 'date-fns'
 import { es } from 'date-fns/locale'
@@ -40,9 +40,6 @@ import {
   Zap,
   Flame,
   RefreshCw,
-  Copy,
-  Mail,
-  MessageCircle,
   ArrowRight,
 } from 'lucide-react'
 
@@ -55,8 +52,10 @@ import RefreshContainer from '../components/RefreshContainer'
 import { SkeletonCard } from '../components/animated'
 import { useOfflineAssignments } from '../hooks/useOfflineAssignments'
 import FilterSystem, { type FilterConfig } from '../components/FilterSystem'
+import ExportSheet from '../components/ExportSheet'
 import api from '@/shared/lib/api'
 import { useToast } from '@/shared/components/ui/use-toast'
+import { useAuth } from '@/shared/hooks/useAuth'
 
 /**
  * Tipo de período
@@ -309,9 +308,12 @@ const PersonalReports = () => {
     (searchParams.get('period') as PeriodType) || 'week',
   )
   const [isFiltersOpen, setIsFiltersOpen] = useState(false)
+  const [isExportOpen, setIsExportOpen] = useState(false)
   const [filterValues, setFilterValues] = useState<Record<string, any>>({})
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const exportContentRef = useRef<HTMLDivElement>(null)
+  const { user } = useAuth()
 
   // Datos del período
   const periodData = useMemo(() => {
@@ -552,65 +554,35 @@ const PersonalReports = () => {
     })
   }, [loadData, toast])
 
-  // Exportar PDF
-  const handleExportPDF = useCallback(() => {
-    toast({
-      title: 'Exportar PDF',
-      description: 'Funcionalidad en desarrollo',
-    })
-  }, [toast])
+  // Preparar datos para exportación
+  const exportData = useMemo(() => {
+    return periodAssignments.map((a) => ({
+      Fecha: a.completedAt ? format(new Date(a.completedAt), 'dd/MM/yyyy HH:mm', { locale: es }) : '',
+      Tarea: a.formName,
+      Estado: a.status === 'completed' ? 'Completada' : a.status === 'in_progress' ? 'En progreso' : 'Pendiente',
+      Progreso: a.progress ? `${a.progress}%` : '0%',
+      Prioridad: a.priority || 'N/A',
+      Ubicación: a.location || 'N/A',
+    }))
+  }, [periodAssignments])
 
-  // Exportar CSV
-  const handleExportCSV = useCallback(() => {
-    const csv = [
-      ['Fecha', 'Tarea', 'Estado', 'Tiempo'],
-      ...periodAssignments.map((a) => [
-        a.completedAt ? format(new Date(a.completedAt), 'dd/MM/yyyy') : '',
-        a.formName,
-        a.status,
-        '25 min', // Simulado
-      ]),
-    ]
-      .map((row) => row.join(','))
-      .join('\n')
-
-    const blob = new Blob([csv], { type: 'text/csv' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `reporte-${format(new Date(), 'yyyy-MM-dd')}.csv`
-    a.click()
-    URL.revokeObjectURL(url)
-
-    toast({
-      title: 'CSV exportado',
-      description: 'El archivo se ha descargado',
-    })
-  }, [periodAssignments, toast])
-
-  // Compartir
-  const handleShare = useCallback(async () => {
-    const shareData = {
-      title: 'Mi Reporte Personal - Collector',
-      text: `Completé ${productivityMetrics.tasksCompleted} tareas esta semana`,
-      url: window.location.href,
+  // Metadata para exportación
+  const exportMetadata = useMemo(() => {
+    const periodLabel =
+      period === 'today'
+        ? 'Hoy'
+        : period === 'week'
+          ? 'Esta semana'
+          : period === 'month'
+            ? 'Este mes'
+            : 'Personalizado'
+    return {
+      userId: user?.id,
+      userName: user?.name || user?.email,
+      period: `${periodLabel} (${format(periodData.start, 'dd/MM/yyyy')} - ${format(periodData.end, 'dd/MM/yyyy')})`,
+      appVersion: '1.0.0',
     }
-
-    if (navigator.share) {
-      try {
-        await navigator.share(shareData)
-      } catch (err) {
-        // Usuario canceló
-      }
-    } else {
-      // Fallback: copiar al portapapeles
-      await navigator.clipboard.writeText(shareData.url)
-      toast({
-        title: 'Link copiado',
-        description: 'El link se ha copiado al portapapeles',
-      })
-    }
-  }, [productivityMetrics, toast])
+  }, [period, periodData, user])
 
   // Configuración de filtros
   const filterConfigs: FilterConfig[] = useMemo(
@@ -680,8 +652,8 @@ const PersonalReports = () => {
           </Tabs>
         </div>
 
-        {/* Contenido */}
-        <div className="flex-1 space-y-4 p-4">
+        {/* Contenido - Ref para captura PNG */}
+        <div ref={exportContentRef} className="flex-1 space-y-4 p-4">
           {/* Loading */}
           {isLoading && (
             <div className="space-y-4">
@@ -886,32 +858,15 @@ const PersonalReports = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-2 gap-2">
-                    <Button variant="outline" size="sm" onClick={handleExportPDF} className="gap-2">
-                      <FileText className="h-4 w-4" />
-                      PDF
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={handleExportCSV} className="gap-2">
-                      <Download className="h-4 w-4" />
-                      CSV
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={handleShare} className="gap-2">
-                      <Share2 className="h-4 w-4" />
-                      Compartir
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        navigator.clipboard.writeText(window.location.href)
-                        toast({ title: 'Link copiado', duration: 2000 })
-                      }}
-                      className="gap-2"
-                    >
-                      <Copy className="h-4 w-4" />
-                      Copiar link
-                    </Button>
-                  </div>
+                  <Button
+                    variant="default"
+                    size="lg"
+                    onClick={() => setIsExportOpen(true)}
+                    className="w-full gap-2"
+                  >
+                    <Download className="h-4 w-4" />
+                    Exportar reporte
+                  </Button>
                 </CardContent>
               </Card>
             </>
@@ -946,6 +901,17 @@ const PersonalReports = () => {
           onClose={() => setIsFiltersOpen(false)}
           storageKey="personal-reports-filters"
           persistInUrl={true}
+        />
+
+        {/* Export Sheet */}
+        <ExportSheet
+          open={isExportOpen}
+          onClose={() => setIsExportOpen(false)}
+          title="Exportar Reporte Personal"
+          data={exportData}
+          element={exportContentRef.current}
+          metadata={exportMetadata}
+          dateRange={periodData}
         />
       </div>
     </RefreshContainer>
