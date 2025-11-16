@@ -212,6 +212,84 @@ const TutorialLibrary = () => {
     },
   ]
 
+  // Configuración de ordenamiento para tutoriales
+  const sortOptions: SortOption[] = useMemo(
+    () => [
+      {
+        value: 'name_asc',
+        label: 'Nombre (A-Z)',
+        description: 'Ordenar alfabéticamente por título',
+      },
+      {
+        value: 'name_desc',
+        label: 'Nombre (Z-A)',
+        description: 'Ordenar alfabéticamente inverso',
+      },
+      {
+        value: 'category',
+        label: 'Categoría',
+        description: 'Ordenar por categoría',
+      },
+      {
+        value: 'duration',
+        label: 'Duración',
+        description: 'Ordenar por duración (corta a larga)',
+      },
+    ],
+    [],
+  )
+
+  // Ordenar tutoriales
+  const sortedTutorials = useMemo(() => {
+    const sorted = [...tutorials]
+
+    switch (sort) {
+      case 'name_asc':
+        sorted.sort((a, b) => {
+          return a.title.localeCompare(b.title, 'es', { sensitivity: 'base' })
+        })
+        break
+
+      case 'name_desc':
+        sorted.sort((a, b) => {
+          return b.title.localeCompare(a.title, 'es', { sensitivity: 'base' })
+        })
+        break
+
+      case 'category':
+        sorted.sort((a, b) => {
+          return sortDirection === 'asc'
+            ? a.category.localeCompare(b.category, 'es', { sensitivity: 'base' })
+            : b.category.localeCompare(a.category, 'es', { sensitivity: 'base' })
+        })
+        break
+
+      case 'duration':
+        // Extraer minutos de la duración (ej: "3 min" -> 3)
+        const parseDuration = (duration: string) => {
+          const match = duration.match(/(\d+)/)
+          return match ? parseInt(match[1], 10) : 0
+        }
+        sorted.sort((a, b) => {
+          const durationA = parseDuration(a.duration)
+          const durationB = parseDuration(b.duration)
+          return sortDirection === 'asc' ? durationA - durationB : durationB - durationA
+        })
+        break
+
+      default:
+        break
+    }
+
+    return sorted
+  }, [tutorials, sort, sortDirection])
+
+  // Handler para cambio de ordenamiento
+  const handleSortChange = useCallback((newSort: string, newDirection: SortDirection) => {
+    setSort(newSort)
+    setSortDirection(newDirection)
+  }, [])
+
   // Iniciar tutorial
   const handleStartTutorial = (tutorial: TutorialItem) => {
     setCurrentTutorialSteps(tutorial.steps)
@@ -337,6 +415,19 @@ const TutorialLibrary = () => {
           onSkip={handleTutorialComplete}
         />
       )}
+
+      {/* Sort Options Modal */}
+      <SortOptions
+        options={sortOptions}
+        currentSort={sort}
+        currentDirection={sortDirection}
+        onChange={handleSortChange}
+        open={showSort}
+        onOpen={() => setShowSort(true)}
+        onClose={() => setShowSort(false)}
+        storageKey="tutorials-sort"
+        showButton={false}
+      />
     </div>
   )
 }

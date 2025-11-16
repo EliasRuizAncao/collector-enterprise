@@ -436,6 +436,21 @@ const Sessions = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Sort Options Modal */}
+      {otherSessions.length > 0 && (
+        <SortOptions
+          options={sortOptions}
+          currentSort={sort}
+          currentDirection={sortDirection}
+          onChange={handleSortChange}
+          open={showSort}
+          onOpen={() => setShowSort(true)}
+          onClose={() => setShowSort(false)}
+          storageKey="sessions-sort"
+          showButton={false}
+        />
+      )}
     </div>
   )
 }
