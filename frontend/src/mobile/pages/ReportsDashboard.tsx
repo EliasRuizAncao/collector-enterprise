@@ -658,6 +658,15 @@ const ReportsDashboard = () => {
                   <Button
                     variant="outline"
                     size="sm"
+                    onClick={() => navigate('/mobile/reports/personal')}
+                    className="gap-2 whitespace-nowrap"
+                  >
+                    <BarChart3 className="h-4 w-4" />
+                    Mis reportes
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => handleQuickAccess('reports')}
                     className="gap-2 whitespace-nowrap"
                   >
