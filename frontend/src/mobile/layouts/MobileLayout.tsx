@@ -1,12 +1,13 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
-import { Menu, Bell } from 'lucide-react'
+import { Menu, Bell, Search } from 'lucide-react'
 
 import { Button } from '@/shared/components/ui/button'
 import { Badge } from '@/shared/components/ui/badge'
 import { useToast } from '@/shared/components/ui/use-toast'
 import BottomNav from '../components/BottomNav'
 import MobileDrawer from '../components/MobileDrawer'
+import GlobalSearch from '../components/GlobalSearch'
 import { PageTransition } from '../components/animated'
 import { OfflineBanner, SyncIndicator, ConnectionStatus } from '../components/offline'
 import {
@@ -32,6 +33,7 @@ const MobileLayout = () => {
   const navigate = useNavigate()
   const { toast } = useToast()
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [unreadNotifications, setUnreadNotifications] = useState(0)
   const [notificationPermission, setNotificationPermission] = useState<'default' | 'granted' | 'denied'>('default')
 
@@ -147,6 +149,22 @@ const MobileLayout = () => {
     return () => clearInterval(interval)
   }, [updateBadgeCount])
 
+  // Keyboard shortcut para búsqueda (Cmd+K / Ctrl+K)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Cmd+K en Mac, Ctrl+K en Windows/Linux
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        setIsSearchOpen(true)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [])
+
   return (
     <div className="flex h-dvh max-h-dvh flex-col overflow-hidden bg-background">
       {/* Offline Banner */}
@@ -172,9 +190,18 @@ const MobileLayout = () => {
           </div>
         </div>
 
-        {/* Notificaciones y Connection Status */}
+        {/* Búsqueda, Notificaciones y Connection Status */}
         <div className="flex items-center gap-2">
           <ConnectionStatus size="sm" showTooltip={true} />
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-9 w-9 rounded-lg touch-manipulation"
+            aria-label="Búsqueda global"
+            onClick={() => setIsSearchOpen(true)}
+          >
+            <Search className="h-5 w-5" />
+          </Button>
           <Button
             variant="ghost"
             size="icon"
@@ -218,6 +245,9 @@ const MobileLayout = () => {
 
       {/* Welcome Tutorial - Tour inicial para nuevos usuarios */}
       <WelcomeTutorial />
+
+      {/* Global Search - Búsqueda global */}
+      <GlobalSearch open={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </div>
   )
 }
