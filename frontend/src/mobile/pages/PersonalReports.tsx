@@ -738,6 +738,35 @@ const PersonalReports = () => {
                 </CardContent>
               </Card>
 
+              {/* Insights Automáticos */}
+              {insights.length > 0 && (
+                <InsightsCarousel
+                  insights={insights}
+                  onDismiss={(insightId) => {
+                    insightsEngine.markAsSeen(insightId)
+                    setInsights((prev) => prev.filter((i) => i.id !== insightId))
+                  }}
+                  onAction={(insight) => {
+                    if (insight.action?.label === 'Ver tareas') {
+                      navigate('/mobile/assignments')
+                    } else if (insight.action?.label === 'Ver tarea') {
+                      // TODO: navegar a tarea específica
+                      toast({
+                        title: 'Navegando a tarea',
+                        description: 'Funcionalidad en desarrollo',
+                      })
+                    } else if (insight.action?.label === 'Sincronizar' || insight.action?.label === 'Sincronizar ahora') {
+                      // TODO: trigger sync
+                      toast({
+                        title: 'Sincronizando...',
+                        description: 'Los datos se están sincronizando',
+                      })
+                    }
+                  }}
+                  maxVisible={5}
+                />
+              )}
+
               {/* Logros y Badges */}
               {achievements.length > 0 && (
                 <Card>
