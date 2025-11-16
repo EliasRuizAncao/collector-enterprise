@@ -3,7 +3,7 @@
  * Accesible desde Settings > Ayuda
  */
 
-import { useState } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   ArrowLeft,
@@ -15,6 +15,7 @@ import {
   History,
   Lightbulb,
   CheckCircle2,
+  ArrowUpDown,
 } from 'lucide-react'
 
 import { Button } from '@/shared/components/ui/button'
@@ -26,6 +27,8 @@ import {
   CardTitle,
 } from '@/shared/components/ui/card'
 import { Badge } from '@/shared/components/ui/badge'
+import { Button } from '@/shared/components/ui/button'
+import SortOptions, { type SortOption, type SortDirection } from '../components/SortOptions'
 import { Tutorial } from '../components/Tutorial'
 import { resetTutorialState } from '../utils/tutorialManager'
 
@@ -56,6 +59,9 @@ const TutorialLibrary = () => {
   const navigate = useNavigate()
   const [activeTutorial, setActiveTutorial] = useState<string | null>(null)
   const [currentTutorialSteps, setCurrentTutorialSteps] = useState<any[]>([])
+  const [showSort, setShowSort] = useState(false)
+  const [sort, setSort] = useState<string>('name_asc')
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
 
   // Lista de tutoriales disponibles
   const tutorials: TutorialItem[] = [
@@ -231,6 +237,15 @@ const TutorialLibrary = () => {
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <h1 className="flex-1 text-xl font-bold">Tutoriales</h1>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setShowSort(true)}
+          className="h-9 w-9"
+          aria-label="Ordenar"
+        >
+          <ArrowUpDown className="h-5 w-5" />
+        </Button>
       </div>
 
       {/* Contenido */}
@@ -250,7 +265,7 @@ const TutorialLibrary = () => {
 
         {/* Lista de tutoriales */}
         <div className="space-y-4">
-          {tutorials.map((tutorial) => (
+          {sortedTutorials.map((tutorial) => (
             <Card key={tutorial.id} className="overflow-hidden">
               <CardHeader>
                 <div className="flex items-start gap-4">

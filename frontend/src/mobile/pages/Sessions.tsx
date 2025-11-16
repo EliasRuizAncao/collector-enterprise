@@ -3,9 +3,9 @@
  * Gestionar sesiones activas del usuario
  */
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, Smartphone, Monitor, Tablet, LogOut, AlertTriangle } from 'lucide-react'
+import { ArrowLeft, Smartphone, Monitor, Tablet, LogOut, AlertTriangle, ArrowUpDown } from 'lucide-react'
 import { format, formatDistanceToNow } from 'date-fns'
 import { es } from 'date-fns/locale'
 
@@ -29,6 +29,7 @@ import {
   AlertDialogTitle,
 } from '@/shared/components/ui/alert-dialog'
 import { useToast } from '@/shared/components/ui/use-toast'
+import SortOptions, { type SortOption, type SortDirection } from '../components/SortOptions'
 import api from '@/shared/lib/api'
 
 /**
@@ -55,6 +56,9 @@ const Sessions = () => {
   const [sessions, setSessions] = useState<ActiveSession[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [sessionToRevoke, setSessionToRevoke] = useState<string | null>(null)
+  const [showSort, setShowSort] = useState(false)
+  const [sort, setSort] = useState<string>('date_recent')
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
 
   // Cargar sesiones activas
   useEffect(() => {
@@ -156,8 +160,98 @@ const Sessions = () => {
     )
   }
 
+  // Configuración de ordenamiento para sesiones
+  const sortOptions: SortOption[] = useMemo(
+    () => [
+      {
+        value: 'date_recent',
+        label: 'Última actividad (más reciente primero)',
+        description: 'Ordenar por última actividad, más recientes primero',
+      },
+      {
+        value: 'date_oldest',
+        label: 'Última actividad (más antigua primero)',
+        description: 'Ordenar por última actividad, más antiguas primero',
+      },
+      {
+        value: 'name_asc',
+        label: 'Dispositivo (A-Z)',
+        description: 'Ordenar alfabéticamente por nombre de dispositivo',
+      },
+      {
+        value: 'name_desc',
+        label: 'Dispositivo (Z-A)',
+        description: 'Ordenar alfabéticamente inverso',
+      },
+      {
+        value: 'deviceType',
+        label: 'Tipo de dispositivo',
+        description: 'Ordenar por tipo: móvil, tablet, desktop',
+      },
+    ],
+    [],
+  )
+
+  // Ordenar sesiones
+  const sortSessions = useCallback(
+    (sessionsToSort: ActiveSession[], sortValue: string, direction: SortDirection) => {
+      const sorted = [...sessionsToSort]
+
+      switch (sortValue) {
+        case 'date_recent':
+          sorted.sort((a, b) => {
+            return b.lastActivity.getTime() - a.lastActivity.getTime()
+          })
+          break
+
+        case 'date_oldest':
+          sorted.sort((a, b) => {
+            return a.lastActivity.getTime() - b.lastActivity.getTime()
+          })
+          break
+
+        case 'name_asc':
+          sorted.sort((a, b) => {
+            return a.device.localeCompare(b.device, 'es', { sensitivity: 'base' })
+          })
+          break
+
+        case 'name_desc':
+          sorted.sort((a, b) => {
+            return b.device.localeCompare(a.device, 'es', { sensitivity: 'base' })
+          })
+          break
+
+        case 'deviceType':
+          const typeOrder: Record<string, number> = { mobile: 1, tablet: 2, desktop: 3 }
+          sorted.sort((a, b) => {
+            const orderA = typeOrder[a.deviceType] || 0
+            const orderB = typeOrder[b.deviceType] || 0
+            return direction === 'asc' ? orderA - orderB : orderB - orderA
+          })
+          break
+
+        default:
+          break
+      }
+
+      return sorted
+    },
+    [],
+  )
+
   const currentSession = sessions.find((s) => s.isCurrent)
-  const otherSessions = sessions.filter((s) => !s.isCurrent)
+  const otherSessionsFiltered = sessions.filter((s) => !s.isCurrent)
+  const otherSessions = useMemo(
+    () => sortSessions(otherSessionsFiltered, sort, sortDirection),
+    [otherSessionsFiltered, sort, sortDirection, sortSessions],
+  )
+
+  // Handler para cambio de ordenamiento
+  const handleSortChange = useCallback((newSort: string, newDirection: SortDirection) => {
+    setSort(newSort)
+    setSortDirection(newDirection)
+  }, [])
 
   return (
     <div className="flex min-h-screen flex-col pb-20">
@@ -172,6 +266,17 @@ const Sessions = () => {
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <h1 className="flex-1 text-xl font-bold">Sesiones Activas</h1>
+        {otherSessions.length > 0 && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setShowSort(true)}
+            className="h-9 w-9"
+            aria-label="Ordenar"
+          >
+            <ArrowUpDown className="h-5 w-5" />
+          </Button>
+        )}
       </div>
 
       {/* Contenido */}
