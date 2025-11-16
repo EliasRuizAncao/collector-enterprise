@@ -7,15 +7,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { format, subDays, startOfDay, isToday, isYesterday } from 'date-fns'
 import { es } from 'date-fns/locale'
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  ResponsiveContainer,
-  Tooltip,
-  Cell,
-} from 'recharts'
+import { MobileBarChart, type MobileBarChartData } from '../components/charts'
 import {
   CheckCircle2,
   Clock,
@@ -127,102 +119,6 @@ const StatsCard = ({
   )
 }
 
-/**
- * Componente Bar Chart con Recharts
- */
-const SimpleBarChart = ({
-  data,
-  onBarTap,
-}: {
-  data: ChartDataPoint[]
-  onBarTap?: (date: Date) => void
-}) => {
-  // Preparar datos para recharts
-  const chartData = data.map((point) => ({
-    date: point.dateLabel,
-    count: point.count,
-    dateObj: point.date,
-    isToday: isToday(point.date),
-    isYesterday: isYesterday(point.date),
-  }))
-
-  // Custom tooltip
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload
-      return (
-        <div className="rounded-lg border bg-background p-2 shadow-md">
-          <p className="text-sm font-semibold">{data.date}</p>
-          <p className="text-xs text-muted-foreground">
-            {data.count} formulario{data.count !== 1 ? 's' : ''} completado{data.count !== 1 ? 's' : ''}
-          </p>
-        </div>
-      )
-    }
-    return null
-  }
-
-  return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold">Últimos 7 días</h3>
-        <Badge variant="outline" className="text-xs">
-          Formularios completados
-        </Badge>
-      </div>
-
-      <ResponsiveContainer width="100%" height={200}>
-        <BarChart
-          data={chartData}
-          margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
-          onClick={(data) => {
-            if (data?.activePayload?.[0]?.payload?.dateObj) {
-              onBarTap?.(data.activePayload[0].payload.dateObj)
-            }
-          }}
-        >
-          <XAxis
-            dataKey="date"
-            axisLine={false}
-            tickLine={false}
-            tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
-            interval={0}
-          />
-          <YAxis
-            axisLine={false}
-            tickLine={false}
-            tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
-            width={30}
-          />
-          <Tooltip content={<CustomTooltip />} />
-          <Bar
-            dataKey="count"
-            radius={[8, 8, 0, 0]}
-            cursor="pointer"
-            onClick={(data) => {
-              if (data?.dateObj) {
-                onBarTap?.(data.dateObj)
-              }
-            }}
-          >
-            {chartData.map((entry, index) => (
-              <Cell
-                key={`cell-${index}`}
-                fill={
-                  entry.isToday
-                    ? 'hsl(var(--primary))'
-                    : entry.isYesterday
-                      ? 'hsl(var(--primary) / 0.7)'
-                      : 'hsl(var(--primary) / 0.5)'
-                }
-              />
-            ))}
-          </Bar>
-        </BarChart>
-      </ResponsiveContainer>
-    </div>
-  )
-}
 
 /**
  * Componente Quick Insight Card

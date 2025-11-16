@@ -8,17 +8,14 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { format, startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subDays, subWeeks, subMonths, eachDayOfInterval, isSameDay } from 'date-fns'
 import { es } from 'date-fns/locale'
 import {
-  BarChart,
-  Bar,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  ResponsiveContainer,
-  Tooltip,
-  Cell,
-  CartesianGrid,
-} from 'recharts'
+  MobileBarChart,
+  MobileLineChart,
+  MobileProgressRing,
+  MobileHeatMap,
+  type MobileBarChartData,
+  type MobileLineChartData,
+  type MobileHeatMapData,
+} from '../components/charts'
 import {
   CheckCircle2,
   Clock,
@@ -105,74 +102,6 @@ interface Achievement {
   progress?: number // 0-100
 }
 
-/**
- * Componente Progress Ring (Circular)
- */
-const ProgressRing = ({
-  value,
-  max,
-  label,
-  size = 80,
-  strokeWidth = 8,
-  color = 'primary',
-}: {
-  value: number
-  max: number
-  label: string
-  size?: number
-  strokeWidth?: number
-  color?: 'primary' | 'green' | 'orange' | 'red' | 'blue'
-}) => {
-  const percentage = Math.min((value / max) * 100, 100)
-  const radius = (size - strokeWidth) / 2
-  const circumference = radius * 2 * Math.PI
-  const offset = circumference - (percentage / 100) * circumference
-
-  const colorClasses = {
-    primary: 'stroke-primary',
-    green: 'stroke-green-500',
-    orange: 'stroke-orange-500',
-    red: 'stroke-red-500',
-    blue: 'stroke-blue-500',
-  }
-
-  return (
-    <div className="flex flex-col items-center">
-      <div className="relative" style={{ width: size, height: size }}>
-        <svg width={size} height={size} className="transform -rotate-90">
-          <circle
-            cx={size / 2}
-            cy={size / 2}
-            r={radius}
-            stroke="currentColor"
-            strokeWidth={strokeWidth}
-            fill="none"
-            className="text-muted"
-          />
-          <circle
-            cx={size / 2}
-            cy={size / 2}
-            r={radius}
-            stroke="currentColor"
-            strokeWidth={strokeWidth}
-            fill="none"
-            strokeDasharray={circumference}
-            strokeDashoffset={offset}
-            strokeLinecap="round"
-            className={cn('transition-all duration-500', colorClasses[color])}
-          />
-        </svg>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center">
-            <div className="text-lg font-bold">{value}</div>
-            <div className="text-xs text-muted-foreground">de {max}</div>
-          </div>
-        </div>
-      </div>
-      <p className="text-xs font-medium text-muted-foreground mt-2 text-center">{label}</p>
-    </div>
-  )
-}
 
 /**
  * Componente Achievement Badge
@@ -229,71 +158,6 @@ const AchievementBadge = ({ achievement }: { achievement: Achievement }) => {
   )
 }
 
-/**
- * Componente Heat Map (Calendario de actividad)
- */
-const ActivityHeatMap = ({
-  data,
-  startDate,
-  endDate,
-}: {
-  data: Array<{ date: Date; count: number }>
-  startDate: Date
-  endDate: Date
-}) => {
-  const days = eachDayOfInterval({ start: startDate, end: endDate })
-  const maxCount = Math.max(...data.map((d) => d.count), 1)
-
-  const getIntensity = (count: number) => {
-    if (count === 0) return 'bg-muted'
-    const intensity = count / maxCount
-    if (intensity < 0.25) return 'bg-green-200 dark:bg-green-900'
-    if (intensity < 0.5) return 'bg-green-400 dark:bg-green-700'
-    if (intensity < 0.75) return 'bg-green-600 dark:bg-green-500'
-    return 'bg-green-800 dark:bg-green-300'
-  }
-
-  return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold">Actividad diaria</h3>
-        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-          <span>Menos</span>
-          <div className="flex gap-0.5">
-            {[0, 0.25, 0.5, 0.75, 1].map((intensity, i) => (
-              <div
-                key={i}
-                className={cn('w-3 h-3 rounded', getIntensity(intensity * maxCount))}
-              />
-            ))}
-          </div>
-          <span>Más</span>
-        </div>
-      </div>
-      <div className="grid grid-cols-7 gap-1">
-        {days.map((day, index) => {
-          const dayData = data.find((d) => isSameDay(d.date, day))
-          const count = dayData?.count || 0
-
-          return (
-            <div
-              key={index}
-              className={cn(
-                'aspect-square rounded text-xs flex items-center justify-center transition-all',
-                getIntensity(count),
-                count > 0 && 'font-medium text-white dark:text-black',
-                count === 0 && 'text-muted-foreground',
-              )}
-              title={`${format(day, 'dd/MM')}: ${count} actividad${count !== 1 ? 'es' : ''}`}
-            >
-              {format(day, 'd')}
-            </div>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
 
 /**
  * Componente PersonalReports
@@ -693,17 +557,19 @@ const PersonalReports = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 gap-4">
-                    <ProgressRing
+                    <MobileProgressRing
                       value={productivityMetrics.tasksCompleted}
                       max={50}
                       label="Tareas completadas"
-                      color="green"
+                      size={100}
+                      animated={true}
                     />
-                    <ProgressRing
+                    <MobileProgressRing
                       value={productivityMetrics.completionRate}
                       max={100}
                       label="Tasa de completitud"
-                      color="blue"
+                      size={100}
+                      animated={true}
                     />
                   </div>
 
@@ -747,22 +613,22 @@ const PersonalReports = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <ResponsiveContainer width="100%" height={200}>
-                    <BarChart data={[
-                      { name: 'Sin errores', value: qualityMetrics.formsWithoutErrors },
-                      { name: 'Resubmisiones', value: qualityMetrics.resubmissionsNeeded },
-                      { name: 'Con feedback', value: qualityMetrics.feedbackReceived },
-                    ]}>
-                      <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                      <YAxis tick={{ fontSize: 12 }} />
-                      <Tooltip />
-                      <Bar dataKey="value" radius={[8, 8, 0, 0]}>
-                        <Cell fill="hsl(var(--primary))" />
-                        <Cell fill="hsl(var(--destructive))" />
-                        <Cell fill="hsl(var(--primary) / 0.7)" />
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
+                  <MobileBarChart
+                    data={[
+                      { name: 'Sin errores', value: qualityMetrics.formsWithoutErrors, color: 'hsl(var(--primary))' },
+                      { name: 'Resubmisiones', value: qualityMetrics.resubmissionsNeeded, color: 'hsl(var(--destructive))' },
+                      { name: 'Con feedback', value: qualityMetrics.feedbackReceived, color: 'hsl(var(--primary) / 0.7)' },
+                    ]}
+                    height={200}
+                    showGrid={true}
+                    onBarTap={(data, index) => {
+                      toast({
+                        title: data.name,
+                        description: `Valor: ${data.value}`,
+                        duration: 2000,
+                      })
+                    }}
+                  />
                 </CardContent>
               </Card>
 
@@ -795,21 +661,24 @@ const PersonalReports = () => {
                   </div>
 
                   {/* Gráfico de línea */}
-                  <ResponsiveContainer width="100%" height={200}>
-                    <LineChart data={dailyActivityData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted))" />
-                      <XAxis dataKey="dateLabel" tick={{ fontSize: 12 }} />
-                      <YAxis tick={{ fontSize: 12 }} />
-                      <Tooltip />
-                      <Line
-                        type="monotone"
-                        dataKey="count"
-                        stroke="hsl(var(--primary))"
-                        strokeWidth={2}
-                        dot={{ r: 4 }}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
+                  <MobileLineChart
+                    data={dailyActivityData.map((d) => ({
+                      name: d.dateLabel,
+                      value: d.count,
+                      label: format(d.date, 'dd/MM/yyyy', { locale: es }),
+                    }))}
+                    height={200}
+                    showGrid={true}
+                    smooth={true}
+                    showDots={true}
+                    onPointTap={(data, index) => {
+                      toast({
+                        title: data.label || data.name,
+                        description: `${data.value} actividad${data.value !== 1 ? 'es' : ''}`,
+                        duration: 2000,
+                      })
+                    }}
+                  />
                 </CardContent>
               </Card>
 
@@ -822,10 +691,21 @@ const PersonalReports = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <ActivityHeatMap
-                    data={dailyActivityData.map((d) => ({ date: d.date, count: d.count }))}
+                  <MobileHeatMap
+                    data={dailyActivityData.map((d) => ({
+                      date: d.date,
+                      value: d.count,
+                      label: `${d.count} actividad${d.count !== 1 ? 'es' : ''}`,
+                    }))}
                     startDate={periodData.start}
                     endDate={periodData.end}
+                    onCellTap={(data) => {
+                      toast({
+                        title: format(data.date, 'dd/MM/yyyy', { locale: es }),
+                        description: data.label || `${data.value} actividad${data.value !== 1 ? 'es' : ''}`,
+                        duration: 2000,
+                      })
+                    }}
                   />
                 </CardContent>
               </Card>
