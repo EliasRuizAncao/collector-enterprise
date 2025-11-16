@@ -10,6 +10,8 @@ import RefreshContainer from '../components/RefreshContainer'
 import AssignmentCard, { type Assignment } from '../components/AssignmentCard'
 import FilterSystem, { type FilterConfig } from '../components/FilterSystem'
 import FilterChips from '../components/FilterChips'
+import SortOptions, { type SortOption, type SortDirection } from '../components/SortOptions'
+import { sortAssignments } from '../hooks/useSort'
 import AssignmentSearch from '../components/AssignmentSearch'
 import OfflineIndicator from '../components/OfflineIndicator'
 import { useOfflineAssignments, type SyncStatus } from '../hooks/useOfflineAssignments'
@@ -81,9 +83,12 @@ const MobileAssignments = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isFiltersOpen, setIsFiltersOpen] = useState(false)
+  const [isSortOpen, setIsSortOpen] = useState(false)
   const [filterValues, setFilterValues] = useState<Record<string, any>>({})
   const [searchResults, setSearchResults] = useState<Assignment[]>([])
   const [isSearching, setIsSearching] = useState(false)
+  const [sort, setSort] = useState<string>('date_recent')
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
   // TODO: Restaurar infinite scroll cuando se implemente paginación
   // const [hasMore, setHasMore] = useState(true)
   // const [page, setPage] = useState(1)
@@ -225,6 +230,53 @@ const MobileAssignments = () => {
     [formOptions, priorityOptions],
   )
 
+  // Configuración de ordenamiento para tareas
+  const sortOptions: SortOption[] = useMemo(
+    () => [
+      {
+        value: 'date_recent',
+        label: 'Fecha (más reciente primero)',
+        description: 'Ordenar por fecha de asignación, más recientes primero',
+      },
+      {
+        value: 'date_oldest',
+        label: 'Fecha (más antigua primero)',
+        description: 'Ordenar por fecha de asignación, más antiguas primero',
+      },
+      {
+        value: 'dueDate',
+        label: 'Fecha límite',
+        description: 'Ordenar por fecha de vencimiento',
+      },
+      {
+        value: 'priority',
+        label: 'Prioridad (alta a baja)',
+        description: 'Urgente, Alta, Media, Baja',
+      },
+      {
+        value: 'progress',
+        label: 'Progreso (menos completo primero)',
+        description: 'Ordenar por porcentaje de completado',
+      },
+      {
+        value: 'status',
+        label: 'Estado (pendiente primero)',
+        description: 'Pendiente, En progreso, Completado',
+      },
+      {
+        value: 'name_asc',
+        label: 'Nombre (A-Z)',
+        description: 'Ordenar alfabéticamente',
+      },
+      {
+        value: 'name_desc',
+        label: 'Nombre (Z-A)',
+        description: 'Ordenar alfabéticamente inverso',
+      },
+    ],
+    [],
+  )
+
   // Filtrar por tab y filtros
   useEffect(() => {
     if (!searchQuery.trim()) {
@@ -279,9 +331,17 @@ const MobileAssignments = () => {
         }
       }
 
-      setFilteredAssignments(filtered)
+      // Aplicar ordenamiento
+      const sorted = sortAssignments(filtered, sort, sortDirection)
+      setFilteredAssignments(sorted)
     }
-  }, [assignments, activeTab, searchQuery, filterValues])
+  }, [assignments, activeTab, searchQuery, filterValues, sort, sortDirection])
+
+  // Handler para cambio de ordenamiento
+  const handleSortChange = useCallback((newSort: string, newDirection: SortDirection) => {
+    setSort(newSort)
+    setSortDirection(newDirection)
+  }, [])
 
   // Infinite scroll - TODO: Implementar cuando se necesite paginación
   // const handleScroll = useCallback(() => {
@@ -488,6 +548,33 @@ const MobileAssignments = () => {
           </div>
         )}
 
+        {/* Sort Options */}
+        <div
+          className={cn(
+            'sticky z-30 border-b border-border/60 bg-background px-4 py-2',
+            Object.keys(filterValues).filter(
+              (key) =>
+                filterValues[key] !== undefined &&
+                filterValues[key] !== null &&
+                filterValues[key] !== '' &&
+                (Array.isArray(filterValues[key]) ? filterValues[key].length > 0 : true),
+            ).length > 0
+              ? 'top-[calc(3.5rem+4rem)]'
+              : 'top-14',
+          )}
+        >
+          <SortOptions
+            options={sortOptions}
+            currentSort={sort}
+            currentDirection={sortDirection}
+            onChange={handleSortChange}
+            open={isSortOpen}
+            onOpen={() => setIsSortOpen(true)}
+            onClose={() => setIsSortOpen(false)}
+            storageKey="assignments-sort"
+          />
+        </div>
+
         {/* Tabs Horizontales Scrollables */}
         <div
           className={cn(
@@ -499,8 +586,8 @@ const MobileAssignments = () => {
                 filterValues[key] !== '' &&
                 (Array.isArray(filterValues[key]) ? filterValues[key].length > 0 : true),
             ).length > 0
-              ? 'top-[calc(3.5rem+4rem)]'
-              : 'top-14',
+              ? 'top-[calc(3.5rem+8rem)]'
+              : 'top-[calc(3.5rem+4rem)]',
           )}
         >
           {(['pending', 'completed', 'overdue', 'all'] as ActiveTab[]).map((tab) => {
@@ -656,6 +743,19 @@ const MobileAssignments = () => {
           storageKey="assignments-filters"
           persistInUrl={true}
           resultCount={filteredAssignments.length}
+        />
+
+        {/* Sort Options Modal */}
+        <SortOptions
+          options={sortOptions}
+          currentSort={sort}
+          currentDirection={sortDirection}
+          onChange={handleSortChange}
+          open={isSortOpen}
+          onOpen={() => setIsSortOpen(true)}
+          onClose={() => setIsSortOpen(false)}
+          storageKey="assignments-sort"
+          showButton={false}
         />
       </div>
     </RefreshContainer>

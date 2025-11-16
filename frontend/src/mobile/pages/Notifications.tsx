@@ -23,6 +23,7 @@ import {
   AlertTriangle,
   Calendar,
   MapPin,
+  ArrowUpDown,
 } from 'lucide-react'
 import { format, formatDistanceToNow, isToday, isYesterday, startOfWeek, startOfMonth, isWithinInterval } from 'date-fns'
 import { es } from 'date-fns/locale'
@@ -38,6 +39,8 @@ import {
 } from '@/shared/components/ui/card'
 import FilterSystem, { type FilterConfig } from '../components/FilterSystem'
 import FilterChips from '../components/FilterChips'
+import SortOptions, { type SortOption, type SortDirection } from '../components/SortOptions'
+import { sortNotifications } from '../hooks/useSort'
 import { useToast } from '@/shared/components/ui/use-toast'
 import { cn } from '@/shared/lib/utils'
 import api from '@/shared/lib/api'
@@ -294,11 +297,14 @@ const Notifications = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showFilters, setShowFilters] = useState(false)
+  const [showSort, setShowSort] = useState(false)
   const [filterValues, setFilterValues] = useState<Record<string, any>>({
     type: 'all',
     status: 'all',
     dateRange: 'all',
   })
+  const [sort, setSort] = useState<string>('date_recent')
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
 
   // Cargar notificaciones
   const loadNotifications = useCallback(async () => {
@@ -397,6 +403,33 @@ const Notifications = () => {
     void loadNotifications()
   }, [loadNotifications])
 
+  // Configuración de ordenamiento para notificaciones
+  const sortOptions: SortOption[] = useMemo(
+    () => [
+      {
+        value: 'date_recent',
+        label: 'Fecha (más reciente primero)',
+        description: 'Ordenar por fecha, más recientes primero',
+      },
+      {
+        value: 'date_oldest',
+        label: 'Fecha (más antigua primero)',
+        description: 'Ordenar por fecha, más antiguas primero',
+      },
+      {
+        value: 'name_asc',
+        label: 'Título (A-Z)',
+        description: 'Ordenar alfabéticamente por título',
+      },
+      {
+        value: 'name_desc',
+        label: 'Título (Z-A)',
+        description: 'Ordenar alfabéticamente inverso',
+      },
+    ],
+    [],
+  )
+
   // Filtrar notificaciones
   const filteredNotifications = useMemo(() => {
     let filtered = [...notifications]
@@ -435,10 +468,16 @@ const Notifications = () => {
       )
     }
 
-    return filtered.sort(
-      (a, b) => b.timestamp.getTime() - a.timestamp.getTime(),
-    )
-  }, [notifications, filterValues])
+    // Aplicar ordenamiento
+    const sorted = sortNotifications(filtered, sort, sortDirection)
+    return sorted
+  }, [notifications, filterValues, sort, sortDirection])
+
+  // Handler para cambio de ordenamiento
+  const handleSortChange = useCallback((newSort: string, newDirection: SortDirection) => {
+    setSort(newSort)
+    setSortDirection(newDirection)
+  }, [])
 
   // Agrupar por fecha
   const groupedNotifications = useMemo(
@@ -842,6 +881,19 @@ const Notifications = () => {
         storageKey="notifications-filters"
         persistInUrl={true}
         resultCount={filteredNotifications.length}
+      />
+
+      {/* Sort Options Modal */}
+      <SortOptions
+        options={sortOptions}
+        currentSort={sort}
+        currentDirection={sortDirection}
+        onChange={handleSortChange}
+        open={showSort}
+        onOpen={() => setShowSort(true)}
+        onClose={() => setShowSort(false)}
+        storageKey="notifications-sort"
+        showButton={false}
       />
     </div>
   )

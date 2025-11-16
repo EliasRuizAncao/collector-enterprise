@@ -25,6 +25,7 @@ import {
   Calendar,
   ChevronRight,
   Loader2,
+  ArrowUpDown,
 } from 'lucide-react'
 import { format, formatDistanceToNow, isToday, isYesterday, startOfWeek, startOfMonth, isWithinInterval } from 'date-fns'
 import { es } from 'date-fns/locale'
@@ -48,6 +49,8 @@ import {
 } from '@/shared/components/ui/dialog'
 import FilterSystem, { type FilterConfig } from '../components/FilterSystem'
 import FilterChips from '../components/FilterChips'
+import SortOptions, { type SortOption, type SortDirection } from '../components/SortOptions'
+import { sortActivities } from '../hooks/useSort'
 import { useToast } from '@/shared/components/ui/use-toast'
 import { cn } from '@/shared/lib/utils'
 import api from '@/shared/lib/api'
@@ -121,12 +124,15 @@ const History = () => {
   const [error, setError] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [showFilters, setShowFilters] = useState(false)
+  const [showSort, setShowSort] = useState(false)
   const [showDetails, setShowDetails] = useState(false)
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null)
   const [showExport, setShowExport] = useState(false)
   const [hasMore, setHasMore] = useState(true)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
   const [page, setPage] = useState(1)
+  const [sort, setSort] = useState<string>('date_recent')
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
 
   // Filtros
   const [filterValues, setFilterValues] = useState<Record<string, any>>({
@@ -263,8 +269,16 @@ const History = () => {
       filtered = filtered.filter((activity) => activity.status === filterValues.status)
     }
 
-    setFilteredActivities(filtered)
-  }, [activities, searchQuery, filterValues])
+    // Aplicar ordenamiento
+    const sorted = sortActivities(filtered, sort, sortDirection)
+    setFilteredActivities(sorted)
+  }, [activities, searchQuery, filterValues, sort, sortDirection])
+
+  // Handler para cambio de ordenamiento
+  const handleSortChange = useCallback((newSort: string, newDirection: SortDirection) => {
+    setSort(newSort)
+    setSortDirection(newDirection)
+  }, [])
 
   // Agrupar actividades por fecha
   const groupedActivities = useMemo(() => {
@@ -396,6 +410,38 @@ const History = () => {
       },
     ],
     [formOptions],
+  )
+
+  // Configuración de ordenamiento para historial
+  const sortOptions: SortOption[] = useMemo(
+    () => [
+      {
+        value: 'date_recent',
+        label: 'Fecha (más reciente primero)',
+        description: 'Ordenar por fecha, más recientes primero',
+      },
+      {
+        value: 'date_oldest',
+        label: 'Fecha (más antigua primero)',
+        description: 'Ordenar por fecha, más antiguas primero',
+      },
+      {
+        value: 'type',
+        label: 'Tipo de actividad',
+        description: 'Ordenar por tipo de actividad',
+      },
+      {
+        value: 'name_asc',
+        label: 'Nombre (A-Z)',
+        description: 'Ordenar alfabéticamente por título',
+      },
+      {
+        value: 'name_desc',
+        label: 'Nombre (Z-A)',
+        description: 'Ordenar alfabéticamente inverso',
+      },
+    ],
+    [],
   )
 
   // Aplicar filtros
@@ -743,6 +789,19 @@ const History = () => {
         storageKey="history-filters"
         persistInUrl={true}
         resultCount={filteredActivities.length}
+      />
+
+      {/* Sort Options Modal */}
+      <SortOptions
+        options={sortOptions}
+        currentSort={sort}
+        currentDirection={sortDirection}
+        onChange={handleSortChange}
+        open={showSort}
+        onOpen={() => setShowSort(true)}
+        onClose={() => setShowSort(false)}
+        storageKey="history-sort"
+        showButton={false}
       />
 
       {/* Modal de Detalles */}
