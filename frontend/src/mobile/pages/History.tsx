@@ -51,6 +51,7 @@ import FilterSystem, { type FilterConfig } from '../components/FilterSystem'
 import FilterChips from '../components/FilterChips'
 import SortOptions, { type SortOption, type SortDirection } from '../components/SortOptions'
 import { sortActivities } from '../hooks/useSort'
+import VoiceSearch from '../components/VoiceSearch'
 import { useToast } from '@/shared/components/ui/use-toast'
 import { cn } from '@/shared/lib/utils'
 import api from '@/shared/lib/api'
@@ -648,24 +649,32 @@ const History = () => {
 
       {/* Búsqueda */}
       <div className="border-b px-4 py-3">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Buscar en historial..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
+        <div className="relative flex items-center gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar en historial..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 pr-10"
+            />
+            {searchQuery && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-0 top-0 h-full"
+                onClick={() => setSearchQuery('')}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+          {/* Voice Search Button */}
+          <VoiceSearch
+            onResult={(text) => setSearchQuery(text)}
+            language="es-CL"
+            size="md"
           />
-          {searchQuery && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute right-0 top-0 h-full"
-              onClick={() => setSearchQuery('')}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          )}
         </div>
       </div>
 

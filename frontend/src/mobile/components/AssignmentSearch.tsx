@@ -8,6 +8,7 @@ import { Input } from '@/shared/components/ui/input'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/shared/components/ui/sheet'
 import { Label } from '@/shared/components/ui/label'
 import AssignmentCard, { type Assignment } from './AssignmentCard'
+import VoiceSearch from './VoiceSearch'
 
 /**
  * Props del componente AssignmentSearch
@@ -215,29 +216,41 @@ const AssignmentSearch = ({
 
           {/* Search Input */}
           <div className="border-b border-border/60 px-4 py-3">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                ref={inputRef}
-                type="text"
-                placeholder="Buscar tareas..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={handleKeyDown}
-                className="mobile-input pl-10 pr-10"
-                autoFocus
+            <div className="relative flex items-center gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  ref={inputRef}
+                  type="text"
+                  placeholder="Buscar tareas..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  className="mobile-input pl-10 pr-10"
+                  autoFocus
+                />
+                {searchQuery && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-1 top-1/2 h-8 w-8 -translate-y-1/2 rounded-full touch-manipulation"
+                    onClick={handleClear}
+                    aria-label="Limpiar búsqueda"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+              {/* Voice Search Button */}
+              <VoiceSearch
+                onResult={(text) => {
+                  setSearchQuery(text)
+                  saveToHistory(text)
+                  onSearch?.(text)
+                }}
+                language="es-CL"
+                size="md"
               />
-              {searchQuery && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-1 top-1/2 h-8 w-8 -translate-y-1/2 rounded-full touch-manipulation"
-                  onClick={handleClear}
-                  aria-label="Limpiar búsqueda"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              )}
             </div>
           </div>
 
