@@ -8,6 +8,15 @@ import { useNavigate } from 'react-router-dom'
 import { format, subDays, startOfDay, isToday, isYesterday } from 'date-fns'
 import { es } from 'date-fns/locale'
 import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  ResponsiveContainer,
+  Tooltip,
+  Cell,
+} from 'recharts'
+import {
   CheckCircle2,
   Clock,
   TrendingUp,
@@ -119,7 +128,7 @@ const StatsCard = ({
 }
 
 /**
- * Componente Simple Bar Chart
+ * Componente Bar Chart con Recharts
  */
 const SimpleBarChart = ({
   data,
@@ -128,7 +137,30 @@ const SimpleBarChart = ({
   data: ChartDataPoint[]
   onBarTap?: (date: Date) => void
 }) => {
-  const maxValue = Math.max(...data.map((d) => d.count), 1)
+  // Preparar datos para recharts
+  const chartData = data.map((point) => ({
+    date: point.dateLabel,
+    count: point.count,
+    dateObj: point.date,
+    isToday: isToday(point.date),
+    isYesterday: isYesterday(point.date),
+  }))
+
+  // Custom tooltip
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload
+      return (
+        <div className="rounded-lg border bg-background p-2 shadow-md">
+          <p className="text-sm font-semibold">{data.date}</p>
+          <p className="text-xs text-muted-foreground">
+            {data.count} formulario{data.count !== 1 ? 's' : ''} completado{data.count !== 1 ? 's' : ''}
+          </p>
+        </div>
+      )
+    }
+    return null
+  }
 
   return (
     <div className="space-y-3">
@@ -139,50 +171,55 @@ const SimpleBarChart = ({
         </Badge>
       </div>
 
-      <div className="flex items-end justify-between gap-2 h-32">
-        {data.map((point, index) => {
-          const height = maxValue > 0 ? (point.count / maxValue) * 100 : 0
-          const isToday = isToday(point.date)
-          const isYesterday = isYesterday(point.date)
-
-          return (
-            <button
-              key={index}
-              type="button"
-              onClick={() => onBarTap?.(point.date)}
-              className="flex-1 flex flex-col items-center gap-1 touch-manipulation active:opacity-70"
-              aria-label={`${point.dateLabel}: ${point.count} formularios`}
-            >
-              <div className="relative w-full flex items-end justify-center h-24">
-                <div
-                  className={cn(
-                    'w-full rounded-t transition-all duration-300 min-h-[4px]',
-                    isToday
-                      ? 'bg-primary'
-                      : isYesterday
-                        ? 'bg-primary/70'
-                        : 'bg-primary/50',
-                  )}
-                  style={{ height: `${height}%` }}
-                />
-                {point.count > 0 && (
-                  <span className="absolute -top-5 text-xs font-medium text-muted-foreground">
-                    {point.count}
-                  </span>
-                )}
-              </div>
-              <span
-                className={cn(
-                  'text-xs font-medium',
-                  isToday ? 'text-primary font-semibold' : 'text-muted-foreground',
-                )}
-              >
-                {point.dateLabel}
-              </span>
-            </button>
-          )
-        })}
-      </div>
+      <ResponsiveContainer width="100%" height={200}>
+        <BarChart
+          data={chartData}
+          margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+          onClick={(data) => {
+            if (data?.activePayload?.[0]?.payload?.dateObj) {
+              onBarTap?.(data.activePayload[0].payload.dateObj)
+            }
+          }}
+        >
+          <XAxis
+            dataKey="date"
+            axisLine={false}
+            tickLine={false}
+            tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
+            interval={0}
+          />
+          <YAxis
+            axisLine={false}
+            tickLine={false}
+            tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
+            width={30}
+          />
+          <Tooltip content={<CustomTooltip />} />
+          <Bar
+            dataKey="count"
+            radius={[8, 8, 0, 0]}
+            cursor="pointer"
+            onClick={(data) => {
+              if (data?.dateObj) {
+                onBarTap?.(data.dateObj)
+              }
+            }}
+          >
+            {chartData.map((entry, index) => (
+              <Cell
+                key={`cell-${index}`}
+                fill={
+                  entry.isToday
+                    ? 'hsl(var(--primary))'
+                    : entry.isYesterday
+                      ? 'hsl(var(--primary) / 0.7)'
+                      : 'hsl(var(--primary) / 0.5)'
+                }
+              />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
     </div>
   )
 }
