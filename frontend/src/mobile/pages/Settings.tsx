@@ -1193,6 +1193,22 @@ const Settings = () => {
           </CardContent>
         </Card>
 
+        {/* 9. Gestión de Tags */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              Gestión de Tags
+            </CardTitle>
+            <CardDescription>
+              Administra tus tags personalizados y visualiza estadísticas de uso
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <TagManager />
+          </CardContent>
+        </Card>
+
         {/* 10. Avanzado */}
         {settings.developerMode && (
           <Card>
