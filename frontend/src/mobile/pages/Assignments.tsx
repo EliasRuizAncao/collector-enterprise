@@ -8,7 +8,8 @@ import { Badge } from '@/shared/components/ui/badge'
 import { Button } from '@/shared/components/ui/button'
 import RefreshContainer from '../components/RefreshContainer'
 import AssignmentCard, { type Assignment } from '../components/AssignmentCard'
-import AssignmentFilters, { type AssignmentFilters as FiltersType } from '../components/AssignmentFilters'
+import FilterSystem, { type FilterConfig } from '../components/FilterSystem'
+import FilterChips from '../components/FilterChips'
 import AssignmentSearch from '../components/AssignmentSearch'
 import OfflineIndicator from '../components/OfflineIndicator'
 import { useOfflineAssignments, type SyncStatus } from '../hooks/useOfflineAssignments'
@@ -80,7 +81,7 @@ const MobileAssignments = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isFiltersOpen, setIsFiltersOpen] = useState(false)
-  const [filters, setFilters] = useState<FiltersType>({})
+  const [filterValues, setFilterValues] = useState<Record<string, any>>({})
   const [searchResults, setSearchResults] = useState<Assignment[]>([])
   const [isSearching, setIsSearching] = useState(false)
   // TODO: Restaurar infinite scroll cuando se implemente paginación
@@ -153,12 +154,84 @@ const MobileAssignments = () => {
     setFilteredAssignments(filtered)
   }, [assignments, searchQuery])
 
-  // Filtrar por tab
+  // Obtener opciones de formularios y prioridades únicas
+  const formOptions = useMemo(() => {
+    const uniqueForms = new Map<string, { value: string; label: string; count: number }>()
+    assignments.forEach((assignment) => {
+      const existing = uniqueForms.get(assignment.formId)
+      if (existing) {
+        existing.count++
+      } else {
+        uniqueForms.set(assignment.formId, {
+          value: assignment.formId,
+          label: assignment.formName,
+          count: 1,
+        })
+      }
+    })
+    return Array.from(uniqueForms.values()).sort((a, b) => a.label.localeCompare(b.label))
+  }, [assignments])
+
+  const priorityOptions = useMemo(() => {
+    const priorities = ['low', 'medium', 'high', 'urgent'] as const
+    return priorities.map((priority) => {
+      const count = assignments.filter((a) => a.priority === priority).length
+      return {
+        value: priority,
+        label: priority === 'low' ? 'Baja' : priority === 'medium' ? 'Media' : priority === 'high' ? 'Alta' : 'Urgente',
+        count,
+      }
+    })
+  }, [assignments])
+
+  // Configuración de filtros
+  const filterConfigs: FilterConfig[] = useMemo(
+    () => [
+      {
+        id: 'status',
+        type: 'select',
+        label: 'Estado',
+        category: 'General',
+        options: [
+          { value: 'pending', label: 'Pendiente' },
+          { value: 'in_progress', label: 'En progreso' },
+          { value: 'completed', label: 'Completado' },
+        ],
+      },
+      {
+        id: 'priority',
+        type: 'multiselect',
+        label: 'Prioridad',
+        category: 'General',
+        options: priorityOptions,
+        hideEmptyOptions: true,
+      },
+      {
+        id: 'formIds',
+        type: formOptions.length > 20 ? 'search-select' : 'multiselect',
+        label: 'Formularios',
+        category: 'General',
+        options: formOptions,
+        hideEmptyOptions: true,
+      },
+      {
+        id: 'dateRange',
+        type: 'daterange',
+        label: 'Rango de fechas',
+        category: 'Fechas',
+        description: 'Filtrar por fecha de asignación',
+      },
+    ],
+    [formOptions, priorityOptions],
+  )
+
+  // Filtrar por tab y filtros
   useEffect(() => {
     if (!searchQuery.trim()) {
       const now = new Date()
       let filtered = assignments
 
+      // Filtrar por tab
       switch (activeTab) {
         case 'pending':
           filtered = assignments.filter((a) => a.status === 'pending')
@@ -177,9 +250,38 @@ const MobileAssignments = () => {
           break
       }
 
+      // Aplicar filtros adicionales
+      if (filterValues.status) {
+        filtered = filtered.filter((a) => a.status === filterValues.status)
+      }
+
+      if (filterValues.priority && Array.isArray(filterValues.priority) && filterValues.priority.length > 0) {
+        filtered = filtered.filter((a) => a.priority && filterValues.priority.includes(a.priority))
+      }
+
+      if (filterValues.formIds && Array.isArray(filterValues.formIds) && filterValues.formIds.length > 0) {
+        filtered = filtered.filter((a) => filterValues.formIds.includes(a.formId))
+      }
+
+      if (filterValues.dateRange) {
+        const { start, end } = filterValues.dateRange
+        if (start) {
+          filtered = filtered.filter((a) => {
+            const assignedDate = new Date(a.assignedAt)
+            return assignedDate >= new Date(start)
+          })
+        }
+        if (end) {
+          filtered = filtered.filter((a) => {
+            const assignedDate = new Date(a.assignedAt)
+            return assignedDate <= new Date(end)
+          })
+        }
+      }
+
       setFilteredAssignments(filtered)
     }
-  }, [assignments, activeTab, searchQuery])
+  }, [assignments, activeTab, searchQuery, filterValues])
 
   // Infinite scroll - TODO: Implementar cuando se necesite paginación
   // const handleScroll = useCallback(() => {
@@ -261,10 +363,13 @@ const MobileAssignments = () => {
     console.log('Ver detalles', assignmentId)
   }, [])
 
-  const handleApplyFilters = useCallback((newFilters: FiltersType) => {
-    setFilters(newFilters)
+  const handleApplyFilters = useCallback(() => {
     setIsFiltersOpen(false)
     // Los filtros se aplican en el useEffect de filteredAssignments
+  }, [])
+
+  const handleResetFilters = useCallback(() => {
+    setFilterValues({})
   }, [])
 
   // Handler para búsqueda
@@ -328,25 +433,76 @@ const MobileAssignments = () => {
             <Button
               variant="ghost"
               size="icon"
-              className="h-9 w-9 rounded-lg touch-manipulation"
+              className="relative h-9 w-9 rounded-lg touch-manipulation"
               onClick={() => setIsFiltersOpen(true)}
               aria-label="Filtros"
             >
               <Filter className="h-5 w-5" />
-              {Object.keys(filters).length > 0 && (
+              {Object.keys(filterValues).filter(
+                (key) =>
+                  filterValues[key] !== undefined &&
+                  filterValues[key] !== null &&
+                  filterValues[key] !== '' &&
+                  (Array.isArray(filterValues[key]) ? filterValues[key].length > 0 : true),
+              ).length > 0 && (
                 <Badge
                   variant="destructive"
                   className="absolute -right-1 -top-1 h-4 w-4 rounded-full p-0 text-[10px]"
                 >
-                  1
+                  {Object.keys(filterValues).filter(
+                    (key) =>
+                      filterValues[key] !== undefined &&
+                      filterValues[key] !== null &&
+                      filterValues[key] !== '' &&
+                      (Array.isArray(filterValues[key]) ? filterValues[key].length > 0 : true),
+                  ).length}
                 </Badge>
               )}
             </Button>
           </div>
         </div>
 
+        {/* Filter Chips */}
+        {Object.keys(filterValues).filter(
+          (key) =>
+            filterValues[key] !== undefined &&
+            filterValues[key] !== null &&
+            filterValues[key] !== '' &&
+            (Array.isArray(filterValues[key]) ? filterValues[key].length > 0 : true),
+        ).length > 0 && (
+          <div className="sticky top-14 z-30 border-b border-border/60 bg-background px-4 py-2">
+            <FilterChips
+              filters={filterConfigs}
+              values={filterValues}
+              onRemove={(filterId) => {
+                setFilterValues((prev) => {
+                  const newValues = { ...prev }
+                  delete newValues[filterId]
+                  return newValues
+                })
+              }}
+              onClearAll={() => {
+                setFilterValues({})
+              }}
+            />
+          </div>
+        )}
+
         {/* Tabs Horizontales Scrollables */}
-        <div className="sticky top-14 z-30 flex items-center gap-2 overflow-x-auto border-b border-border/60 bg-background px-4 py-2 scrollbar-hide">
+        <div
+          className={cn(
+            'sticky z-30 flex items-center gap-2 overflow-x-auto border-b border-border/60 bg-background px-4 py-2 scrollbar-hide',
+            Object.keys(filterValues).filter(
+              (key) =>
+                filterValues[key] !== undefined &&
+                filterValues[key] !== null &&
+                filterValues[key] !== '' &&
+                (Array.isArray(filterValues[key]) ? filterValues[key].length > 0 : true),
+            ).length > 0
+              ? 'top-[calc(3.5rem+4rem)]'
+              : 'top-14',
+          )}
+        >
           {(['pending', 'completed', 'overdue', 'all'] as ActiveTab[]).map((tab) => {
             const count = counts[tab]
             const isActive = activeTab === tab
@@ -489,11 +645,16 @@ const MobileAssignments = () => {
         />
 
         {/* Filters Modal (Sheet Bottom) */}
-        <AssignmentFilters
+        <FilterSystem
+          filters={filterConfigs}
+          values={filterValues}
+          onChange={setFilterValues}
+          onApply={handleApplyFilters}
+          onReset={handleResetFilters}
           open={isFiltersOpen}
           onClose={() => setIsFiltersOpen(false)}
-          filters={filters}
-          onApply={handleApplyFilters}
+          storageKey="assignments-filters"
+          persistInUrl={true}
           resultCount={filteredAssignments.length}
         />
       </div>

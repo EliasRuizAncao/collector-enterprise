@@ -46,15 +46,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/shared/components/ui/dialog'
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@/shared/components/ui/sheet'
-import { Checkbox } from '@/shared/components/ui/checkbox'
-import { Label } from '@/shared/components/ui/label'
+import FilterSystem, { type FilterConfig } from '../components/FilterSystem'
+import FilterChips from '../components/FilterChips'
 import { useToast } from '@/shared/components/ui/use-toast'
 import { cn } from '@/shared/lib/utils'
 import api from '@/shared/lib/api'
@@ -136,12 +129,9 @@ const History = () => {
   const [page, setPage] = useState(1)
 
   // Filtros
-  const [filters, setFilters] = useState<ActivityFilters>({
+  const [filterValues, setFilterValues] = useState<Record<string, any>>({
     types: [],
-    dateRange: {
-      start: null,
-      end: null,
-    },
+    dateRange: { start: null, end: null },
     formId: null,
     status: null,
   })
@@ -161,20 +151,20 @@ const History = () => {
         const params = new URLSearchParams()
         params.append('page', pageNum.toString())
         params.append('limit', '20')
-        if (filters.types.length > 0) {
-          params.append('types', filters.types.join(','))
+        if (filterValues.types && Array.isArray(filterValues.types) && filterValues.types.length > 0) {
+          params.append('types', filterValues.types.join(','))
         }
-        if (filters.dateRange.start) {
-          params.append('startDate', filters.dateRange.start.toISOString())
+        if (filterValues.dateRange?.start) {
+          params.append('startDate', new Date(filterValues.dateRange.start).toISOString())
         }
-        if (filters.dateRange.end) {
-          params.append('endDate', filters.dateRange.end.toISOString())
+        if (filterValues.dateRange?.end) {
+          params.append('endDate', new Date(filterValues.dateRange.end).toISOString())
         }
-        if (filters.formId) {
-          params.append('formId', filters.formId)
+        if (filterValues.formId) {
+          params.append('formId', filterValues.formId)
         }
-        if (filters.status) {
-          params.append('status', filters.status)
+        if (filterValues.status) {
+          params.append('status', filterValues.status)
         }
         if (searchQuery) {
           params.append('search', searchQuery)
@@ -225,22 +215,56 @@ const History = () => {
     void loadActivities(1, false)
   }, [loadActivities])
 
-  // Filtrar actividades localmente (para búsqueda en tiempo real)
+  // Filtrar actividades localmente (para búsqueda y filtros)
   useEffect(() => {
-    if (!searchQuery) {
-      setFilteredActivities(activities)
-      return
+    let filtered = activities
+
+    // Filtrar por búsqueda
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase()
+      filtered = filtered.filter(
+        (activity) =>
+          activity.title.toLowerCase().includes(query) ||
+          activity.description.toLowerCase().includes(query) ||
+          activity.metadata?.formName?.toLowerCase().includes(query),
+      )
     }
 
-    const query = searchQuery.toLowerCase()
-    const filtered = activities.filter(
-      (activity) =>
-        activity.title.toLowerCase().includes(query) ||
-        activity.description.toLowerCase().includes(query) ||
-        activity.metadata?.formName?.toLowerCase().includes(query),
-    )
+    // Filtrar por tipos
+    if (
+      filterValues.types &&
+      Array.isArray(filterValues.types) &&
+      filterValues.types.length > 0
+    ) {
+      filtered = filtered.filter((activity) => filterValues.types.includes(activity.type))
+    }
+
+    // Filtrar por fecha
+    if (filterValues.dateRange?.start || filterValues.dateRange?.end) {
+      filtered = filtered.filter((activity) => {
+        const activityDate = activity.timestamp
+        if (filterValues.dateRange.start && activityDate < new Date(filterValues.dateRange.start)) {
+          return false
+        }
+        if (filterValues.dateRange.end && activityDate > new Date(filterValues.dateRange.end)) {
+          return false
+        }
+        return true
+      })
+    }
+
+    // Filtrar por formulario
+    if (filterValues.formId) {
+      filtered = filtered.filter((activity) => activity.metadata?.formId === filterValues.formId)
+    }
+
+    // Filtrar por status
+    if (filterValues.status) {
+      filtered = filtered.filter((activity) => activity.status === filterValues.status)
+    }
+
     setFilteredActivities(filtered)
-  }, [activities, searchQuery])
+  }, [activities, searchQuery, filterValues])
 
   // Agrupar actividades por fecha
   const groupedActivities = useMemo(() => {
@@ -307,6 +331,73 @@ const History = () => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [loadMore])
 
+  // Obtener opciones de formularios únicos
+  const formOptions = useMemo(() => {
+    const uniqueForms = new Map<string, { value: string; label: string; count: number }>()
+    activities.forEach((activity) => {
+      if (activity.metadata?.formId && activity.metadata?.formName) {
+        const existing = uniqueForms.get(activity.metadata.formId)
+        if (existing) {
+          existing.count++
+        } else {
+          uniqueForms.set(activity.metadata.formId, {
+            value: activity.metadata.formId,
+            label: activity.metadata.formName,
+            count: 1,
+          })
+        }
+      }
+    })
+    return Array.from(uniqueForms.values()).sort((a, b) => a.label.localeCompare(b.label))
+  }, [activities])
+
+  // Configuración de filtros
+  const filterConfigs: FilterConfig[] = useMemo(
+    () => [
+      {
+        id: 'types',
+        type: 'multiselect',
+        label: 'Tipo de actividad',
+        category: 'General',
+        options: [
+          { value: 'form_completed', label: 'Formularios completados' },
+          { value: 'photo_captured', label: 'Fotos capturadas' },
+          { value: 'task_started', label: 'Tareas iniciadas' },
+          { value: 'session_started', label: 'Sesiones iniciadas' },
+          { value: 'config_changed', label: 'Configuración cambiada' },
+        ],
+        hideEmptyOptions: true,
+      },
+      {
+        id: 'formId',
+        type: formOptions.length > 20 ? 'search-select' : 'select',
+        label: 'Formulario',
+        category: 'General',
+        options: formOptions,
+        hideEmptyOptions: true,
+      },
+      {
+        id: 'status',
+        type: 'select',
+        label: 'Resultado',
+        category: 'General',
+        options: [
+          { value: 'success', label: 'Exitoso' },
+          { value: 'pending', label: 'Pendiente' },
+          { value: 'error', label: 'Error' },
+        ],
+      },
+      {
+        id: 'dateRange',
+        type: 'daterange',
+        label: 'Rango de fechas',
+        category: 'Fechas',
+        description: 'Filtrar por fecha de actividad',
+      },
+    ],
+    [formOptions],
+  )
+
   // Aplicar filtros
   const handleApplyFilters = () => {
     setPage(1)
@@ -316,7 +407,7 @@ const History = () => {
 
   // Resetear filtros
   const handleResetFilters = () => {
-    setFilters({
+    setFilterValues({
       types: [],
       dateRange: { start: null, end: null },
       formId: null,
@@ -337,14 +428,14 @@ const History = () => {
     try {
       const params = new URLSearchParams()
       params.append('format', format)
-      if (filters.dateRange.start) {
-        params.append('startDate', filters.dateRange.start.toISOString())
+      if (filterValues.dateRange?.start) {
+        params.append('startDate', new Date(filterValues.dateRange.start).toISOString())
       }
-      if (filters.dateRange.end) {
-        params.append('endDate', filters.dateRange.end.toISOString())
+      if (filterValues.dateRange?.end) {
+        params.append('endDate', new Date(filterValues.dateRange.end).toISOString())
       }
-      if (filters.types.length > 0) {
-        params.append('types', filters.types.join(','))
+      if (filterValues.types && Array.isArray(filterValues.types) && filterValues.types.length > 0) {
+        params.append('types', filterValues.types.join(','))
       }
 
       const response = await api.get(`/activities/export?${params.toString()}`, {
@@ -441,8 +532,55 @@ const History = () => {
 
   return (
     <div className="flex min-h-screen flex-col pb-20">
+      {/* Filter Chips */}
+      {Object.keys(filterValues).filter(
+        (key) =>
+          filterValues[key] !== undefined &&
+          filterValues[key] !== null &&
+          filterValues[key] !== '' &&
+          (Array.isArray(filterValues[key]) ? filterValues[key].length > 0 : true) &&
+          (typeof filterValues[key] === 'object' && !Array.isArray(filterValues[key])
+            ? filterValues[key].start || filterValues[key].end
+            : true),
+      ).length > 0 && (
+        <div className="sticky top-0 z-10 border-b border-border/60 bg-background px-4 py-2">
+          <FilterChips
+            filters={filterConfigs}
+            values={filterValues}
+            onRemove={(filterId) => {
+              setFilterValues((prev) => {
+                const newValues = { ...prev }
+                if (filterId === 'dateRange') {
+                  newValues[filterId] = { start: null, end: null }
+                } else {
+                  delete newValues[filterId]
+                }
+                return newValues
+              })
+            }}
+            onClearAll={handleResetFilters}
+          />
+        </div>
+      )}
+
       {/* Header */}
-      <div className="sticky top-0 z-10 flex items-center gap-2 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 py-3">
+      <div
+        className={cn(
+          'sticky z-10 flex items-center gap-2 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 py-3',
+          Object.keys(filterValues).filter(
+            (key) =>
+              filterValues[key] !== undefined &&
+              filterValues[key] !== null &&
+              filterValues[key] !== '' &&
+              (Array.isArray(filterValues[key]) ? filterValues[key].length > 0 : true) &&
+              (typeof filterValues[key] === 'object' && !Array.isArray(filterValues[key])
+                ? filterValues[key].start || filterValues[key].end
+                : true),
+          ).length > 0
+            ? 'top-[4rem]'
+            : 'top-0',
+        )}
+      >
         <h1 className="flex-1 text-xl font-bold">Historial</h1>
         <Button
           variant="ghost"
@@ -594,144 +732,18 @@ const History = () => {
       </div>
 
       {/* Modal de Filtros */}
-      <Sheet open={showFilters} onOpenChange={setShowFilters}>
-        <SheetContent side="bottom" className="max-h-[80vh] overflow-y-auto">
-          <SheetHeader>
-            <SheetTitle>Filtros</SheetTitle>
-            <SheetDescription>Filtra las actividades por tipo, fecha y más</SheetDescription>
-          </SheetHeader>
-
-          <div className="space-y-6 mt-6">
-            {/* Tipos de actividad */}
-            <div>
-              <Label className="mb-3 block">Tipo de actividad</Label>
-              <div className="space-y-3">
-                {[
-                  { value: 'form_completed', label: 'Formularios completados' },
-                  { value: 'photo_captured', label: 'Fotos capturadas' },
-                  { value: 'task_started', label: 'Tareas iniciadas' },
-                  { value: 'session_started', label: 'Sesiones iniciadas' },
-                  { value: 'config_changed', label: 'Configuración cambiada' },
-                ].map((type) => (
-                  <div key={type.value} className="flex items-center gap-2">
-                    <Checkbox
-                      id={`type-${type.value}`}
-                      checked={filters.types.includes(type.value as ActivityType)}
-                      onCheckedChange={(checked) => {
-                        if (checked) {
-                          setFilters((prev) => ({
-                            ...prev,
-                            types: [...prev.types, type.value as ActivityType],
-                          }))
-                        } else {
-                          setFilters((prev) => ({
-                            ...prev,
-                            types: prev.types.filter((t) => t !== type.value),
-                          }))
-                        }
-                      }}
-                    />
-                    <Label htmlFor={`type-${type.value}`} className="cursor-pointer">
-                      {type.label}
-                    </Label>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Rango de fechas */}
-            <div>
-              <Label className="mb-3 block">Rango de fechas</Label>
-              <div className="space-y-3">
-                <div>
-                  <Label htmlFor="start-date" className="text-xs text-muted-foreground">
-                    Desde
-                  </Label>
-                  <Input
-                    id="start-date"
-                    type="date"
-                    value={
-                      filters.dateRange.start
-                        ? format(filters.dateRange.start, 'yyyy-MM-dd')
-                        : ''
-                    }
-                    onChange={(e) => {
-                      setFilters((prev) => ({
-                        ...prev,
-                        dateRange: {
-                          ...prev.dateRange,
-                          start: e.target.value ? new Date(e.target.value) : null,
-                        },
-                      }))
-                    }}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="end-date" className="text-xs text-muted-foreground">
-                    Hasta
-                  </Label>
-                  <Input
-                    id="end-date"
-                    type="date"
-                    value={
-                      filters.dateRange.end
-                        ? format(filters.dateRange.end, 'yyyy-MM-dd')
-                        : ''
-                    }
-                    onChange={(e) => {
-                      setFilters((prev) => ({
-                        ...prev,
-                        dateRange: {
-                          ...prev.dateRange,
-                          end: e.target.value ? new Date(e.target.value) : null,
-                        },
-                      }))
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Status */}
-            <div>
-              <Label className="mb-3 block">Resultado</Label>
-              <div className="space-y-3">
-                {[
-                  { value: 'success', label: 'Exitoso' },
-                  { value: 'pending', label: 'Pendiente' },
-                  { value: 'error', label: 'Error' },
-                ].map((status) => (
-                  <div key={status.value} className="flex items-center gap-2">
-                    <Checkbox
-                      id={`status-${status.value}`}
-                      checked={filters.status === status.value}
-                      onCheckedChange={(checked) => {
-                        setFilters((prev) => ({
-                          ...prev,
-                          status: checked ? (status.value as ActivityStatus) : null,
-                        }))
-                      }}
-                    />
-                    <Label htmlFor={`status-${status.value}`} className="cursor-pointer">
-                      {status.label}
-                    </Label>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Botones */}
-            <div className="flex gap-2 pt-4 border-t">
-              <Button variant="outline" className="flex-1" onClick={handleResetFilters}>
-                Limpiar
-              </Button>
-              <Button className="flex-1" onClick={handleApplyFilters}>
-                Aplicar
-              </Button>
-            </div>
-          </div>
-        </SheetContent>
-      </Sheet>
+      <FilterSystem
+        filters={filterConfigs}
+        values={filterValues}
+        onChange={setFilterValues}
+        onApply={handleApplyFilters}
+        onReset={handleResetFilters}
+        open={showFilters}
+        onClose={() => setShowFilters(false)}
+        storageKey="history-filters"
+        persistInUrl={true}
+        resultCount={filteredActivities.length}
+      />
 
       {/* Modal de Detalles */}
       <Dialog open={showDetails} onOpenChange={setShowDetails}>

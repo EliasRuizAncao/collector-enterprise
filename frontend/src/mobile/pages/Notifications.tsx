@@ -36,22 +36,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/components/ui/card'
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@/shared/components/ui/sheet'
-import { Checkbox } from '@/shared/components/ui/checkbox'
-import { Label } from '@/shared/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/shared/components/ui/select'
+import FilterSystem, { type FilterConfig } from '../components/FilterSystem'
+import FilterChips from '../components/FilterChips'
 import { useToast } from '@/shared/components/ui/use-toast'
 import { cn } from '@/shared/lib/utils'
 import api from '@/shared/lib/api'
@@ -308,10 +294,10 @@ const Notifications = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showFilters, setShowFilters] = useState(false)
-  const [filters, setFilters] = useState({
-    type: 'all' as 'all' | NotificationType,
-    status: 'all' as 'all' | NotificationStatus,
-    dateRange: 'all' as 'all' | 'today' | 'week' | 'month',
+  const [filterValues, setFilterValues] = useState<Record<string, any>>({
+    type: 'all',
+    status: 'all',
+    dateRange: 'all',
   })
 
   // Cargar notificaciones
@@ -416,21 +402,21 @@ const Notifications = () => {
     let filtered = [...notifications]
 
     // Filtrar por tipo
-    if (filters.type !== 'all') {
-      filtered = filtered.filter((n) => n.type === filters.type)
+    if (filterValues.type && filterValues.type !== 'all') {
+      filtered = filtered.filter((n) => n.type === filterValues.type)
     }
 
     // Filtrar por estado
-    if (filters.status !== 'all') {
-      filtered = filtered.filter((n) => n.status === filters.status)
+    if (filterValues.status && filterValues.status !== 'all') {
+      filtered = filtered.filter((n) => n.status === filterValues.status)
     }
 
     // Filtrar por rango de fechas
-    if (filters.dateRange !== 'all') {
+    if (filterValues.dateRange && filterValues.dateRange !== 'all') {
       const now = new Date()
       let startDate: Date
 
-      switch (filters.dateRange) {
+      switch (filterValues.dateRange) {
         case 'today':
           startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate())
           break
@@ -452,7 +438,7 @@ const Notifications = () => {
     return filtered.sort(
       (a, b) => b.timestamp.getTime() - a.timestamp.getTime(),
     )
-  }, [notifications, filters])
+  }, [notifications, filterValues])
 
   // Agrupar por fecha
   const groupedNotifications = useMemo(
@@ -589,17 +575,58 @@ const Notifications = () => {
 
   // Reset filtros
   const handleResetFilters = useCallback(() => {
-    setFilters({
+    setFilterValues({
       type: 'all',
       status: 'all',
       dateRange: 'all',
     })
   }, [])
 
+  const handleApplyFilters = useCallback(() => {
+    setShowFilters(false)
+  }, [])
+
   return (
     <div className="flex min-h-screen flex-col pb-20">
+      {/* Filter Chips */}
+      {Object.keys(filterValues).filter(
+        (key) =>
+          filterValues[key] !== undefined &&
+          filterValues[key] !== null &&
+          filterValues[key] !== '' &&
+          filterValues[key] !== 'all',
+      ).length > 0 && (
+        <div className="sticky top-0 z-10 border-b border-border/60 bg-background px-4 py-2">
+          <FilterChips
+            filters={filterConfigs}
+            values={filterValues}
+            onRemove={(filterId) => {
+              setFilterValues((prev) => {
+                const newValues = { ...prev }
+                newValues[filterId] = 'all'
+                return newValues
+              })
+            }}
+            onClearAll={handleResetFilters}
+          />
+        </div>
+      )}
+
       {/* Header */}
-      <div className="sticky top-0 z-10 flex items-center gap-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 py-3">
+      <div
+        className={cn(
+          'sticky z-10 flex items-center gap-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 py-3',
+          Object.keys(filterValues).filter(
+            (key) =>
+              filterValues[key] !== undefined &&
+              filterValues[key] !== null &&
+              filterValues[key] !== '' &&
+              filterValues[key] !== 'all',
+          ).length > 0
+            ? 'top-[4rem]'
+            : 'top-0',
+        )}
+      >
         <Button
           variant="ghost"
           size="icon"
@@ -804,102 +831,18 @@ const Notifications = () => {
       </div>
 
       {/* Filtros Sheet */}
-      <Sheet open={showFilters} onOpenChange={setShowFilters}>
-        <SheetContent side="bottom" className="h-[80vh]">
-          <SheetHeader>
-            <SheetTitle>Filtros</SheetTitle>
-            <SheetDescription>
-              Filtra las notificaciones por tipo, estado y fecha
-            </SheetDescription>
-          </SheetHeader>
-
-          <div className="mt-6 space-y-6">
-            {/* Tipo */}
-            <div className="space-y-2">
-              <Label>Tipo de notificación</Label>
-              <Select
-                value={filters.type}
-                onValueChange={(value) =>
-                  setFilters((prev) => ({ ...prev, type: value as any }))
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todas</SelectItem>
-                  <SelectItem value="new_task">Nueva tarea</SelectItem>
-                  <SelectItem value="reminder">Recordatorio</SelectItem>
-                  <SelectItem value="overdue">Vencida</SelectItem>
-                  <SelectItem value="comment">Comentario</SelectItem>
-                  <SelectItem value="update">Actualización</SelectItem>
-                  <SelectItem value="system">Sistema</SelectItem>
-                  <SelectItem value="security">Seguridad</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Estado */}
-            <div className="space-y-2">
-              <Label>Estado</Label>
-              <Select
-                value={filters.status}
-                onValueChange={(value) =>
-                  setFilters((prev) => ({ ...prev, status: value as any }))
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todas</SelectItem>
-                  <SelectItem value="unread">No leídas</SelectItem>
-                  <SelectItem value="read">Leídas</SelectItem>
-                  <SelectItem value="archived">Archivadas</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Rango de fechas */}
-            <div className="space-y-2">
-              <Label>Rango de fechas</Label>
-              <Select
-                value={filters.dateRange}
-                onValueChange={(value) =>
-                  setFilters((prev) => ({ ...prev, dateRange: value as any }))
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todas las fechas</SelectItem>
-                  <SelectItem value="today">Hoy</SelectItem>
-                  <SelectItem value="week">Esta semana</SelectItem>
-                  <SelectItem value="month">Este mes</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Botones */}
-            <div className="flex gap-2 pt-4">
-              <Button
-                variant="outline"
-                className="flex-1"
-                onClick={handleResetFilters}
-              >
-                Limpiar
-              </Button>
-              <Button
-                className="flex-1"
-                onClick={() => setShowFilters(false)}
-              >
-                Aplicar
-              </Button>
-            </div>
-          </div>
-        </SheetContent>
-      </Sheet>
+      <FilterSystem
+        filters={filterConfigs}
+        values={filterValues}
+        onChange={setFilterValues}
+        onApply={handleApplyFilters}
+        onReset={handleResetFilters}
+        open={showFilters}
+        onClose={() => setShowFilters(false)}
+        storageKey="notifications-filters"
+        persistInUrl={true}
+        resultCount={filteredNotifications.length}
+      />
     </div>
   )
 }
