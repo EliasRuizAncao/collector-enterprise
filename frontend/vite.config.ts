@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt', // Cambiar a 'prompt' para permitir al usuario elegir cuándo actualizar
       includeAssets: ['favicon.ico', 'robots.txt', 'icons/*.png'],
       manifest: {
         name: 'Collector Enterprise - Amaranto',
@@ -30,20 +30,97 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        // Pre-caching: Shell de la app y assets críticos
+        globPatterns: [
+          '**/*.{js,css,html,ico,png,svg,woff2}',
+          'index.html',
+          'manifest.webmanifest',
+        ],
+        // Estrategias de runtime caching
         runtimeCaching: [
+          // 1. Network First para API calls (con timeout de 5s)
           {
-            urlPattern: /^https:\/\/api\.*/i,
+            urlPattern: /^https?:\/\/.*\/api\/.*/i,
             handler: 'NetworkFirst',
             options: {
               cacheName: 'api-cache',
+              networkTimeoutSeconds: 5,
               expiration: {
                 maxEntries: 50,
-                maxAgeSeconds: 300, // 5 minutos
+                maxAgeSeconds: 7 * 24 * 60 * 60, // 7 días
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
+          // 2. Cache First para assets estáticos
+          {
+            urlPattern: /\.(?:js|css|woff2?|ttf|eot)$/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'static-assets',
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 365 * 24 * 60 * 60, // 1 año
+              },
+            },
+          },
+          {
+            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|ico)$/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'images-cache',
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 30 * 24 * 60 * 60, // 30 días
+              },
+            },
+          },
+          // 3. Stale While Revalidate para datos frecuentes (dashboard)
+          {
+            urlPattern: /^https?:\/\/.*\/api\/(dashboard|stats|forms)/i,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'dashboard-cache',
+              expiration: {
+                maxEntries: 20,
+                maxAgeSeconds: 5 * 60, // 5 minutos
+              },
+            },
+          },
+          // 4. Network Only para operaciones críticas (login, logout)
+          {
+            urlPattern: /^https?:\/\/.*\/api\/(auth|login|logout)/i,
+            handler: 'NetworkOnly',
+            options: {
+              cacheName: 'auth-cache',
+            },
+          },
+          // Fonts con cache largo
+          {
+            urlPattern: /\.(?:woff2?|ttf|eot|otf)$/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'fonts-cache',
+              expiration: {
+                maxEntries: 20,
+                maxAgeSeconds: 365 * 24 * 60 * 60, // 1 año
               },
             },
           },
         ],
+        // Background sync
+        skipWaiting: false,
+        clientsClaim: false,
+        // Offline page
+        navigateFallback: '/offline.html',
+        navigateFallbackDenylist: [/^\/api/, /^\/_/, /^\/admin/],
+      },
+      // Configuración de actualización
+      devOptions: {
+        enabled: true,
+        type: 'module',
       },
     }),
   ],

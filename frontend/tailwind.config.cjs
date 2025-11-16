@@ -1,4 +1,53 @@
 /** @type {import('tailwindcss').Config} */
+const mobileTheme = require('./src/mobile/styles/mobileTheme.cjs')
+
+// Colores base que no deben perderse
+const baseColors = {
+  border: 'hsl(var(--border))',
+  input: 'hsl(var(--input))',
+  ring: 'hsl(var(--ring))',
+  background: 'hsl(var(--background))',
+  foreground: 'hsl(var(--foreground))',
+  primary: {
+    DEFAULT: 'hsl(var(--primary))',
+    foreground: 'hsl(var(--primary-foreground))',
+  },
+  secondary: {
+    DEFAULT: 'hsl(var(--secondary))',
+    foreground: 'hsl(var(--secondary-foreground))',
+  },
+  destructive: {
+    DEFAULT: 'hsl(var(--destructive))',
+    foreground: 'hsl(var(--destructive-foreground))',
+  },
+  muted: {
+    DEFAULT: 'hsl(var(--muted))',
+    foreground: 'hsl(var(--muted-foreground))',
+  },
+  accent: {
+    DEFAULT: 'hsl(var(--accent))',
+    foreground: 'hsl(var(--accent-foreground))',
+  },
+  popover: {
+    DEFAULT: 'hsl(var(--popover))',
+    foreground: 'hsl(var(--popover-foreground))',
+  },
+  card: {
+    DEFAULT: 'hsl(var(--card))',
+    foreground: 'hsl(var(--card-foreground))',
+  },
+}
+
+// Fusionar colores base con colores móviles
+const mergedColors = {
+  ...baseColors,
+  ...mobileTheme.theme.extend.colors,
+}
+
+// Fusionar el extend de mobileTheme, pero reemplazar colors con la versión fusionada
+const mobileThemeExtend = { ...mobileTheme.theme.extend }
+mobileThemeExtend.colors = mergedColors
+
 module.exports = {
   darkMode: ['class'],
   content: [
@@ -16,41 +65,7 @@ module.exports = {
       },
     },
     extend: {
-      colors: {
-        border: 'hsl(var(--border))',
-        input: 'hsl(var(--input))',
-        ring: 'hsl(var(--ring))',
-        background: 'hsl(var(--background))',
-        foreground: 'hsl(var(--foreground))',
-        primary: {
-          DEFAULT: 'hsl(var(--primary))',
-          foreground: 'hsl(var(--primary-foreground))',
-        },
-        secondary: {
-          DEFAULT: 'hsl(var(--secondary))',
-          foreground: 'hsl(var(--secondary-foreground))',
-        },
-        destructive: {
-          DEFAULT: 'hsl(var(--destructive))',
-          foreground: 'hsl(var(--destructive-foreground))',
-        },
-        muted: {
-          DEFAULT: 'hsl(var(--muted))',
-          foreground: 'hsl(var(--muted-foreground))',
-        },
-        accent: {
-          DEFAULT: 'hsl(var(--accent))',
-          foreground: 'hsl(var(--accent-foreground))',
-        },
-        popover: {
-          DEFAULT: 'hsl(var(--popover))',
-          foreground: 'hsl(var(--popover-foreground))',
-        },
-        card: {
-          DEFAULT: 'hsl(var(--card))',
-          foreground: 'hsl(var(--card-foreground))',
-        },
-      },
+      colors: mergedColors,
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
@@ -70,7 +85,15 @@ module.exports = {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
       },
+      // Extensión del theme mobile (sin colors que ya están fusionados arriba)
+      ...Object.fromEntries(
+        Object.entries(mobileThemeExtend).filter(([key]) => key !== 'colors').map(([key, value]) => [key, value]),
+      ),
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [
+    require('tailwindcss-animate'),
+    // Plugin mobile
+    mobileTheme.plugin,
+  ],
 }
