@@ -531,7 +531,33 @@ const ReportsDashboard = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <SimpleBarChart data={chartData} onBarTap={handleBarTap} />
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-sm font-semibold">Últimos 7 días</h3>
+                      <Badge variant="outline" className="text-xs">
+                        Formularios completados
+                      </Badge>
+                    </div>
+                    <MobileBarChart
+                      data={chartData.map((point) => ({
+                        name: point.dateLabel,
+                        value: point.count,
+                        color: isToday(point.date)
+                          ? 'hsl(var(--primary))'
+                          : isYesterday(point.date)
+                            ? 'hsl(var(--primary) / 0.7)'
+                            : 'hsl(var(--primary) / 0.5)',
+                      }))}
+                      height={200}
+                      showGrid={true}
+                      onBarTap={(data, index) => {
+                        const point = chartData[index]
+                        if (point) {
+                          handleBarTap(point.date)
+                        }
+                      }}
+                    />
+                  </div>
                 </CardContent>
               </Card>
 
