@@ -684,6 +684,15 @@ const Notifications = () => {
           <Button
             variant="ghost"
             size="icon"
+            onClick={() => setShowSort(true)}
+            className="h-9 w-9"
+            aria-label="Ordenar"
+          >
+            <ArrowUpDown className="h-5 w-5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => setShowFilters(true)}
             className="h-9 w-9"
           >
