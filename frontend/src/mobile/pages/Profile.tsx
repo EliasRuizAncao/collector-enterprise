@@ -598,7 +598,19 @@ const MobileProfile = () => {
         {/* 2. Estadísticas */}
         <Card>
           <CardHeader>
-            <CardTitle>Estadísticas</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle>Estadísticas</CardTitle>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/mobile/reports/personal')}
+                className="gap-2"
+              >
+                <Activity className="h-4 w-4" />
+                Ver reportes
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-4">
