@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sin conexión - Collector Enterprise</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: white;
+    }
+    .container {
+      text-align: center;
+      max-width: 500px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+    .icon {
+      font-size: 80px;
+      margin-bottom: 20px;
+    }
+    h1 {
+      font-size: 28px;
+      margin-bottom: 16px;
+      font-weight: 600;
+    }
+    p {
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 24px;
+      opacity: 0.9;
+    }
+    .features {
+      text-align: left;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 24px 0;
+    }
+    .features ul {
+      list-style: none;
+    }
+    .features li {
+      padding: 8px 0;
+      padding-left: 24px;
+      position: relative;
+    }
+    .features li:before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #4ade80;
+      font-weight: bold;
+    }
+    button {
+      background: white;
+      color: #667eea;
+      border: none;
+      padding: 14px 32px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      margin-top: 16px;
+    }
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    button:active {
+      transform: translateY(0);
+    }
+    .status {
+      margin-top: 20px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="icon">📡</div>
+    <h1>Sin conexión a Internet</h1>
+    <p>
+      No hay conexión a Internet en este momento. Algunas funcionalidades están disponibles offline.
+    </p>
+    
+    <div class="features">
+      <p style="font-weight: 600; margin-bottom: 12px;">Funcionalidades disponibles offline:</p>
+      <ul>
+        <li>Ver asignaciones guardadas</li>
+        <li>Completar formularios</li>
+        <li>Ver datos en caché</li>
+        <li>Guardar borradores</li>
+      </ul>
+    </div>
+
+    <button onclick="window.location.reload()">Reintentar conexión</button>
+    
+    <div class="status" id="status">
+      Estado: Sin conexión
+    </div>
+  </div>
+
+  <script>
+    // Verificar estado de conexión
+    function updateStatus() {
+      const statusEl = document.getElementById('status');
+      if (navigator.onLine) {
+        statusEl.textContent = 'Estado: Conectado - Recargando...';
+        setTimeout(() => window.location.reload(), 1000);
+      } else {
+        statusEl.textContent = 'Estado: Sin conexión';
+      }
+    }
+
+    // Escuchar cambios de conexión
+    window.addEventListener('online', updateStatus);
+    window.addEventListener('offline', updateStatus);
+    
+    // Verificar periódicamente
+    setInterval(updateStatus, 5000);
+  </script>
+</body>
+</html>
+
