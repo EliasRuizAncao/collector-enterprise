@@ -81,6 +81,7 @@ import {
   getNotificationPermission,
   requestNotificationPermission,
 } from '../utils/pushNotifications'
+import TagManager from '../components/TagManager'
 
 /**
  * Página principal de configuración

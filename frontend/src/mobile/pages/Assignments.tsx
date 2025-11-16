@@ -12,6 +12,9 @@ import FilterSystem, { type FilterConfig } from '../components/FilterSystem'
 import FilterChips from '../components/FilterChips'
 import SortOptions, { type SortOption, type SortDirection } from '../components/SortOptions'
 import { sortAssignments } from '../hooks/useSort'
+import TagPicker from '../components/TagPicker'
+import { useAssignmentTags } from '../hooks/useAssignmentTags'
+import { useTags } from '../hooks/useTags'
 import AssignmentSearch from '../components/AssignmentSearch'
 import OfflineIndicator from '../components/OfflineIndicator'
 import { useOfflineAssignments, type SyncStatus } from '../hooks/useOfflineAssignments'
@@ -89,6 +92,12 @@ const MobileAssignments = () => {
   const [isSearching, setIsSearching] = useState(false)
   const [sort, setSort] = useState<string>('date_recent')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
+  const [tagPickerOpen, setTagPickerOpen] = useState(false)
+  const [selectedAssignmentForTags, setSelectedAssignmentForTags] = useState<string | null>(null)
+  
+  const { getTags, setTags } = useAssignmentTags()
+  const { incrementUsage } = useTags()
+  
   // TODO: Restaurar infinite scroll cuando se implemente paginación
   // const [hasMore, setHasMore] = useState(true)
   // const [page, setPage] = useState(1)
@@ -96,8 +105,13 @@ const MobileAssignments = () => {
   
   const scrollContainerRef = useRef<HTMLDivElement>(null)
 
-  // Usar asignaciones offline como fuente principal
-  const assignments = offlineAssignments
+  // Usar asignaciones offline como fuente principal y agregar tags
+  const assignments = useMemo(() => {
+    return offlineAssignments.map((assignment) => ({
+      ...assignment,
+      tagIds: getTags(assignment.id),
+    }))
+  }, [offlineAssignments, getTags])
 
   // Sincronizar filteredAssignments cuando cambian las asignaciones offline
   useEffect(() => {
@@ -342,6 +356,30 @@ const MobileAssignments = () => {
     setSort(newSort)
     setSortDirection(newDirection)
   }, [])
+
+  // Handler para abrir tag picker
+  const handleOpenTagPicker = useCallback((assignmentId: string) => {
+    setSelectedAssignmentForTags(assignmentId)
+    setTagPickerOpen(true)
+  }, [])
+
+  // Handler para cambiar tags de un assignment
+  const handleTagsChange = useCallback(
+    (tagIds: string[]) => {
+      if (!selectedAssignmentForTags) return
+
+      setTags(selectedAssignmentForTags, tagIds)
+      
+      // Incrementar contador de uso para cada tag
+      tagIds.forEach((tagId) => {
+        incrementUsage(tagId)
+      })
+
+      setTagPickerOpen(false)
+      setSelectedAssignmentForTags(null)
+    },
+    [selectedAssignmentForTags, setTags, incrementUsage],
+  )
 
   // Infinite scroll - TODO: Implementar cuando se necesite paginación
   // const handleScroll = useCallback(() => {
@@ -757,6 +795,24 @@ const MobileAssignments = () => {
           storageKey="assignments-sort"
           showButton={false}
         />
+
+        {/* Tag Picker Modal */}
+        {selectedAssignmentForTags && (
+          <TagPicker
+            selectedTagIds={getTags(selectedAssignmentForTags)}
+            onChange={handleTagsChange}
+            open={tagPickerOpen}
+            onClose={() => {
+              setTagPickerOpen(false)
+              setSelectedAssignmentForTags(null)
+            }}
+            title="Agregar tags"
+            description="Selecciona tags para categorizar esta tarea"
+            suggestionContext={{
+              formName: assignments.find((a) => a.id === selectedAssignmentForTags)?.formName,
+            }}
+          />
+        )}
       </div>
     </RefreshContainer>
   )

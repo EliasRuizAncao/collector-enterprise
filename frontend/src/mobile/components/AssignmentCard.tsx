@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { format } from 'date-fns'
 import { motion } from 'framer-motion'
@@ -12,6 +12,8 @@ import { useHaptics } from '../hooks/useHaptics'
 import type { SyncStatus } from '../hooks/useOfflineAssignments'
 import { fadeIn, tapScale, getReducedMotionVariants } from '../utils/animations'
 import { OfflineModeBadge } from './offline'
+import TagSystem from './TagSystem'
+import { useTags } from '../hooks/useTags'
 
 /**
  * Tipo para una tarea/asignación
@@ -30,6 +32,8 @@ export interface Assignment {
   location?: string
   completedFields?: number
   totalFields?: number
+  /** IDs de tags asociados a esta asignación */
+  tagIds?: string[]
 }
 
 /**
@@ -92,6 +96,13 @@ const AssignmentCard = ({
   const navigate = useNavigate()
   const haptics = useHaptics()
   const cardRef = useRef<HTMLDivElement>(null)
+  const { getTagById } = useTags()
+
+  // Obtener tags de la asignación
+  const assignmentTags = useMemo(() => {
+    if (!assignment.tagIds || assignment.tagIds.length === 0) return []
+    return assignment.tagIds.map((id) => getTagById(id)).filter((tag): tag is NonNullable<typeof tag> => tag !== undefined)
+  }, [assignment.tagIds, getTagById])
   const [swipeOffset, setSwipeOffset] = useState(0)
   const [isSwiping, setIsSwiping] = useState(false)
   const [swipeDirection, setSwipeDirection] = useState<'left' | 'right' | null>(null)
@@ -479,6 +490,13 @@ const AssignmentCard = ({
                   </div>
                 </div>
               )}
+
+            {/* Tags */}
+            {assignmentTags.length > 0 && (
+              <div className="pt-1">
+                <TagSystem tags={assignmentTags} maxVisible={3} size="sm" />
+              </div>
+            )}
           </div>
         </CardContent>
 
