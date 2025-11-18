@@ -11,6 +11,7 @@ import {
   Moon,
   Users,
   ClipboardList,
+  BarChart3,
 } from 'lucide-react'
 
 import { cn } from '@/shared/lib/utils'
@@ -65,6 +66,12 @@ const allNavItems: NavItem[] = [
     label: 'Usuarios',
     to: '/admin/usuarios',
     icon: Users,
+    allowedRoles: ['ADMIN', 'MANAGER'],
+  },
+  {
+    label: 'Reportes',
+    to: '/admin/reportes',
+    icon: BarChart3,
     allowedRoles: ['ADMIN', 'MANAGER'],
   },
   {

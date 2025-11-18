@@ -12,6 +12,7 @@ import dashboardRoutes from './routes/dashboard.routes'
 import assignmentRoutes from './routes/assignment.routes'
 import responseRoutes from './routes/response.routes'
 import searchRoutes from './routes/search.routes'
+import reportRoutes from './routes/report.routes'
 
 import { errorHandler } from './middleware/errorHandler'
 
@@ -78,6 +79,7 @@ app.use('/api/assignments', assignmentRoutes)
 app.use('/api/responses', responseRoutes) // Ruta principal para respuestas
 app.use('/api/form-responses', responseRoutes) // Mantener compatibilidad
 app.use('/api/search', searchRoutes) // Búsqueda global
+app.use('/api/reports', reportRoutes) // Reportes (solo ADMIN y MANAGER)
 
 // Error handler (debe ser el último middleware)
 app.use(errorHandler)
