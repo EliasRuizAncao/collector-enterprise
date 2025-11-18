@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import { motion, AnimatePresence, HTMLMotionProps, Variants } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useLocation } from 'react-router-dom'
 import { cn } from '@/shared/lib/utils'
 import { useNavigationDirection } from '../../hooks/useNavigationDirection'
@@ -11,6 +11,8 @@ import {
   slideInFromBottom,
   getReducedMotionVariants,
   prefersReducedMotion,
+  type Variants,
+  type HTMLMotionProps,
 } from '../../utils/animations'
 
 interface PageTransitionProps extends HTMLMotionProps<'div'> {

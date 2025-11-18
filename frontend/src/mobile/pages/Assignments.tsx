@@ -735,25 +735,6 @@ const MobileAssignments = () => {
                 />
               ))}
             </AnimatedList>
-
-              {/* Infinite scroll deshabilitado temporalmente */}
-              {/* TODO: Restaurar cuando se implemente paginación */}
-              {/* {isLoadingMore && (
-                <div className="space-y-3">
-                  {[1, 2, 3].map((i) => (
-                    <AssignmentCardSkeleton key={`loading-${i}`} />
-                  ))}
-                </div>
-              )}
-
-              {!hasMore && filteredAssignments.length > 0 && (
-                <div className="py-8 text-center">
-                  <p className="text-mobile-caption text-muted-foreground">
-                    No hay más tareas
-                  </p>
-                </div>
-              )} */}
-            </div>
           )}
         </div>
 

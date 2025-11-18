@@ -1,8 +1,9 @@
-import { forwardRef, useState, FocusEvent } from 'react'
-import { motion, HTMLMotionProps } from 'framer-motion'
+import { forwardRef, useState, type FocusEvent } from 'react'
+import { motion } from 'framer-motion'
+import { type HTMLMotionProps } from '../../utils/animations'
 import { cn } from '@/shared/lib/utils'
 import { scaleIn, shake, bounce } from '../../utils/animations'
-import { Input, InputProps } from '@/shared/components/ui/input'
+import { Input, type InputProps } from '@/shared/components/ui/input'
 
 interface AnimatedInputProps extends InputProps {
   success?: boolean

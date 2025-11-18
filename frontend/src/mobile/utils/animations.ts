@@ -1,4 +1,50 @@
-import { Variants, Transition } from 'framer-motion'
+import React from 'react'
+
+// Tipos para animaciones de framer-motion
+// Definidos localmente para evitar problemas de importación
+
+export type Transition = {
+  type?: 'tween' | 'spring' | 'inertia' | 'keyframes' | 'just'
+  duration?: number
+  delay?: number
+  ease?: string | number[]
+  damping?: number
+  stiffness?: number
+  mass?: number
+  repeat?: number
+  repeatType?: 'loop' | 'reverse' | 'mirror'
+  repeatDelay?: number
+}
+
+export type Variants = {
+  initial?: any
+  animate?: any
+  exit?: any
+  transition?: Transition
+  [key: string]: any
+}
+
+// HTMLMotionProps es un tipo helper que combina props HTML con props de motion
+// En framer-motion v12, este tipo se obtiene de las props del componente motion
+export type HTMLMotionProps<T extends keyof JSX.IntrinsicElements = 'div'> = 
+  React.HTMLAttributes<JSX.IntrinsicElements[T]> & {
+    initial?: any
+    animate?: any
+    exit?: any
+    variants?: Variants
+    transition?: Transition
+    whileHover?: any
+    whileTap?: any
+    whileFocus?: any
+    whileInView?: any
+    drag?: boolean | 'x' | 'y'
+    dragConstraints?: any
+    dragElastic?: number
+    onDragStart?: (event: any, info: any) => void
+    onDrag?: (event: any, info: any) => void
+    onDragEnd?: (event: any, info: any) => void
+    [key: string]: any
+  }
 
 /**
  * Sistema de animaciones consistente para mobile

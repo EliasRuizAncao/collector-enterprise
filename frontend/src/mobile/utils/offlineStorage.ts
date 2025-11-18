@@ -2,7 +2,7 @@
  * OfflineStorageManager - Manager robusto de IndexedDB usando Dexie.js
  */
 
-import Dexie, { Table } from 'dexie'
+import Dexie from 'dexie'
 
 // ============================================================================
 // TIPOS Y INTERFACES
@@ -76,11 +76,13 @@ export interface CacheItem {
 // ============================================================================
 
 class CollectorDatabase extends Dexie {
-  assignments!: Table<Assignment, string>
-  form_responses!: Table<FormResponse, string>
-  photos!: Table<Photo, string>
-  sync_queue!: Table<SyncQueueItem, string>
-  cache!: Table<CacheItem, string>
+  // En Dexie v4, las tablas se declaran sin el tipo Table explícito
+  // Dexie genera los tipos automáticamente basándose en el schema
+  assignments!: Dexie.Table<Assignment, string>
+  form_responses!: Dexie.Table<FormResponse, string>
+  photos!: Dexie.Table<Photo, string>
+  sync_queue!: Dexie.Table<SyncQueueItem, string>
+  cache!: Dexie.Table<CacheItem, string>
 
   constructor() {
     super('CollectorEnterpriseDB')
@@ -88,7 +90,7 @@ class CollectorDatabase extends Dexie {
     // Definir schema
     this.version(1).stores({
       assignments: 'id, formId, userId, status, _syncStatus, createdAt, updatedAt',
-      form_responses: 'id, assignmentId, _isDraft, _syncStatus, _lastSaved',
+      form_responses: 'id, assignmentId, _syncStatus, _lastSaved, _isDraft',
       photos: 'id, responseId, _uploaded',
       sync_queue: 'id, action, createdAt, retries',
       cache: 'key, expiresAt',
@@ -160,20 +162,32 @@ class OfflineStorageManager {
     await this.init()
 
     try {
-      let collection = this.db.assignments.toCollection()
+      let query: Dexie.Collection<Assignment, string> | null = null
 
+      // Usar índices cuando sea posible para mejor performance
       if (filter?.userId) {
-        collection = collection.filter((a) => a.userId === filter.userId)
+        query = this.db.assignments.where('userId').equals(filter.userId)
+      } else {
+        query = this.db.assignments.toCollection()
       }
+
+      // Aplicar filtros adicionales
       if (filter?.status) {
-        collection = collection.filter((a) => a.status === filter.status)
+        query = query.filter((a) => a.status === filter.status)
       }
       if (filter?.syncStatus) {
-        collection = collection.filter((a) => a._syncStatus === filter.syncStatus)
+        query = query.filter((a) => a._syncStatus === filter.syncStatus)
       }
 
-      return await collection.sortBy('updatedAt')
+      const results = await query.toArray()
+      // Ordenar manualmente porque updatedAt puede no ser un índice
+      return results.sort((a, b) => {
+        const dateA = a.updatedAt?.getTime() || 0
+        const dateB = b.updatedAt?.getTime() || 0
+        return dateB - dateA // Más reciente primero
+      })
     } catch (error) {
+      console.error('Error en getAssignments:', error)
       throw this.handleError(error)
     }
   }
@@ -334,10 +348,15 @@ class OfflineStorageManager {
     await this.init()
 
     try {
-      return await this.db.form_responses
-        .where('_isDraft')
-        .equals(true)
-        .sortBy('_lastSaved')
+      // Usar toCollection().filter() porque _isDraft no es un índice
+      const allResponses = await this.db.form_responses.toArray()
+      return allResponses
+        .filter((r) => r._isDraft === true)
+        .sort((a, b) => {
+          const dateA = a._lastSaved?.getTime() || 0
+          const dateB = b._lastSaved?.getTime() || 0
+          return dateB - dateA // Más reciente primero
+        })
     } catch (error) {
       throw this.handleError(error)
     }
@@ -770,10 +789,11 @@ class OfflineStorageManager {
 
 export const offlineStorage = new OfflineStorageManager()
 
-// Inicializar automáticamente
-if (typeof window !== 'undefined') {
+// Inicializar automáticamente (solo en producción o cuando se use)
+// En desarrollo, se inicializará lazy cuando se use por primera vez
+if (typeof window !== 'undefined' && import.meta.env.PROD) {
   offlineStorage.init().catch((error) => {
-    console.error('Error al inicializar offline storage:', error)
+    console.warn('Error al inicializar offline storage (se inicializará cuando se use):', error)
   })
 }
 

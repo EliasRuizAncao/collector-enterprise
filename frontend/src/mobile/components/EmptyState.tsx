@@ -1,8 +1,8 @@
-import { ReactNode } from 'react'
-import { motion, HTMLMotionProps } from 'framer-motion'
+import { type ReactNode } from 'react'
+import { motion } from 'framer-motion'
 import { Button } from '@/shared/components/ui/button'
 import { cn } from '@/shared/lib/utils'
-import { fadeIn, bounceIn, getReducedMotionVariants } from '../utils/animations'
+import { fadeIn, bounceIn, getReducedMotionVariants, type HTMLMotionProps } from '../utils/animations'
 
 export interface EmptyStateProps extends HTMLMotionProps<'div'> {
   /**

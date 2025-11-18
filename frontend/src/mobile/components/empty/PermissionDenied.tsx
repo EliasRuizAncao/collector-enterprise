@@ -1,5 +1,5 @@
 import { Lock, Unlock } from 'lucide-react'
-import { EmptyState, EmptyStateProps } from '../EmptyState'
+import { EmptyState, type EmptyStateProps } from '../EmptyState'
 
 interface PermissionDeniedProps extends Omit<EmptyStateProps, 'icon' | 'title' | 'description'> {
   /**

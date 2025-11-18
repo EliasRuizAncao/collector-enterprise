@@ -1,8 +1,9 @@
-import { ReactNode, forwardRef } from 'react'
-import { motion, HTMLMotionProps } from 'framer-motion'
+import { type ReactNode, forwardRef } from 'react'
+import { motion } from 'framer-motion'
+import { type HTMLMotionProps } from '../../utils/animations'
 import { cn } from '@/shared/lib/utils'
 import { tapScale, bounce, shake, pulse } from '../../utils/animations'
-import { Button, ButtonProps } from '@/shared/components/ui/button'
+import { Button, type ButtonProps } from '@/shared/components/ui/button'
 
 interface AnimatedButtonProps extends ButtonProps {
   loading?: boolean

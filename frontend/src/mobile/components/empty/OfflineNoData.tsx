@@ -1,5 +1,5 @@
 import { WifiOff, RefreshCw } from 'lucide-react'
-import { EmptyState, EmptyStateProps } from '../EmptyState'
+import { EmptyState, type EmptyStateProps } from '../EmptyState'
 
 interface OfflineNoDataProps extends Omit<EmptyStateProps, 'icon' | 'title' | 'description'> {
   /**

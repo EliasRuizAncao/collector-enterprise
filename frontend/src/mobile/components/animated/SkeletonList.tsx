@@ -1,4 +1,5 @@
-import { motion, HTMLMotionProps } from 'framer-motion'
+import { motion } from 'framer-motion'
+import { type HTMLMotionProps } from '../../utils/animations'
 import { cn } from '@/shared/lib/utils'
 import { staggerContainer, staggerItem, getReducedMotionVariants } from '../../utils/animations'
 import { SkeletonCard } from './SkeletonCard'

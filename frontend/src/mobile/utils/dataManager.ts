@@ -423,7 +423,7 @@ class DataManager {
       drafts: number
     }
     freedSpace: number
-  } {
+  }> {
     const opts: CleanupOptions = {
       deleteSyncedResponsesOlderThan: this.settings.keepSyncedResponsesDays,
       deleteUploadedPhotosOlderThan: this.settings.keepUploadedPhotosDays,

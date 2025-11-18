@@ -1,5 +1,6 @@
 import { ReactNode, Children } from 'react'
-import { motion, HTMLMotionProps, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
+import { type HTMLMotionProps } from '../../utils/animations'
 import { cn } from '@/shared/lib/utils'
 import { staggerContainer, staggerItem, getReducedMotionVariants } from '../../utils/animations'
 

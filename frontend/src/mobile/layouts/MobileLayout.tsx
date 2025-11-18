@@ -96,8 +96,11 @@ const MobileLayout = () => {
             // Intentar suscribirse si no está suscrito
             await subscribeToNotifications()
           }
-        } catch (error) {
-          console.error('Error al inicializar notificaciones:', error)
+        } catch (error: any) {
+          // Solo loggear errores que no sean 404 (endpoint no implementado aún)
+          if (error?.response?.status !== 404) {
+            console.error('Error al inicializar notificaciones:', error)
+          }
         }
       }
 

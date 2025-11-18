@@ -1,5 +1,5 @@
 import { Camera } from 'lucide-react'
-import { EmptyState, EmptyStateProps } from '../EmptyState'
+import { EmptyState, type EmptyStateProps } from '../EmptyState'
 
 interface NoPhotosProps extends Omit<EmptyStateProps, 'icon' | 'title' | 'description'> {
   /**

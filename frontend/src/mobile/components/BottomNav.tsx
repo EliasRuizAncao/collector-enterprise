@@ -44,13 +44,16 @@ const BottomNav = () => {
 
         setPendingCount(data.pending || 0)
         setHasNotifications(data.notifications || false)
-      } catch (error) {
+      } catch (error: any) {
         // En desarrollo, usar valores mock
         if (import.meta.env.DEV) {
           setPendingCount(3)
           setHasNotifications(false)
         }
-        console.error('Error loading pending count:', error)
+        // Solo loggear errores que no sean 404 (endpoint no implementado aún)
+        if (error?.response?.status !== 404) {
+          console.error('Error loading pending count:', error)
+        }
       }
     }
 

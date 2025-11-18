@@ -1,5 +1,6 @@
 import { ReactNode } from 'react'
-import { motion, HTMLMotionProps } from 'framer-motion'
+import { motion } from 'framer-motion'
+import { type HTMLMotionProps } from '../../utils/animations'
 import { cn } from '@/shared/lib/utils'
 import { slideInFromBottom, fadeIn, getReducedMotionVariants } from '../../utils/animations'
 

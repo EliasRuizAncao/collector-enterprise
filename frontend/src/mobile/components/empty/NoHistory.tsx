@@ -1,5 +1,5 @@
 import { Clock } from 'lucide-react'
-import { EmptyState, EmptyStateProps } from '../EmptyState'
+import { EmptyState, type EmptyStateProps } from '../EmptyState'
 
 interface NoHistoryProps extends Omit<EmptyStateProps, 'icon' | 'title' | 'description'> {
   /**

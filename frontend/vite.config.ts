@@ -8,7 +8,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'prompt', // Cambiar a 'prompt' para permitir al usuario elegir cuándo actualizar
-      includeAssets: ['favicon.ico', 'robots.txt', 'icons/*.png'],
+      includeAssets: ['favicon.ico', 'robots.txt'],
       manifest: {
         name: 'Collector Enterprise - Amaranto',
         short_name: 'Collector',
@@ -33,8 +33,6 @@ export default defineConfig({
         // Pre-caching: Shell de la app y assets críticos
         globPatterns: [
           '**/*.{js,css,html,ico,png,svg,woff2}',
-          'index.html',
-          'manifest.webmanifest',
         ],
         // Estrategias de runtime caching
         runtimeCaching: [
@@ -115,7 +113,9 @@ export default defineConfig({
         clientsClaim: false,
         // Offline page
         navigateFallback: '/offline.html',
-        navigateFallbackDenylist: [/^\/api/, /^\/_/, /^\/admin/],
+        navigateFallbackDenylist: [/^\/api/, /^\/_/],
+        // Permitir rutas mobile y admin en el fallback
+        navigateFallbackAllowlist: [/^\/mobile/, /^\/admin/, /^\/$/],
       },
       // Configuración de actualización
       devOptions: {

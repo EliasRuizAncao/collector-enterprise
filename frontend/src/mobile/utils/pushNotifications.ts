@@ -164,14 +164,33 @@ const getServiceWorkerRegistration = async (): Promise<ServiceWorkerRegistration
     // Intentar obtener registration existente
     let registration = await navigator.serviceWorker.getRegistration()
 
-    // Si no existe, registrar el service worker
+    // Si no existe, intentar registrarlo (VitePWA debería manejarlo automáticamente)
     if (!registration) {
-      registration = await navigator.serviceWorker.register('/sw.js', {
-        scope: '/',
-      })
-
-      // Esperar a que el service worker esté activo
-      await navigator.serviceWorker.ready
+      // En desarrollo, VitePWA usa dev-sw.js, en producción usa sw.js
+      const swPath = import.meta.env.DEV ? '/dev-sw.js?dev-sw' : '/sw.js'
+      
+      try {
+        registration = await navigator.serviceWorker.register(swPath, {
+          scope: '/',
+        })
+        // Esperar a que el service worker esté activo
+        await navigator.serviceWorker.ready
+      } catch (error) {
+        // Si falla, intentar con sw.js como fallback
+        if (swPath !== '/sw.js') {
+          try {
+            registration = await navigator.serviceWorker.register('/sw.js', {
+              scope: '/',
+            })
+            await navigator.serviceWorker.ready
+          } catch (fallbackError) {
+            console.warn('No se pudo registrar Service Worker para notificaciones. VitePWA debería manejarlo.')
+            throw new Error('No se pudo registrar el service worker para notificaciones')
+          }
+        } else {
+          throw new Error('No se pudo registrar el service worker para notificaciones')
+        }
+      }
     }
 
     return registration
@@ -232,9 +251,15 @@ export const sendTokenToBackend = async (token: string): Promise<void> => {
       platform: isIOS() ? 'ios' : isAndroid() ? 'android' : 'web',
       userAgent: navigator.userAgent,
     })
-  } catch (error) {
-    console.error('Error al enviar token al backend:', error)
-    throw error
+  } catch (error: any) {
+    // Solo loggear errores que no sean 404 (endpoint no implementado aún)
+    if (error?.response?.status !== 404) {
+      console.error('Error al enviar token al backend:', error)
+    }
+    // No lanzar el error si es 404, es esperado en desarrollo
+    if (error?.response?.status !== 404) {
+      throw error
+    }
   }
 }
 
@@ -266,9 +291,15 @@ export const subscribeToNotifications = async (): Promise<void> => {
 
     // Configurar listeners para notificaciones
     setupNotificationListeners()
-  } catch (error) {
-    console.error('Error al suscribirse a notificaciones:', error)
-    throw error
+  } catch (error: any) {
+    // Solo loggear errores que no sean 404 (endpoint no implementado aún)
+    if (error?.response?.status !== 404) {
+      console.error('Error al suscribirse a notificaciones:', error)
+    }
+    // No lanzar el error si es 404, es esperado en desarrollo
+    if (error?.response?.status !== 404) {
+      throw error
+    }
   }
 }
 
