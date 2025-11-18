@@ -27,7 +27,6 @@ import {
   CardTitle,
 } from '@/shared/components/ui/card'
 import { Badge } from '@/shared/components/ui/badge'
-import { Button } from '@/shared/components/ui/button'
 import SortOptions, { type SortOption, type SortDirection } from '../components/SortOptions'
 import { Tutorial } from '../components/Tutorial'
 import { resetTutorialState } from '../utils/tutorialManager'

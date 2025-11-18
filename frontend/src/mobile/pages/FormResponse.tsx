@@ -20,6 +20,8 @@ import {
   FileText,
   HelpCircle,
   AlertTriangle,
+  LayoutGrid,
+  List,
 } from 'lucide-react'
 
 import { cn } from '@/shared/lib/utils'
@@ -62,8 +64,7 @@ import {
   MobileSwitch,
   MobileFileInput,
 } from '../components/inputs'
-import { SignaturePad, CameraCapture } from '../components'
-import { LocationPicker } from '../components/offline'
+import { SignaturePad, CameraCapture, LocationPicker } from '../components'
 
 /**
  * Tipo para los datos de respuesta del formulario
@@ -124,6 +125,14 @@ const FormField = ({
   onChange,
   onBlur,
   isOnline,
+  showCameraCapture,
+  currentPhotoField,
+  setShowCameraCapture,
+  setCurrentPhotoField,
+  showSignaturePad,
+  currentSignatureField,
+  setShowSignaturePad,
+  setCurrentSignatureField,
 }: {
   field: Field
   value: unknown
@@ -131,6 +140,14 @@ const FormField = ({
   onChange: (value: unknown) => void
   onBlur: () => void
   isOnline: boolean
+  showCameraCapture: boolean
+  currentPhotoField: string | null
+  setShowCameraCapture: (show: boolean) => void
+  setCurrentPhotoField: (fieldId: string | null) => void
+  showSignaturePad: boolean
+  currentSignatureField: string | null
+  setShowSignaturePad: (show: boolean) => void
+  setCurrentSignatureField: (fieldId: string | null) => void
 }) => {
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null)
 
@@ -426,8 +443,8 @@ const FormField = ({
             {error && (
               <p className="text-sm text-red-600">{error}</p>
             )}
-            {helperText && !error && (
-              <p className="text-sm text-muted-foreground">{helperText}</p>
+            {field.helperText && !error && (
+              <p className="text-sm text-muted-foreground">{field.helperText}</p>
             )}
             {showCameraCapture && currentPhotoField === field.id && (
               <CameraCapture
@@ -509,8 +526,8 @@ const FormField = ({
             {error && (
               <p className="text-sm text-red-600">{error}</p>
             )}
-            {helperText && !error && (
-              <p className="text-sm text-muted-foreground">{helperText}</p>
+            {field.helperText && !error && (
+              <p className="text-sm text-muted-foreground">{field.helperText}</p>
             )}
             {showSignaturePad && currentSignatureField === field.id && (
               <SignaturePad
@@ -613,6 +630,13 @@ const MobileFormResponse = () => {
   const [showCameraCapture, setShowCameraCapture] = useState(false)
   const [currentSignatureField, setCurrentSignatureField] = useState<string | null>(null)
   const [currentPhotoField, setCurrentPhotoField] = useState<string | null>(null)
+  
+  // Modo de visualización: 'single' = campo por campo, 'all' = todos los campos
+  const [viewMode, setViewMode] = useState<'single' | 'all'>(() => {
+    // Cargar preferencia del usuario desde localStorage
+    const saved = localStorage.getItem('form-view-mode')
+    return (saved === 'single' || saved === 'all') ? saved : 'all'
+  })
 
   const autoSaveTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const formContainerRef = useRef<HTMLDivElement>(null)
@@ -694,8 +718,18 @@ const MobileFormResponse = () => {
           form = formRes.data
         } else {
           // Obtener formulario por formId
-          const formResponse = await api.get(`/forms/${assignment.formId}`)
-          form = formResponse.data
+          try {
+            const formResponse = await api.get(`/forms/${assignment.formId}`)
+            form = formResponse.data
+          } catch (e: any) {
+            // Si falla con 404, usar datos mock o mostrar error
+            if (e?.response?.status === 404) {
+              setError('Formulario no encontrado. Verifica tu conexión.')
+              setIsLoading(false)
+              return
+            }
+            throw e
+          }
         }
 
         // Guardar assignment en cache usando dataManager (con compresión)
@@ -794,9 +828,12 @@ const MobileFormResponse = () => {
           })
           // Marcar como sincronizado si se guardó en servidor
           await offlineStorage.markAsSync(draftId)
-        } catch (e) {
+        } catch (e: any) {
           // Si falla, se guardó localmente y se sincronizará después
-          console.warn('Error al guardar borrador en servidor:', e)
+          // Solo loggear errores que no sean 404 (endpoint no implementado aún)
+          if (e?.response?.status !== 404) {
+            console.warn('Error al guardar borrador en servidor:', e)
+          }
         }
       }
 
@@ -893,9 +930,9 @@ const MobileFormResponse = () => {
     if (Object.keys(errors).length > 0) {
       // Scroll al primer error
       const firstErrorFieldId = Object.keys(errors)[0]
-      const firstErrorIndex = sortedFields.findIndex((f) => f.id === firstErrorFieldId)
-      if (firstErrorIndex >= 0) {
-        setState((prev) => ({ ...prev, currentFieldIndex: firstErrorIndex }))
+      const errorElement = document.getElementById(`field-${firstErrorFieldId}`)
+      if (errorElement && formContainerRef.current) {
+        errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
       }
 
       // Vibración háptica
@@ -970,6 +1007,20 @@ const MobileFormResponse = () => {
     onSwipeRight: goToPrevious,
     threshold: 50,
   })
+
+  // Scroll automático al campo actual en modo "campo por campo"
+  useEffect(() => {
+    if (viewMode === 'single' && currentField && formContainerRef.current) {
+      // Pequeño delay para asegurar que el DOM se haya actualizado
+      const timer = setTimeout(() => {
+        const fieldElement = document.getElementById(`field-${currentField.id}`)
+        if (fieldElement) {
+          fieldElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }
+      }, 100)
+      return () => clearTimeout(timer)
+    }
+  }, [viewMode, state.currentFieldIndex, currentField])
 
   // Enviar formulario
   const handleSubmit = useCallback(async () => {
@@ -1140,7 +1191,9 @@ const MobileFormResponse = () => {
         <div className="flex-1 px-3">
           <h1 className="truncate text-base font-semibold">{state.form.title}</h1>
           <p className="text-xs text-muted-foreground">
-            {completedFields} de {totalFields} campos
+            {viewMode === 'single' 
+              ? `Campo ${state.currentFieldIndex + 1} de ${totalFields}` 
+              : `${completedFields} de ${totalFields} campos`}
           </p>
         </div>
 
@@ -1158,6 +1211,33 @@ const MobileFormResponse = () => {
             <DropdownMenuItem onClick={handleSaveAndExit}>
               <Save className="mr-2 h-4 w-4" />
               Guardar y salir
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={() => {
+                const newMode = viewMode === 'single' ? 'all' : 'single'
+                setViewMode(newMode)
+                localStorage.setItem('form-view-mode', newMode)
+                // Si cambia a modo single, asegurar que el campo actual esté visible
+                if (newMode === 'single' && currentField) {
+                  const fieldElement = document.getElementById(`field-${currentField.id}`)
+                  if (fieldElement) {
+                    fieldElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                  }
+                }
+              }}
+            >
+              {viewMode === 'single' ? (
+                <>
+                  <LayoutGrid className="mr-2 h-4 w-4" />
+                  Ver todos los campos
+                </>
+              ) : (
+                <>
+                  <List className="mr-2 h-4 w-4" />
+                  Campo por campo
+                </>
+              )}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
@@ -1181,24 +1261,59 @@ const MobileFormResponse = () => {
         </div>
       )}
 
-      {/* Contenido Principal - One field per screen */}
+      {/* Contenido Principal */}
       <div
         ref={formContainerRef}
-        className="flex-1 overflow-y-auto"
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
+        className="flex-1 overflow-y-auto pb-24"
+        onTouchStart={viewMode === 'single' ? handleTouchStart : undefined}
+        onTouchMove={viewMode === 'single' ? handleTouchMove : undefined}
+        onTouchEnd={viewMode === 'single' ? handleTouchEnd : undefined}
       >
-        <div className="p-6">
-          {currentField && (
-            <FormField
-              field={currentField}
-              value={state.formData[currentField.id]}
-              error={state.validationErrors[currentField.id]}
-              onChange={(value) => handleFieldChange(currentField.id, value)}
-              onBlur={() => handleFieldBlur(currentField.id)}
-              isOnline={isOnline}
-            />
+        <div className="p-6 space-y-6">
+          {viewMode === 'all' ? (
+            // Modo: Todos los campos visibles
+            sortedFields.map((field) => (
+              <div key={field.id} id={`field-${field.id}`}>
+                <FormField
+                  field={field}
+                  value={state.formData[field.id]}
+                  error={state.validationErrors[field.id]}
+                  onChange={(value) => handleFieldChange(field.id, value)}
+                  onBlur={() => handleFieldBlur(field.id)}
+                  isOnline={isOnline}
+                  showCameraCapture={showCameraCapture}
+                  currentPhotoField={currentPhotoField}
+                  setShowCameraCapture={setShowCameraCapture}
+                  setCurrentPhotoField={setCurrentPhotoField}
+                  showSignaturePad={showSignaturePad}
+                  currentSignatureField={currentSignatureField}
+                  setShowSignaturePad={setShowSignaturePad}
+                  setCurrentSignatureField={setCurrentSignatureField}
+                />
+              </div>
+            ))
+          ) : (
+            // Modo: Campo por campo
+            currentField && (
+              <div id={`field-${currentField.id}`}>
+                <FormField
+                  field={currentField}
+                  value={state.formData[currentField.id]}
+                  error={state.validationErrors[currentField.id]}
+                  onChange={(value) => handleFieldChange(currentField.id, value)}
+                  onBlur={() => handleFieldBlur(currentField.id)}
+                  isOnline={isOnline}
+                  showCameraCapture={showCameraCapture}
+                  currentPhotoField={currentPhotoField}
+                  setShowCameraCapture={setShowCameraCapture}
+                  setCurrentPhotoField={setCurrentPhotoField}
+                  showSignaturePad={showSignaturePad}
+                  currentSignatureField={currentSignatureField}
+                  setShowSignaturePad={setShowSignaturePad}
+                  setCurrentSignatureField={setCurrentSignatureField}
+                />
+              </div>
+            )
           )}
 
           {/* Indicador de guardado */}
@@ -1219,50 +1334,87 @@ const MobileFormResponse = () => {
       </div>
 
       {/* Footer Sticky */}
-      <footer className="sticky bottom-0 border-t border-border bg-background px-4 py-3 safe-bottom">
+      <footer className="fixed bottom-16 left-0 right-0 z-[60] border-t border-border bg-background px-4 py-3 safe-bottom">
         <div className="flex items-center gap-3">
-          <Button
-            variant="ghost"
-            onClick={goToPrevious}
-            disabled={state.currentFieldIndex === 0}
-            className="flex-1"
-          >
-            Anterior
-          </Button>
+          {viewMode === 'single' ? (
+            // Modo campo por campo: mostrar navegación
+            <>
+              <Button
+                variant="ghost"
+                onClick={goToPrevious}
+                disabled={state.currentFieldIndex === 0}
+                className="flex-1"
+              >
+                Anterior
+              </Button>
 
-          {state.currentFieldIndex < totalFields - 1 ? (
-            <Button onClick={goToNext} className="flex-1" disabled={!currentField}>
-              Siguiente
-            </Button>
-          ) : (
-            <Button
-              onClick={handleSubmit}
-              disabled={state.isSubmitting || !currentField}
-              className="flex-1"
-            >
-              {state.isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Enviando...
-                </>
+              {state.currentFieldIndex < totalFields - 1 ? (
+                <Button onClick={goToNext} className="flex-1" disabled={!currentField}>
+                  Siguiente
+                </Button>
               ) : (
-                <>
-                  <Send className="mr-2 h-4 w-4" />
-                  Enviar
-                </>
+                <Button
+                  onClick={handleSubmit}
+                  disabled={state.isSubmitting || !currentField}
+                  className="flex-1"
+                >
+                  {state.isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Enviando...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="mr-2 h-4 w-4" />
+                      Enviar
+                    </>
+                  )}
+                </Button>
               )}
-            </Button>
-          )}
 
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={saveDraft}
-            disabled={!state.isDirty || state.isSaving}
-            title="Guardar borrador"
-          >
-            <Save className="h-4 w-4" />
-          </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={saveDraft}
+                disabled={!state.isDirty || state.isSaving}
+                title="Guardar borrador"
+              >
+                <Save className="h-4 w-4" />
+              </Button>
+            </>
+          ) : (
+            // Modo todos los campos: solo botón de enviar
+            <>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={saveDraft}
+                disabled={!state.isDirty || state.isSaving}
+                title="Guardar borrador"
+                className="flex-shrink-0"
+              >
+                <Save className="h-4 w-4" />
+              </Button>
+
+              <Button
+                onClick={handleSubmit}
+                disabled={state.isSubmitting}
+                className="flex-1"
+              >
+                {state.isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Enviando...
+                  </>
+                ) : (
+                  <>
+                    <Send className="mr-2 h-4 w-4" />
+                    Enviar
+                  </>
+                )}
+              </Button>
+            </>
+          )}
         </div>
       </footer>
 

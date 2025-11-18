@@ -47,6 +47,21 @@ export const LineChartCard = <TData extends Record<string, unknown>>({
 }: ChartCardProps<TData>) => {
   const [xKey, ...seriesKeys] = dataKeys
 
+  // Si no hay datos, mostrar mensaje
+  if (!data || data.length === 0) {
+    return (
+      <Card className="border-border/70">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-base font-semibold text-foreground">{title}</CardTitle>
+          {description ? <CardDescription>{description}</CardDescription> : null}
+        </CardHeader>
+        <CardContent className="flex h-72 items-center justify-center">
+          <p className="text-sm text-muted-foreground">No hay datos para mostrar</p>
+        </CardContent>
+      </Card>
+    )
+  }
+
   return (
     <Card className="border-border/70">
       <CardHeader className="space-y-1">
@@ -100,6 +115,21 @@ export const BarChartCard = <TData extends Record<string, unknown>>({
   colors = defaultColors,
 }: ChartCardProps<TData>) => {
   const [xKey, ...seriesKeys] = dataKeys
+
+  // Si no hay datos, mostrar mensaje
+  if (!data || data.length === 0) {
+    return (
+      <Card className="border-border/70">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-base font-semibold text-foreground">{title}</CardTitle>
+          {description ? <CardDescription>{description}</CardDescription> : null}
+        </CardHeader>
+        <CardContent className="flex h-72 items-center justify-center">
+          <p className="text-sm text-muted-foreground">No hay datos para mostrar</p>
+        </CardContent>
+      </Card>
+    )
+  }
 
   return (
     <Card className="border-border/70">

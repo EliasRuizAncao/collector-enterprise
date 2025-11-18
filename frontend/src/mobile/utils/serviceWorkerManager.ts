@@ -47,6 +47,7 @@ class ServiceWorkerManager {
 
   /**
    * Registrar Service Worker
+   * Nota: VitePWA ya registra el SW automáticamente, así que primero intentamos obtener el existente
    */
   async registerServiceWorker(): Promise<ServiceWorkerRegistration | null> {
     if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
@@ -55,10 +56,35 @@ class ServiceWorkerManager {
     }
 
     try {
-      // Registrar SW
-      const registration = await navigator.serviceWorker.register('/sw.js', {
-        scope: '/',
-      })
+      // Primero intentar obtener el SW ya registrado (por VitePWA)
+      let registration = await navigator.serviceWorker.getRegistration()
+      
+      // Si no existe, intentar registrarlo manualmente
+      if (!registration) {
+        // En desarrollo, VitePWA usa dev-sw.js, en producción usa sw.js
+        const swPath = import.meta.env.DEV ? '/dev-sw.js?dev-sw' : '/sw.js'
+        
+        try {
+          registration = await navigator.serviceWorker.register(swPath, {
+            scope: '/',
+          })
+        } catch (registerError) {
+          // Si falla, intentar con sw.js como fallback
+          if (swPath !== '/sw.js') {
+            try {
+              registration = await navigator.serviceWorker.register('/sw.js', {
+                scope: '/',
+              })
+            } catch (fallbackError) {
+              console.warn('No se pudo registrar Service Worker. VitePWA debería manejarlo automáticamente.')
+              return null
+            }
+          } else {
+            console.warn('No se pudo registrar Service Worker. VitePWA debería manejarlo automáticamente.')
+            return null
+          }
+        }
+      }
 
       this.registration = registration
 
@@ -89,12 +115,26 @@ class ServiceWorkerManager {
 
       this.notifyStateChange()
 
-      console.log('Service Worker registrado exitosamente')
+      if (registration) {
+        console.log('Service Worker obtenido/registrado exitosamente')
+      }
       return registration
     } catch (error) {
-      console.error('Error al registrar Service Worker:', error)
+      // No mostrar error si VitePWA ya está manejando el SW
+      console.warn('Service Worker: VitePWA debería manejarlo automáticamente', error)
       return null
     }
+  }
+
+  /**
+   * Obtener el registration actual del Service Worker
+   */
+  async getRegistration(): Promise<ServiceWorkerRegistration | null> {
+    if (!this.registration) {
+      // Si no hay registration, intentar obtenerlo o registrarlo
+      return await this.registerServiceWorker()
+    }
+    return this.registration
   }
 
   /**
@@ -269,18 +309,29 @@ export const serviceWorkerManager = new ServiceWorkerManager()
 
 /**
  * Registrar Service Worker al cargar
+ * Nota: En desarrollo, VitePWA maneja el registro automáticamente
+ * Solo intentamos obtener el registration existente
  */
 if (typeof window !== 'undefined') {
-  // Registrar cuando el DOM esté listo
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      serviceWorkerManager.registerServiceWorker()
-    })
-  } else {
-    serviceWorkerManager.registerServiceWorker()
+  // En desarrollo, VitePWA ya registra el SW, solo obtenemos el registration
+  // En producción, intentamos registrarlo si no existe
+  const initServiceWorker = async () => {
+    // Esperar un poco para que VitePWA termine de registrar
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    
+    // Intentar obtener el registration existente
+    const registration = await serviceWorkerManager.registerServiceWorker()
+    
+    if (registration) {
+      // Iniciar verificación periódica (cada hora)
+      serviceWorkerManager.startUpdateCheck(60)
+    }
   }
 
-  // Iniciar verificación periódica (cada hora)
-  serviceWorkerManager.startUpdateCheck(60)
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initServiceWorker)
+  } else {
+    initServiceWorker()
+  }
 }
 

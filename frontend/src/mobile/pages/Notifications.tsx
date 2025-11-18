@@ -403,6 +403,53 @@ const Notifications = () => {
     void loadNotifications()
   }, [loadNotifications])
 
+  // Configuración de filtros
+  const filterConfigs: FilterConfig[] = useMemo(
+    () => [
+      {
+        id: 'type',
+        type: 'select',
+        label: 'Tipo de notificación',
+        category: 'General',
+        options: [
+          { value: 'all', label: 'Todos los tipos' },
+          { value: 'new_task', label: 'Nueva tarea' },
+          { value: 'reminder', label: 'Recordatorio' },
+          { value: 'overdue', label: 'Vencida' },
+          { value: 'comment', label: 'Comentario' },
+          { value: 'update', label: 'Actualización' },
+          { value: 'system', label: 'Sistema' },
+          { value: 'security', label: 'Seguridad' },
+        ],
+      },
+      {
+        id: 'status',
+        type: 'select',
+        label: 'Estado',
+        category: 'General',
+        options: [
+          { value: 'all', label: 'Todos los estados' },
+          { value: 'unread', label: 'No leídas' },
+          { value: 'read', label: 'Leídas' },
+          { value: 'archived', label: 'Archivadas' },
+        ],
+      },
+      {
+        id: 'dateRange',
+        type: 'select',
+        label: 'Rango de fechas',
+        category: 'Fechas',
+        options: [
+          { value: 'all', label: 'Todas las fechas' },
+          { value: 'today', label: 'Hoy' },
+          { value: 'week', label: 'Esta semana' },
+          { value: 'month', label: 'Este mes' },
+        ],
+      },
+    ],
+    [],
+  )
+
   // Configuración de ordenamiento para notificaciones
   const sortOptions: SortOption[] = useMemo(
     () => [

@@ -79,6 +79,7 @@ const MobileSelect = ({
   const [searchQuery, setSearchQuery] = useState('')
   const [hasShaken, setHasShaken] = useState(false)
   const inputRef = useRef<HTMLButtonElement>(null)
+  const justSelectedRef = useRef(false)
 
   // Determinar si mostrar search
   const shouldShowSearch = showSearch !== undefined ? showSearch : options.length > 10
@@ -145,9 +146,16 @@ const MobileSelect = ({
         : [...currentValues, optionValue]
       onChange(newValues)
     } else {
+      // Marcar que se acaba de seleccionar un valor
+      justSelectedRef.current = true
+      // Cambiar el valor - esto limpiará el error automáticamente en handleFieldChange
       onChange(optionValue)
       setIsOpen(false)
-      onBlur?.()
+      // Validar después de que el estado se haya actualizado
+      setTimeout(() => {
+        justSelectedRef.current = false
+        onBlur?.()
+      }, 200)
     }
   }
 
@@ -244,7 +252,20 @@ const MobileSelect = ({
       )}
 
       {/* Sheet con opciones */}
-      <Sheet open={isOpen} onOpenChange={setIsOpen}>
+      <Sheet 
+        open={isOpen} 
+        onOpenChange={(open) => {
+          setIsOpen(open)
+          // Cuando se cierra el sheet sin seleccionar, llamar onBlur para validar
+          // Solo si no es múltiple y no se acaba de seleccionar un valor
+          if (!open && !multiple && !justSelectedRef.current) {
+            // Delay para asegurar que cualquier cambio de estado se haya procesado
+            setTimeout(() => {
+              onBlur?.()
+            }, 100)
+          }
+        }}
+      >
         <SheetContent side="bottom" className="h-[80vh]">
           <SheetHeader>
             <SheetTitle>{label || 'Seleccionar opción'}</SheetTitle>

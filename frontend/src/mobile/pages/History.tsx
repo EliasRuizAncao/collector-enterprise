@@ -33,6 +33,7 @@ import { es } from 'date-fns/locale'
 import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
 import { Badge } from '@/shared/components/ui/badge'
+import { Label } from '@/shared/components/ui/label'
 import {
   Card,
   CardContent,
@@ -189,19 +190,89 @@ const History = () => {
           setActivities(newActivities)
         }
       } catch (err: any) {
-        console.error('Error al cargar actividades:', err)
-        setError(err.response?.data?.error || 'No se pudieron cargar las actividades')
-        toast({
-          title: 'Error',
-          description: 'No se pudieron cargar las actividades',
-          variant: 'destructive',
-        })
+        // En desarrollo, usar datos mock si el endpoint no existe
+        if (import.meta.env.DEV && err?.response?.status === 404) {
+          const mockActivities: Activity[] = [
+            {
+              id: '1',
+              type: 'form_completed',
+              title: 'Formulario completado',
+              description: 'Se completó el formulario "Inspección de Obra"',
+              timestamp: new Date(Date.now() - 30 * 60 * 1000), // 30 min ago
+              status: 'success',
+              metadata: {
+                formId: 'f1',
+                formName: 'Inspección de Obra',
+                responseId: 'r1',
+              },
+            },
+            {
+              id: '2',
+              type: 'photo_captured',
+              title: 'Fotos capturadas',
+              description: 'Se capturaron 3 fotos en la obra',
+              timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2h ago
+              status: 'success',
+              metadata: {
+                photoCount: 3,
+                photoThumbnails: [],
+              },
+            },
+            {
+              id: '3',
+              type: 'task_started',
+              title: 'Tarea iniciada',
+              description: 'Se inició la tarea "Control de Materiales"',
+              timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000), // 5h ago
+              status: 'success',
+              metadata: {
+                formId: 'f2',
+                formName: 'Control de Materiales',
+              },
+            },
+            {
+              id: '4',
+              type: 'session_started',
+              title: 'Sesión iniciada',
+              description: 'Sesión de trabajo iniciada',
+              timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 día
+              status: 'success',
+              metadata: {
+                deviceInfo: 'Mobile App',
+              },
+            },
+          ]
+
+          if (append) {
+            setActivities((prev) => [...prev, ...mockActivities])
+          } else {
+            setActivities(mockActivities)
+          }
+          setHasMore(false)
+          return
+        }
+
+        // Solo loggear y mostrar errores que no sean 404
+        if (err?.response?.status !== 404) {
+          console.error('Error al cargar actividades:', err)
+          setError(err.response?.data?.error || 'No se pudieron cargar las actividades')
+          toast({
+            title: 'Error',
+            description: 'No se pudieron cargar las actividades',
+            variant: 'destructive',
+          })
+        } else {
+          // En producción, si el endpoint no existe, mostrar mensaje apropiado
+          if (!import.meta.env.DEV) {
+            setError('El endpoint de actividades no está disponible')
+          }
+        }
       } finally {
         setIsLoading(false)
         setIsLoadingMore(false)
       }
     },
-    [filters, searchQuery, toast],
+    [filterValues, searchQuery, toast],
   )
 
   // Transformar actividad de API a formato local

@@ -153,6 +153,16 @@ const MobileDateInput = ({
             type="date"
             value={getInputValue()}
             onChange={handleChange}
+            onClick={(e) => {
+              // Asegurar que el click abra el date picker en móviles
+              if (inputRef.current && 'showPicker' in HTMLInputElement.prototype) {
+                try {
+                  inputRef.current.showPicker()
+                } catch (err) {
+                  // showPicker puede fallar en algunos navegadores, ignorar
+                }
+              }
+            }}
             onBlur={(e) => {
               setIsFocused(false)
               onBlur?.()
@@ -178,15 +188,26 @@ const MobileDateInput = ({
               inputBaseClasses,
               getInputStateClasses(error, false, false, false),
               hasShaken && error && 'input-shake',
+              // El padding-right ya está manejado por CSS para inputs type="date"
+              // Solo agregar padding extra si hay botón de limpiar
               showClearButton && 'pr-10',
+              // Asegurar que el input sea clickeable
+              'cursor-pointer',
             )}
           />
 
-          {/* Icono de calendario */}
+          {/* Icono de calendario - clickeable para abrir el date picker */}
           {!showClearButton && (
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground">
+            <button
+              type="button"
+              onClick={() => {
+                inputRef.current?.showPicker?.() || inputRef.current?.click()
+              }}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1 rounded"
+              aria-label="Abrir selector de fecha"
+            >
               <Calendar className="h-5 w-5" />
-            </div>
+            </button>
           )}
 
           {/* Clear button */}
