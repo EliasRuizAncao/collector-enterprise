@@ -28,6 +28,9 @@ class ServiceWorkerManager {
   private stateListeners: Set<(state: ServiceWorkerState) => void> = new Set()
   private messageListeners: Set<(message: ServiceWorkerMessage) => void> = new Set()
   private broadcastChannel: BroadcastChannel | null = null
+  private connectionCheckInterval: number | null = null
+  private lastConnectionCheck: boolean = true
+  private isCheckingConnection: boolean = false
 
   constructor() {
     // Crear BroadcastChannel para comunicación
@@ -38,10 +41,117 @@ class ServiceWorkerManager {
       }
     }
 
-    // Escuchar cambios de conexión
+    // Escuchar cambios de conexión del navegador
     if (typeof window !== 'undefined') {
-      window.addEventListener('online', () => this.notifyStateChange())
-      window.addEventListener('offline', () => this.notifyStateChange())
+      window.addEventListener('online', () => {
+        // Cuando el navegador dice que está online, verificar realmente
+        this.checkRealConnection()
+      })
+      window.addEventListener('offline', () => {
+        // Cuando el navegador dice que está offline, actualizar inmediatamente
+        this.lastConnectionCheck = false
+        this.notifyStateChange()
+      })
+    }
+
+    // Verificar conexión real periódicamente (cada 30 segundos)
+    this.startConnectionCheck()
+  }
+
+  /**
+   * Verificar conexión real haciendo ping al backend
+   */
+  private async checkRealConnection(): Promise<boolean> {
+    if (this.isCheckingConnection) {
+      return this.lastConnectionCheck
+    }
+
+    this.isCheckingConnection = true
+
+    try {
+      // Si navigator.onLine es false, asumir offline sin verificar
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        this.lastConnectionCheck = false
+        this.isCheckingConnection = false
+        this.notifyStateChange()
+        return false
+      }
+
+      // Intentar hacer ping al endpoint /health del backend
+      const apiUrl = import.meta.env.VITE_API_URL || '/api'
+      let healthUrl: string
+      
+      if (apiUrl.startsWith('http')) {
+        // URL absoluta: http://localhost:3000/api -> http://localhost:3000/health
+        healthUrl = apiUrl.replace('/api', '/health')
+      } else {
+        // URL relativa: /api -> /health
+        healthUrl = '/health'
+      }
+
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 segundos timeout
+
+      try {
+        const response = await fetch(healthUrl, {
+          method: 'GET',
+          signal: controller.signal,
+          cache: 'no-cache',
+        })
+
+        clearTimeout(timeoutId)
+
+        if (response.ok) {
+          this.lastConnectionCheck = true
+          this.isCheckingConnection = false
+          this.notifyStateChange()
+          return true
+        } else {
+          this.lastConnectionCheck = false
+          this.isCheckingConnection = false
+          this.notifyStateChange()
+          return false
+        }
+      } catch (fetchError) {
+        clearTimeout(timeoutId)
+        // Si falla el fetch, probablemente no hay conexión
+        this.lastConnectionCheck = false
+        this.isCheckingConnection = false
+        this.notifyStateChange()
+        return false
+      }
+    } catch (error) {
+      this.lastConnectionCheck = false
+      this.isCheckingConnection = false
+      this.notifyStateChange()
+      return false
+    }
+  }
+
+  /**
+   * Iniciar verificación periódica de conexión
+   */
+  private startConnectionCheck(): void {
+    if (this.connectionCheckInterval) {
+      clearInterval(this.connectionCheckInterval)
+    }
+
+    // Verificar inmediatamente
+    this.checkRealConnection()
+
+    // Verificar cada 30 segundos
+    this.connectionCheckInterval = window.setInterval(() => {
+      this.checkRealConnection()
+    }, 30000)
+  }
+
+  /**
+   * Detener verificación periódica de conexión
+   */
+  private stopConnectionCheck(): void {
+    if (this.connectionCheckInterval) {
+      clearInterval(this.connectionCheckInterval)
+      this.connectionCheckInterval = null
     }
   }
 
@@ -220,7 +330,8 @@ class ServiceWorkerManager {
    * Obtener estado actual
    */
   getState(): ServiceWorkerState {
-    const isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true
+    // Usar la verificación real de conexión en lugar de solo navigator.onLine
+    const isOnline = this.lastConnectionCheck
     const controller = navigator.serviceWorker?.controller
     const waiting = this.registration?.waiting
     const installing = this.registration?.installing
@@ -295,6 +406,7 @@ class ServiceWorkerManager {
    */
   cleanup(): void {
     this.stopUpdateCheck()
+    this.stopConnectionCheck()
     this.stateListeners.clear()
     this.messageListeners.clear()
     if (this.broadcastChannel) {
