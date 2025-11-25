@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Ban, Edit, MoreHorizontal, Search, UserPlus } from 'lucide-react'
+import { Ban, Edit, MoreHorizontal, Search, UserPlus, Users } from 'lucide-react'
 
 import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
@@ -431,7 +431,11 @@ const UsersPage = () => {
       />
 
       {/* Loading Overlay */}
-      <LoadingOverlay isLoading={loading} message="Cargando usuarios..." />
+      <LoadingOverlay
+        isLoading={loading}
+        message="Cargando usuarios..."
+        icon={<Users className="h-8 w-8 text-primary" />}
+      />
     </div>
   )
 }

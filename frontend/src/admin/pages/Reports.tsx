@@ -672,6 +672,11 @@ const Reports = () => {
         isLoading={loading || exportLoading}
         type={exportType || (loading ? 'generating' : 'default')}
         message={loading ? 'Generando reporte...' : undefined}
+        icon={
+          !exportType && loading ? (
+            <BarChart3 className="h-8 w-8 text-primary" />
+          ) : undefined
+        }
       />
     </div>
   )

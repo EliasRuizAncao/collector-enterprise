@@ -433,7 +433,11 @@ const Forms = () => {
       />
 
       {/* Loading Overlay */}
-      <LoadingOverlay isLoading={loading} message="Cargando formularios..." />
+      <LoadingOverlay
+        isLoading={loading}
+        message="Cargando formularios..."
+        icon={<FileText className="h-8 w-8 text-primary" />}
+      />
     </div>
   )
 }

@@ -577,7 +577,11 @@ const FormResponses = () => {
       </Sheet>
 
       {/* Loading Overlay */}
-      <LoadingOverlay isLoading={loading} message="Cargando respuestas..." />
+      <LoadingOverlay
+        isLoading={loading}
+        message="Cargando respuestas..."
+        icon={<FileText className="h-8 w-8 text-primary" />}
+      />
     </div>
   )
 }

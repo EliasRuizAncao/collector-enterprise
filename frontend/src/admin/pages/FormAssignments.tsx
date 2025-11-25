@@ -489,7 +489,11 @@ const FormAssignments = () => {
       />
 
       {/* Loading Overlay */}
-      <LoadingOverlay isLoading={loading} message="Cargando asignaciones..." />
+      <LoadingOverlay
+        isLoading={loading}
+        message="Cargando asignaciones..."
+        icon={<CalendarIcon className="h-8 w-8 text-primary" />}
+      />
     </div>
   )
 }

@@ -1,18 +1,26 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { Loader2, FileSpreadsheet, FileText, BarChart3 } from 'lucide-react'
+import { type ReactNode } from 'react'
 
 interface LoadingOverlayProps {
   isLoading: boolean
   message?: string
   type?: 'default' | 'excel' | 'pdf' | 'generating'
+  icon?: ReactNode // Icono personalizado de la sección
 }
 
 /**
  * Componente de overlay de carga profesional
  * Muestra un overlay semitransparente con animaciones suaves
  */
-const LoadingOverlay = ({ isLoading, message, type = 'default' }: LoadingOverlayProps) => {
+const LoadingOverlay = ({ isLoading, message, type = 'default', icon }: LoadingOverlayProps) => {
   const getIcon = () => {
+    // Si se proporciona un icono personalizado, usarlo
+    if (icon) {
+      return icon
+    }
+
+    // Si no, usar el tipo por defecto
     switch (type) {
       case 'excel':
         return <FileSpreadsheet className="h-8 w-8 text-blue-600" />
@@ -56,19 +64,16 @@ const LoadingOverlay = ({ isLoading, message, type = 'default' }: LoadingOverlay
           >
             <motion.div
               animate={
-                type === 'default'
-                  ? { rotate: 360 }
-                  : type === 'generating'
-                    ? {
-                        scale: [1, 1.1, 1],
-                        rotate: [0, 5, -5, 0],
-                      }
-                    : {
-                        scale: [1, 1.1, 1],
-                      }
+                // Si hay icono personalizado o no es default, usar animación pulsante
+                icon || type !== 'default'
+                  ? {
+                      scale: [1, 1.1, 1],
+                      rotate: type === 'generating' ? [0, 5, -5, 0] : 0,
+                    }
+                  : { rotate: 360 }
               }
               transition={
-                type === 'default'
+                type === 'default' && !icon
                   ? { duration: 1, repeat: Infinity, ease: 'linear' }
                   : {
                       duration: 1.5,
@@ -87,7 +92,8 @@ const LoadingOverlay = ({ isLoading, message, type = 'default' }: LoadingOverlay
             >
               {getMessage()}
             </motion.p>
-            {(type === 'default' || type === 'generating') && (
+            {/* Mostrar puntos animados solo si no hay icono personalizado o es tipo default/generating */}
+            {(icon || type === 'default' || type === 'generating') && (
               <motion.div
                 className="flex gap-1"
                 initial={{ opacity: 0 }}

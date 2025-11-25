@@ -9,6 +9,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/shared/components/ui/aler
 import { Skeleton } from '@/shared/components/ui/skeleton'
 import { cn } from '@/shared/lib/utils'
 import api from '@/shared/lib/api'
+import LoadingOverlay from '@/shared/components/common/LoadingOverlay'
 
 // Interfaz actualizada con clases en español del modelo de Roboflow
 interface EPPDetection {
@@ -257,9 +258,7 @@ const EppMonitor = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {loading ? (
-              <Skeleton className="w-full h-[400px] rounded-lg" />
-            ) : images.length > 0 ? (
+            {images.length > 0 ? (
               <div className="space-y-4">
                 {/* Imagen principal (seleccionada o más reciente) */}
                 {/* Imagen principal (seleccionada o más reciente) */}
@@ -526,16 +525,6 @@ const EppMonitor = () => {
         </Card>
       )}
 
-      {/* Loading state inicial */}
-      {loading && !status && (
-        <Card>
-          <CardContent className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <p className="ml-3 text-muted-foreground">Cargando estado del sistema...</p>
-          </CardContent>
-        </Card>
-      )}
-
       {/* Error state */}
       {error && (
         <Alert variant="destructive">
@@ -544,6 +533,13 @@ const EppMonitor = () => {
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
+
+      {/* Loading Overlay */}
+      <LoadingOverlay
+        isLoading={loading}
+        message="Cargando monitoreo EPP..."
+        icon={<Camera className="h-8 w-8 text-primary" />}
+      />
     </div>
   )
 }

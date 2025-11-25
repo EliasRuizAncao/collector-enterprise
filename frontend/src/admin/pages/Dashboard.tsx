@@ -506,7 +506,13 @@ const Dashboard = () => {
       )}
 
       {/* Loading Overlay */}
-      {!useMockData && <LoadingOverlay isLoading={loading} message="Cargando dashboard..." />}
+      {!useMockData && (
+        <LoadingOverlay
+          isLoading={loading}
+          message="Cargando dashboard..."
+          icon={<BarChart3 className="h-8 w-8 text-primary" />}
+        />
+      )}
     </div>
   )
 }
