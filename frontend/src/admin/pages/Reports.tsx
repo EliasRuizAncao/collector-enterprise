@@ -50,7 +50,6 @@ import useReports, {
 } from '@/shared/hooks/useReports'
 import useForms from '@/shared/hooks/useForms'
 import useUsers from '@/shared/hooks/useUsers'
-import { exportToExcel } from '@/shared/utils/exportToExcel'
 import { AreaChartCard, ComposedChartCard, PieChartCard } from '@/admin/components/reports/AdvancedCharts'
 import { LineChartCard } from '@/admin/components/dashboard/Charts'
 
@@ -66,8 +65,15 @@ type ReportType =
 
 const Reports = () => {
   const { toast } = useToast()
-  const { getCompletionReport, getUserPerformanceReport, getFormAnalyticsReport, loading, error } =
-    useReports()
+  const {
+    getCompletionReport,
+    getUserPerformanceReport,
+    getFormAnalyticsReport,
+    exportReportToExcel,
+    exportReportToPDF,
+    loading,
+    error,
+  } = useReports()
   const { forms, fetchForms } = useForms()
   const { users, fetchUsers } = useUsers()
 
@@ -145,89 +151,91 @@ const Reports = () => {
     }
   }
 
-  // Exportar a Excel
-  const handleExportExcel = () => {
-    try {
-      let dataToExport: Record<string, unknown>[] = []
-
-      switch (reportType) {
-        case 'completion-by-user':
-        case 'completion-by-period':
-        case 'form-summary':
-        case 'compliance':
-          dataToExport = completionData.map((item) => ({
-            Usuario: item.userName,
-            Email: item.userEmail,
-            Formulario: item.formTitle,
-            'Total Respuestas': item.totalResponses,
-            'Asignaciones Totales': item.assignedCount,
-            'Completadas': item.completedCount,
-            'Tasa Completitud (%)': item.completionRate,
-            'Primera Respuesta': item.firstResponse,
-            'Última Respuesta': item.lastResponse,
-          }))
-          break
-
-        case 'user-performance':
-          dataToExport = performanceData.map((item) => ({
-            Usuario: item.userName,
-            Email: item.userEmail,
-            Rol: item.userRole,
-            'Total Respuestas': item.totalResponses,
-            'Formularios Únicos': item.uniqueFormsCompleted,
-            'Días Activos': item.daysActive,
-            'Promedio Respuestas/Día': item.averageResponsesPerDay,
-            'Primera Respuesta': item.firstResponse,
-            'Última Respuesta': item.lastResponse,
-            'Score Rendimiento': item.performanceScore,
-          }))
-          break
-      }
-
-      if (dataToExport.length === 0) {
-        toast({
-          title: 'No hay datos para exportar',
-          description: 'Genera un reporte primero.',
-          variant: 'destructive',
-        })
-        return
-      }
-
-      const reportTypeNames: Record<ReportType, string> = {
-        'completion-by-user': 'completitud-por-usuario',
-        'completion-by-period': 'completitud-por-periodo',
-        'form-summary': 'resumen-formulario',
-        compliance: 'cumplimiento',
-        'user-performance': 'rendimiento-usuarios',
-      }
-
-      exportToExcel(dataToExport, {
-        filename: `reporte-${reportTypeNames[reportType]}-${format(new Date(), 'yyyy-MM-dd')}`,
-        sheetName: 'Datos',
-        autoWidth: true,
-        dateFormat: 'locale',
-      })
-
-      toast({
-        title: 'Exportación exitosa',
-        description: 'El archivo Excel se ha descargado correctamente.',
-      })
-    } catch (err) {
-      console.error('Error al exportar a Excel:', err)
-      toast({
-        title: 'Error al exportar',
-        description: 'No se pudo exportar el archivo Excel.',
-        variant: 'destructive',
-      })
+  // Mapear tipos de reporte del frontend a tipos del backend
+  const getBackendReportType = (): 'completion' | 'user-performance' | 'form-analytics' | null => {
+    switch (reportType) {
+      case 'completion-by-user':
+      case 'completion-by-period':
+      case 'form-summary':
+      case 'compliance':
+        return 'completion'
+      case 'user-performance':
+        return 'user-performance'
+      default:
+        return null
     }
   }
 
-  // Exportar a PDF (placeholder - usar jspdf si está disponible)
-  const handleExportPDF = () => {
-    toast({
-      title: 'Funcionalidad en desarrollo',
-      description: 'La exportación a PDF estará disponible próximamente.',
-    })
+  // Exportar a Excel usando el backend
+  const handleExportExcel = async () => {
+    const backendType = getBackendReportType()
+    if (!backendType) {
+      toast({
+        title: 'Tipo de reporte no válido',
+        description: 'Selecciona un tipo de reporte válido.',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    // Si hay formulario seleccionado, usar form-analytics en lugar de completion
+    const exportType =
+      selectedFormId && backendType === 'completion' ? 'form-analytics' : backendType
+
+    const filters: ReportFilters = {
+      startDate: dateRange.from.toISOString(),
+      endDate: dateRange.to.toISOString(),
+    }
+
+    if (selectedFormId) {
+      filters.formId = selectedFormId
+    }
+
+    if (selectedUserId) {
+      filters.userId = selectedUserId
+    }
+
+    if (exportType === 'user-performance') {
+      filters.limit = 50
+    }
+
+    await exportReportToExcel(exportType as 'completion' | 'user-performance' | 'form-analytics', filters)
+  }
+
+  // Exportar a PDF usando el backend
+  const handleExportPDF = async () => {
+    const backendType = getBackendReportType()
+    if (!backendType) {
+      toast({
+        title: 'Tipo de reporte no válido',
+        description: 'Selecciona un tipo de reporte válido.',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    // Si hay formulario seleccionado, usar form-analytics en lugar de completion
+    const exportType =
+      selectedFormId && backendType === 'completion' ? 'form-analytics' : backendType
+
+    const filters: ReportFilters = {
+      startDate: dateRange.from.toISOString(),
+      endDate: dateRange.to.toISOString(),
+    }
+
+    if (selectedFormId) {
+      filters.formId = selectedFormId
+    }
+
+    if (selectedUserId) {
+      filters.userId = selectedUserId
+    }
+
+    if (exportType === 'user-performance') {
+      filters.limit = 50
+    }
+
+    await exportReportToPDF(exportType as 'completion' | 'user-performance' | 'form-analytics', filters)
   }
 
   // Imprimir reporte
