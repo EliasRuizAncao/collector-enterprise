@@ -5,6 +5,7 @@ import ProtectedRoute from '@/shared/components/auth/ProtectedRoute'
 import RoleProtectedRoute from '@/shared/components/common/RoleProtectedRoute'
 import RouteSkeleton from '@/shared/components/common/RouteSkeleton'
 import UpdatePrompt from '@/mobile/components/UpdatePrompt'
+import { ThemeProvider } from '@/shared/components/theme/ThemeProvider'
 
 // Landing Pages (cargadas inmediatamente, no lazy)
 import Landing from '@/landing/pages/Landing'
@@ -396,12 +397,12 @@ const AppRoutes = () => {
 
 function App() {
   return (
-    <>
+    <ThemeProvider defaultTheme="system">
       <UpdatePrompt autoShow={true} />
       <BrowserRouter>
         <AppRoutes />
       </BrowserRouter>
-    </>
+    </ThemeProvider>
   )
 }
 

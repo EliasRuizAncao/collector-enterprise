@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { NavLink, Outlet, useLocation, Link, useNavigate } from 'react-router-dom'
 import {
   FileText,
@@ -6,8 +6,6 @@ import {
   LogOut,
   Menu,
   Settings,
-  Sun,
-  Moon,
   Users,
   ClipboardList,
   BarChart3,
@@ -39,6 +37,7 @@ import { Avatar, AvatarFallback } from '@/shared/components/ui/avatar'
 import { useAuth } from '@/shared/hooks/useAuth'
 import { useAuthStore } from '@/shared/store/authStore'
 import NotificationBell from '@/components/layout/NotificationBell'
+import ThemeToggle from '@/shared/components/theme/ThemeToggle'
 
 type NavItem = {
   label: string
@@ -96,14 +95,11 @@ const allNavItems: NavItem[] = [
   },
 ]
 
-const storageThemeKey = 'collector-enterprise-theme'
-
 const AdminLayout = () => {
   const location = useLocation()
   const { user, logout } = useAuth()
   const userRole = useAuthStore((state) => state.user?.role)
   const navigate = useNavigate()
-  const [isDarkMode, setIsDarkMode] = useState(false)
   const [isSheetOpen, setIsSheetOpen] = useState(false)
   const userInitials = useMemo(() => {
     const source = user?.name ?? user?.email ?? 'Invitado'
@@ -124,31 +120,6 @@ const AdminLayout = () => {
       return item.allowedRoles.includes(userRole as 'ADMIN' | 'MANAGER' | 'SUPERVISOR' | 'OPERATOR')
     })
   }, [userRole])
-
-  // Sincroniza el tema con el valor guardado o la preferencia del sistema
-  useEffect(() => {
-    if (typeof window === 'undefined') {
-      return
-    }
-
-    const savedTheme = window.localStorage.getItem(storageThemeKey)
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    const shouldEnableDark = savedTheme ? savedTheme === 'dark' : prefersDark
-
-    setIsDarkMode(shouldEnableDark)
-    document.documentElement.classList.toggle('dark', shouldEnableDark)
-  }, [])
-
-  const handleToggleTheme = () => {
-    if (typeof window === 'undefined') {
-      return
-    }
-
-    const nextThemeIsDark = !isDarkMode
-    setIsDarkMode(nextThemeIsDark)
-    document.documentElement.classList.toggle('dark', nextThemeIsDark)
-    window.localStorage.setItem(storageThemeKey, nextThemeIsDark ? 'dark' : 'light')
-  }
 
   // Construye los breadcrumbs dinámicamente a partir de la ruta actual
   const breadcrumbs = useMemo(() => {
@@ -340,17 +311,7 @@ const AdminLayout = () => {
 
           <div className="flex items-center gap-2">
             <NotificationBell />
-
-            <Button
-              variant="ghost"
-              size="icon"
-              className="rounded-full border border-border/60"
-              onClick={handleToggleTheme}
-            >
-              {isDarkMode ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
-              <span className="sr-only">Cambiar tema</span>
-            </Button>
-
+            <ThemeToggle />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
