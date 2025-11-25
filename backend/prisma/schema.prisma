@@ -29,11 +29,12 @@ enum AssignmentFrequency {
   CUSTOM
 }
 
+// Tipos de notificaciones del sistema
 enum NotificationType {
-  FORM_ASSIGNED
-  FORM_COMPLETED
-  DEADLINE_APPROACHING
-  SYSTEM
+  FORM_ASSIGNED // Formulario asignado a un usuario
+  FORM_COMPLETED // Formulario completado
+  DEADLINE // Fecha límite próxima o vencida
+  SYSTEM // Notificación del sistema
 }
 
 model User {
@@ -122,17 +123,20 @@ model AuditLog {
   @@index([module, createdAt])
 }
 
+// Modelo de notificaciones para usuarios
 model Notification {
   id        String           @id @default(uuid())
-  userId    String
-  title     String
-  message   String
-  type      NotificationType
-  read      Boolean          @default(false)
-  createdAt DateTime         @default(now())
+  userId    String // Usuario destinatario de la notificación
+  title     String // Título de la notificación
+  message   String // Mensaje de la notificación
+  type      NotificationType // Tipo de notificación
+  read      Boolean          @default(false) // Indica si la notificación fue leída
+  link      String? // Link opcional para navegar (ej: /forms/123)
+  createdAt DateTime         @default(now()) // Fecha de creación
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  // Índices para optimizar consultas por usuario, estado de lectura y fecha
   @@index([userId, read, createdAt])
   @@index([userId, createdAt])
 }

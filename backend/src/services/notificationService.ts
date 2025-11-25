@@ -30,6 +30,7 @@ export const notifyFormAssigned = async (userId: string, formId: string) => {
       message: `Se te ha asignado el formulario "${form.title}". Por favor, complétalo antes de la fecha límite.`,
       type: NotificationType.FORM_ASSIGNED,
       read: false,
+      link: `/forms/${formId}`, // Link al formulario asignado
     },
   })
 
@@ -81,6 +82,7 @@ export const notifyFormCompleted = async (
       message: `${user.name} ha completado el formulario "${form.title}".`,
       type: NotificationType.FORM_COMPLETED,
       read: false,
+      link: `/forms/${formId}/responses`, // Link a las respuestas del formulario
     },
   })
 
@@ -135,8 +137,9 @@ export const notifyDeadlineApproaching = async (
       userId,
       title: 'Fecha límite próxima',
       message: `El formulario "${assignment.form.title}" vence en ${daysRemaining} día${daysRemaining !== 1 ? 's' : ''}. Por favor, complétalo a tiempo.`,
-      type: NotificationType.DEADLINE_APPROACHING,
+      type: NotificationType.DEADLINE,
       read: false,
+      link: `/forms/${assignment.formId}`, // Link al formulario con fecha límite próxima
     },
   })
 
