@@ -42,7 +42,7 @@ import { Alert, AlertDescription } from '@/shared/components/ui/alert'
 import { cn } from '@/shared/lib/utils'
 import { useAuthStore } from '@/shared/store/authStore'
 import LoadingOverlay from '@/shared/components/common/LoadingOverlay'
-import useAuditLogs, { type AuditLog } from '@/shared/hooks/useAuditLogs'
+import { useAuditLogs, type AuditLog } from '@/shared/hooks/useAuditLogs'
 import useUsers from '@/shared/hooks/useUsers'
 
 /**
@@ -66,9 +66,9 @@ const AuditLog = () => {
   const { users, fetchUsers } = useUsers()
 
   // Filtros
-  const [userId, setUserId] = useState<string>('')
-  const [module, setModule] = useState<string>('')
-  const [action, setAction] = useState<string>('')
+  const [userId, setUserId] = useState<string>('all')
+  const [module, setModule] = useState<string>('all')
+  const [action, setAction] = useState<string>('all')
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({
     from: startOfDay(subDays(new Date(), 30)),
     to: endOfDay(new Date()),
@@ -97,9 +97,9 @@ const AuditLog = () => {
     void fetchAuditLogs({
       page: currentPage,
       limit: 20,
-      userId: userId || undefined,
-      module: module || undefined,
-      action: action || undefined,
+      userId: userId && userId !== 'all' ? userId : undefined,
+      module: module && module !== 'all' ? module : undefined,
+      action: action && action !== 'all' ? action : undefined,
       startDate: dateRange.from.toISOString(),
       endDate: dateRange.to.toISOString(),
     })
@@ -149,9 +149,9 @@ const AuditLog = () => {
    * Limpia todos los filtros
    */
   const clearFilters = () => {
-    setUserId('')
-    setModule('')
-    setAction('')
+    setUserId('all')
+    setModule('all')
+    setAction('all')
     setDateRange({
       from: startOfDay(subDays(new Date(), 30)),
       to: endOfDay(new Date()),
@@ -164,15 +164,15 @@ const AuditLog = () => {
    */
   const handleExportCSV = async () => {
     await exportToCSV({
-      userId: userId || undefined,
-      module: module || undefined,
-      action: action || undefined,
+      userId: userId && userId !== 'all' ? userId : undefined,
+      module: module && module !== 'all' ? module : undefined,
+      action: action && action !== 'all' ? action : undefined,
       startDate: dateRange.from.toISOString(),
       endDate: dateRange.to.toISOString(),
     })
   }
 
-  const hasActiveFilters = userId || module || action
+  const hasActiveFilters = (userId && userId !== 'all') || (module && module !== 'all') || (action && action !== 'all')
 
   return (
     <div className="space-y-6">
@@ -220,7 +220,7 @@ const AuditLog = () => {
                   <SelectValue placeholder="Todos los usuarios" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos</SelectItem>
+                  <SelectItem value="all">Todos</SelectItem>
                   {users.map((user) => (
                     <SelectItem key={user.id} value={user.id}>
                       {user.name} ({user.email})
@@ -235,14 +235,14 @@ const AuditLog = () => {
               <Label>Módulo</Label>
               <Select value={module} onValueChange={(value) => {
                 setModule(value)
-                setAction('') // Resetear acción cuando cambia el módulo
+                setAction('all') // Resetear acción cuando cambia el módulo
                 setCurrentPage(1)
               }}>
                 <SelectTrigger>
                   <SelectValue placeholder="Todos los módulos" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos</SelectItem>
+                  <SelectItem value="all">Todos</SelectItem>
                   {modules.map((mod) => (
                     <SelectItem key={mod} value={mod}>
                       {mod}
@@ -263,7 +263,7 @@ const AuditLog = () => {
                   <SelectValue placeholder="Todas las acciones" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todas</SelectItem>
+                  <SelectItem value="all">Todas</SelectItem>
                   {actions.map((act) => (
                     <SelectItem key={act} value={act}>
                       {act}
