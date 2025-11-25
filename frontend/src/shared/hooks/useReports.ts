@@ -126,6 +126,8 @@ export interface FormAnalyticsData {
 export const useReports = () => {
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
+  const [exportLoading, setExportLoading] = useState(false)
+  const [exportType, setExportType] = useState<'excel' | 'pdf' | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   /**
@@ -239,7 +241,8 @@ export const useReports = () => {
   const exportReportToExcel = useCallback(
     async (type: 'completion' | 'user-performance' | 'form-analytics', filters?: ReportFilters): Promise<boolean> => {
       try {
-        setLoading(true)
+        setExportLoading(true)
+        setExportType('excel')
         setError(null)
 
         const params = new URLSearchParams()
@@ -292,7 +295,8 @@ export const useReports = () => {
         })
         return false
       } finally {
-        setLoading(false)
+        setExportLoading(false)
+        setExportType(null)
       }
     },
     [toast],
@@ -304,7 +308,8 @@ export const useReports = () => {
   const exportReportToPDF = useCallback(
     async (type: 'completion' | 'user-performance' | 'form-analytics', filters?: ReportFilters): Promise<boolean> => {
       try {
-        setLoading(true)
+        setExportLoading(true)
+        setExportType('pdf')
         setError(null)
 
         const params = new URLSearchParams()
@@ -357,7 +362,8 @@ export const useReports = () => {
         })
         return false
       } finally {
-        setLoading(false)
+        setExportLoading(false)
+        setExportType(null)
       }
     },
     [toast],
@@ -365,6 +371,8 @@ export const useReports = () => {
 
   return {
     loading,
+    exportLoading,
+    exportType,
     error,
     getCompletionReport,
     getUserPerformanceReport,

@@ -52,6 +52,7 @@ import useForms from '@/shared/hooks/useForms'
 import useUsers from '@/shared/hooks/useUsers'
 import { AreaChartCard, ComposedChartCard, PieChartCard } from '@/admin/components/reports/AdvancedCharts'
 import { LineChartCard } from '@/admin/components/dashboard/Charts'
+import LoadingOverlay from '@/shared/components/common/LoadingOverlay'
 
 /**
  * Tipos de reporte disponibles
@@ -72,6 +73,8 @@ const Reports = () => {
     exportReportToExcel,
     exportReportToPDF,
     loading,
+    exportLoading,
+    exportType,
     error,
   } = useReports()
   const { forms, fetchForms } = useForms()
@@ -310,15 +313,25 @@ const Reports = () => {
           </Button>
           {completionData.length > 0 || performanceData.length > 0 ? (
             <>
-              <Button variant="outline" onClick={handleExportExcel} className="gap-2">
+              <Button
+                variant="outline"
+                onClick={handleExportExcel}
+                disabled={exportLoading || loading}
+                className="gap-2"
+              >
                 <FileSpreadsheet className="h-4 w-4" />
                 Excel
               </Button>
-              <Button variant="outline" onClick={handleExportPDF} className="gap-2">
+              <Button
+                variant="outline"
+                onClick={handleExportPDF}
+                disabled={exportLoading || loading}
+                className="gap-2"
+              >
                 <FileText className="h-4 w-4" />
                 PDF
               </Button>
-              <Button variant="outline" onClick={handlePrint} className="gap-2">
+              <Button variant="outline" onClick={handlePrint} disabled={exportLoading} className="gap-2">
                 <Printer className="h-4 w-4" />
                 Imprimir
               </Button>
@@ -652,6 +665,9 @@ const Reports = () => {
           )}
         </>
       )}
+
+      {/* Loading Overlay para exportaciones */}
+      <LoadingOverlay isLoading={exportLoading} type={exportType || 'default'} />
     </div>
   )
 }
