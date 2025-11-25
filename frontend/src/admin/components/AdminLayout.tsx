@@ -12,6 +12,7 @@ import {
   Users,
   ClipboardList,
   BarChart3,
+  Camera,
 } from 'lucide-react'
 
 import { cn } from '@/shared/lib/utils'
@@ -67,6 +68,12 @@ const allNavItems: NavItem[] = [
     to: '/admin/usuarios',
     icon: Users,
     allowedRoles: ['ADMIN', 'MANAGER'],
+  },
+  {
+    label: 'Cámara EPP',
+    to: '/admin/epp-monitor',
+    icon: Camera,
+    allowedRoles: ['ADMIN', 'MANAGER', 'SUPERVISOR'],
   },
   {
     label: 'Reportes',

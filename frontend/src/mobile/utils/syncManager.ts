@@ -88,17 +88,89 @@ class SyncManager {
   private lastSyncDate: Date | null = null
   private syncInterval: number | null = null
   private isOnline: boolean = navigator.onLine
+  private isCheckingConnection: boolean = false
 
   constructor() {
     // Escuchar cambios de conexión
     if (typeof window !== 'undefined') {
-      window.addEventListener('online', () => {
-        this.isOnline = true
-        this.autoSync()
+      window.addEventListener('online', async () => {
+        // Verificar conexión real antes de marcar como online
+        await this.checkRealConnection()
+        if (this.isOnline) {
+          this.autoSync()
+        }
       })
       window.addEventListener('offline', () => {
         this.isOnline = false
       })
+    }
+
+    // Verificar conexión real al inicializar
+    this.checkRealConnection()
+  }
+
+  /**
+   * Verificar conexión real haciendo ping al backend
+   */
+  private async checkRealConnection(): Promise<boolean> {
+    if (this.isCheckingConnection) {
+      return this.isOnline
+    }
+
+    this.isCheckingConnection = true
+
+    try {
+      // Si navigator.onLine es false, asumir offline sin verificar
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        this.isOnline = false
+        this.isCheckingConnection = false
+        return false
+      }
+
+      // Intentar hacer ping al endpoint /health del backend
+      const apiUrl = import.meta.env.VITE_API_URL || '/api'
+      let healthUrl: string
+      
+      if (apiUrl.startsWith('http')) {
+        // URL absoluta: http://localhost:3000/api -> http://localhost:3000/health
+        healthUrl = apiUrl.replace('/api', '/health')
+      } else {
+        // URL relativa: /api -> /health
+        healthUrl = '/health'
+      }
+
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 segundos timeout
+
+      try {
+        const response = await fetch(healthUrl, {
+          method: 'GET',
+          signal: controller.signal,
+          cache: 'no-cache',
+        })
+
+        clearTimeout(timeoutId)
+
+        if (response.ok) {
+          this.isOnline = true
+          this.isCheckingConnection = false
+          return true
+        } else {
+          this.isOnline = false
+          this.isCheckingConnection = false
+          return false
+        }
+      } catch (fetchError) {
+        clearTimeout(timeoutId)
+        // Si falla el fetch, probablemente no hay conexión
+        this.isOnline = false
+        this.isCheckingConnection = false
+        return false
+      }
+    } catch (error) {
+      this.isOnline = false
+      this.isCheckingConnection = false
+      return false
     }
   }
 
@@ -114,6 +186,9 @@ class SyncManager {
       console.warn('Sync ya está en progreso')
       return
     }
+
+    // Verificar conexión real antes de sincronizar
+    await this.checkRealConnection()
 
     if (!this.isOnline) {
       throw new Error('No hay conexión a Internet')
