@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { NavLink, Outlet, useLocation, Link, useNavigate } from 'react-router-dom'
 import {
-  Bell,
   FileText,
   LayoutDashboard,
   LogOut,
@@ -38,6 +37,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/shared/components/ui/sheet'
 import { Avatar, AvatarFallback } from '@/shared/components/ui/avatar'
 import { useAuth } from '@/shared/hooks/useAuth'
 import { useAuthStore } from '@/shared/store/authStore'
+import NotificationBell from '@/components/layout/NotificationBell'
 
 type NavItem = {
   label: string
@@ -332,14 +332,7 @@ const AdminLayout = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="rounded-full border border-border/60"
-            >
-              <Bell className="h-5 w-5" />
-              <span className="sr-only">Ver notificaciones</span>
-            </Button>
+            <NotificationBell />
 
             <Button
               variant="ghost"
