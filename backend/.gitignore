@@ -3,3 +3,15 @@ node_modules
 .env
 dist/
 /generated/prisma
+
+# Python virtual environment
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Imágenes y archivos subidos
+uploads/
+reconocimiento/recibidos/

@@ -60,11 +60,19 @@ const corsOptions: CorsOptions = {
 
 app.use(cors(corsOptions))
 
-// Rate limiting
+// Rate limiting general
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
   max: 100, // 100 requests por IP
 })
+
+// Rate limiting específico para EPP (más permisivo para monitoreo en tiempo real)
+const eppLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minuto
+  max: 120, // 120 requests por minuto (permite polling cada 0.5 segundos)
+  message: 'Demasiadas solicitudes al sistema de monitoreo EPP, por favor intente más tarde'
+})
+
 app.use('/api', limiter)
 
 // Body parsing
@@ -99,7 +107,7 @@ app.use('/api/responses', responseRoutes) // Ruta principal para respuestas
 app.use('/api/form-responses', responseRoutes) // Mantener compatibilidad
 app.use('/api/search', searchRoutes) // Búsqueda global
 app.use('/api/reports', reportRoutes) // Reportes (solo ADMIN y MANAGER)
-app.use('/api/v1/epp', eppRoutes) // Rutas de EPP
+app.use('/api/v1/epp', eppLimiter, eppRoutes) // Rutas de EPP con rate limiter específico
 app.use('/api/notifications', notificationRoutes) // Notificaciones
 app.use('/api/audit-logs', auditLogRoutes) // Logs de auditoría (solo ADMIN)
 

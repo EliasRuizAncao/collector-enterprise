@@ -72,12 +72,29 @@ const analyzeImage = async (imagePath: string): Promise<EPPDetection> => {
   // El script espera recibir la ruta absoluta de la imagen
   const absoluteImagePath = path.resolve(imagePath)
   // Detectar Python en venv o sistema
+  // Intentar primero con 'venv', luego con '.venv' como fallback
   const venvPython = process.platform === 'win32'
+    ? path.join(BACKEND_ROOT, 'venv', 'Scripts', 'python.exe')
+    : path.join(BACKEND_ROOT, 'venv', 'bin', 'python')
+  
+  const venvPythonAlt = process.platform === 'win32'
     ? path.join(BACKEND_ROOT, '.venv', 'Scripts', 'python.exe')
     : path.join(BACKEND_ROOT, '.venv', 'bin', 'python')
 
-  // Verificar si existe el venv, si no usar 'python' del sistema
-  const pythonExecutable = await fs.access(venvPython).then(() => venvPython).catch(() => 'python')
+  // Verificar si existe el venv, intentar ambas rutas
+  let pythonExecutable = 'python'
+  try {
+    await fs.access(venvPython)
+    pythonExecutable = venvPython
+  } catch {
+    try {
+      await fs.access(venvPythonAlt)
+      pythonExecutable = venvPythonAlt
+    } catch {
+      // Usar 'python' del sistema como fallback
+      pythonExecutable = 'python'
+    }
+  }
 
   return new Promise((resolve, reject) => {
     const pythonProcess = spawn(pythonExecutable, [PYTHON_SCRIPT_PATH, absoluteImagePath], {
