@@ -14,6 +14,7 @@ import responseRoutes from './routes/response.routes'
 import searchRoutes from './routes/search.routes'
 import reportRoutes from './routes/report.routes'
 import eppRoutes from './routes/epp.routes'
+import notificationRoutes from './routes/notification.routes'
 
 import { errorHandler } from './middleware/errorHandler'
 import path from 'path'
@@ -98,6 +99,7 @@ app.use('/api/form-responses', responseRoutes) // Mantener compatibilidad
 app.use('/api/search', searchRoutes) // Búsqueda global
 app.use('/api/reports', reportRoutes) // Reportes (solo ADMIN y MANAGER)
 app.use('/api/v1/epp', eppRoutes) // Rutas de EPP
+app.use('/api/notifications', notificationRoutes) // Notificaciones
 
 // Error handler (debe ser el último middleware)
 app.use(errorHandler)
