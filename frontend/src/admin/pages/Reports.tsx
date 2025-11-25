@@ -467,7 +467,8 @@ const Reports = () => {
       )}
 
       {/* Preview del reporte */}
-      {loading ? (
+      {/* Mostrar skeleton solo si no hay datos y está cargando por primera vez */}
+      {loading && completionData.length === 0 && performanceData.length === 0 ? (
         <div className="space-y-4">
           <Card>
             <CardHeader>
@@ -666,8 +667,12 @@ const Reports = () => {
         </>
       )}
 
-      {/* Loading Overlay para exportaciones */}
-      <LoadingOverlay isLoading={exportLoading} type={exportType || 'default'} />
+      {/* Loading Overlay para generación y exportación */}
+      <LoadingOverlay
+        isLoading={loading || exportLoading}
+        type={exportType || (loading ? 'generating' : 'default')}
+        message={loading ? 'Generando reporte...' : undefined}
+      />
     </div>
   )
 }

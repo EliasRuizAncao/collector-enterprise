@@ -1,10 +1,10 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { Loader2, FileSpreadsheet, FileText } from 'lucide-react'
+import { Loader2, FileSpreadsheet, FileText, BarChart3 } from 'lucide-react'
 
 interface LoadingOverlayProps {
   isLoading: boolean
   message?: string
-  type?: 'default' | 'excel' | 'pdf'
+  type?: 'default' | 'excel' | 'pdf' | 'generating'
 }
 
 /**
@@ -18,6 +18,8 @@ const LoadingOverlay = ({ isLoading, message, type = 'default' }: LoadingOverlay
         return <FileSpreadsheet className="h-8 w-8 text-blue-600" />
       case 'pdf':
         return <FileText className="h-8 w-8 text-red-600" />
+      case 'generating':
+        return <BarChart3 className="h-8 w-8 text-primary" />
       default:
         return <Loader2 className="h-8 w-8 text-primary animate-spin" />
     }
@@ -53,12 +55,22 @@ const LoadingOverlay = ({ isLoading, message, type = 'default' }: LoadingOverlay
             className="flex flex-col items-center justify-center gap-4 rounded-lg bg-card p-8 shadow-lg border"
           >
             <motion.div
-              animate={{ rotate: type === 'default' ? 360 : 0 }}
+              animate={
+                type === 'default'
+                  ? { rotate: 360 }
+                  : type === 'generating'
+                    ? {
+                        scale: [1, 1.1, 1],
+                        rotate: [0, 5, -5, 0],
+                      }
+                    : {
+                        scale: [1, 1.1, 1],
+                      }
+              }
               transition={
                 type === 'default'
                   ? { duration: 1, repeat: Infinity, ease: 'linear' }
                   : {
-                      scale: [1, 1.1, 1],
                       duration: 1.5,
                       repeat: Infinity,
                       ease: 'easeInOut',
@@ -75,7 +87,7 @@ const LoadingOverlay = ({ isLoading, message, type = 'default' }: LoadingOverlay
             >
               {getMessage()}
             </motion.p>
-            {type === 'default' && (
+            {(type === 'default' || type === 'generating') && (
               <motion.div
                 className="flex gap-1"
                 initial={{ opacity: 0 }}
