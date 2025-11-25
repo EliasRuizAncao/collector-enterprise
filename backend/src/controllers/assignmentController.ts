@@ -8,6 +8,7 @@ import {
   updateAssignmentSchema,
   listAssignmentsQuerySchema,
 } from '@/validators/assignmentValidator'
+import { notifyFormAssigned } from '@/services/notificationService'
 
 const prisma = new PrismaClient()
 const ASSIGNMENTS_MODULE = 'ASSIGNMENTS'
@@ -316,6 +317,18 @@ export const createAssignments = async (req: Request, res: Response, next: NextF
       },
       req,
     )
+
+    // Notificar a cada usuario sobre su nueva asignación
+    // No bloquear la respuesta si alguna notificación falla
+    for (const assignment of assignments) {
+      notifyFormAssigned(assignment.userId, payload.formId).catch((err) => {
+        console.error(
+          `[createAssignments] Error al notificar usuario ${assignment.userId}:`,
+          err,
+        )
+        // No fallar la operación principal si la notificación falla
+      })
+    }
 
     // TODO: Enviar notificaciones a los usuarios asignados
     // await notificationService.sendAssignmentNotifications(assignments)

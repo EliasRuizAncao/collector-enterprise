@@ -5,6 +5,8 @@ import { z } from 'zod'
 import { AuthRequest } from '@/middleware/auth'
 import { submitResponseSchema, listResponsesQuerySchema } from '@/validators/responseValidator'
 import type { Field, FieldType } from '@/types/formBuilder'
+import { notifyFormCompleted } from '@/services/notificationService'
+import { Role } from '@prisma/client'
 
 const prisma = new PrismaClient()
 const RESPONSES_MODULE = 'RESPONSES'
@@ -368,8 +370,31 @@ export const submitResponse = async (req: Request, res: Response, next: NextFunc
     })
     console.log('[submitResponse] Audit log iniciado (no bloqueante)')
 
-    // TODO: Notificar a supervisores si es necesario
-    // await notificationService.notifySupervisors(response)
+    // Notificar a supervisores sobre la respuesta completada
+    // Buscar supervisores (MANAGER o SUPERVISOR) para notificar
+    try {
+      const supervisors = await prisma.user.findMany({
+        where: {
+          role: { in: [Role.MANAGER, Role.SUPERVISOR] },
+          isActive: true,
+        },
+        select: { id: true },
+      })
+
+      // Notificar a cada supervisor (no bloquear si falla)
+      for (const supervisor of supervisors) {
+        notifyFormCompleted(supervisor.id, userId, payload.formId).catch((err) => {
+          console.error(
+            `[submitResponse] Error al notificar supervisor ${supervisor.id}:`,
+            err,
+          )
+          // No fallar la operación principal si la notificación falla
+        })
+      }
+    } catch (err) {
+      console.error('[submitResponse] Error al buscar supervisores para notificar:', err)
+      // No fallar la operación principal si la búsqueda de supervisores falla
+    }
 
     // Preparar respuesta
     const responseData = {
