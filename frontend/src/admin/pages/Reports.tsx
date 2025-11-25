@@ -396,12 +396,15 @@ const Reports = () => {
             {/* Formulario específico */}
             <div className="space-y-2">
               <Label>Formulario (Opcional)</Label>
-              <Select value={selectedFormId} onValueChange={setSelectedFormId}>
+              <Select
+                value={selectedFormId || 'all'}
+                onValueChange={(value) => setSelectedFormId(value === 'all' ? '' : value)}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Todos los formularios" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos los formularios</SelectItem>
+                  <SelectItem value="all">Todos los formularios</SelectItem>
                   {forms.map((form) => (
                     <SelectItem key={form.id} value={form.id}>
                       {form.title}
@@ -414,12 +417,15 @@ const Reports = () => {
             {/* Usuario específico */}
             <div className="space-y-2">
               <Label>Usuario (Opcional)</Label>
-              <Select value={selectedUserId} onValueChange={setSelectedUserId}>
+              <Select
+                value={selectedUserId || 'all'}
+                onValueChange={(value) => setSelectedUserId(value === 'all' ? '' : value)}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Todos los usuarios" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos los usuarios</SelectItem>
+                  <SelectItem value="all">Todos los usuarios</SelectItem>
                   {users.map((user) => (
                     <SelectItem key={user.id} value={user.id}>
                       {user.name}
