@@ -11,6 +11,7 @@ import {
   Moon,
   Users,
   ClipboardList,
+  Camera,
 } from 'lucide-react'
 
 import { cn } from '@/shared/lib/utils'
@@ -60,6 +61,12 @@ const allNavItems: NavItem[] = [
     to: '/admin/asignaciones',
     icon: ClipboardList,
     allowedRoles: ['ADMIN', 'MANAGER'],
+  },
+  {
+    label: 'Cámara EPP',
+    to: '/admin/epp-monitor',
+    icon: Camera,
+    allowedRoles: ['ADMIN', 'MANAGER', 'SUPERVISOR'],
   },
   {
     label: 'Usuarios',

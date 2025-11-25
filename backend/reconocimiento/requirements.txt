@@ -1,0 +1,11 @@
+# Dependencias para detección de EPP con YOLOv8
+# Instalar con: pip install -r requirements.txt
+# Nota: Si tienes Python 3.14, puede ser necesario instalar numpy desde source o usar Python 3.11/3.12
+
+ultralytics>=8.0.0
+opencv-python>=4.6.0
+pillow>=7.1.2
+numpy>=1.23.0,<3.0.0
+torch>=1.8.0
+torchvision>=0.9.0
+
