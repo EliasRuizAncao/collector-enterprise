@@ -13,7 +13,7 @@ import {
 } from '@/shared/components/ui/popover'
 import { Separator } from '@/shared/components/ui/separator'
 import { cn } from '@/shared/lib/utils'
-import { useNotifications } from '@/shared/hooks/useNotifications'
+import { useNotifications } from '@/hooks/useNotifications'
 
 /**
  * Componente de campana de notificaciones para el header
