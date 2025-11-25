@@ -28,6 +28,7 @@ const AdminFormResponses = lazy(() => import('@/admin/pages/FormResponses'))
 const AdminFormAssignments = lazy(() => import('@/admin/pages/FormAssignments'))
 const AdminReports = lazy(() => import('@/admin/pages/Reports'))
 const AdminEppMonitor = lazy(() => import('@/admin/pages/EppMonitor'))
+const AdminAuditLog = lazy(() => import('@/admin/pages/AuditLog'))
 
 // Mobile Layout y Pages (lazy loading)
 const MobileLayout = lazy(() => import('@/mobile/layouts/MobileLayout'))
@@ -206,6 +207,16 @@ const AppRoutes = () => {
               <RoleProtectedRoute allowedRoles={['ADMIN', 'MANAGER', 'SUPERVISOR']}>
                 <Suspense fallback={<RouteSkeleton variant="default" />}>
                   <AdminEppMonitor />
+                </Suspense>
+              </RoleProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/auditoria"
+            element={
+              <RoleProtectedRoute allowedRoles={['ADMIN']}>
+                <Suspense fallback={<RouteSkeleton variant="default" />}>
+                  <AdminAuditLog />
                 </Suspense>
               </RoleProtectedRoute>
             }

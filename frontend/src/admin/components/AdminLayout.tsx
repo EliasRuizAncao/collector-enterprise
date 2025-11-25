@@ -12,6 +12,7 @@ import {
   ClipboardList,
   BarChart3,
   Camera,
+  FileSearch,
 } from 'lucide-react'
 
 import { cn } from '@/shared/lib/utils'
@@ -80,6 +81,12 @@ const allNavItems: NavItem[] = [
     to: '/admin/reportes',
     icon: BarChart3,
     allowedRoles: ['ADMIN', 'MANAGER'],
+  },
+  {
+    label: 'Auditoría',
+    to: '/admin/auditoria',
+    icon: FileSearch,
+    allowedRoles: ['ADMIN'],
   },
   {
     label: 'Configuración',

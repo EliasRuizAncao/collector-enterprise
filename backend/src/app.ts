@@ -15,6 +15,7 @@ import searchRoutes from './routes/search.routes'
 import reportRoutes from './routes/report.routes'
 import eppRoutes from './routes/epp.routes'
 import notificationRoutes from './routes/notification.routes'
+import auditLogRoutes from './routes/auditLog.routes'
 
 import { errorHandler } from './middleware/errorHandler'
 import path from 'path'
@@ -100,6 +101,7 @@ app.use('/api/search', searchRoutes) // Búsqueda global
 app.use('/api/reports', reportRoutes) // Reportes (solo ADMIN y MANAGER)
 app.use('/api/v1/epp', eppRoutes) // Rutas de EPP
 app.use('/api/notifications', notificationRoutes) // Notificaciones
+app.use('/api/audit-logs', auditLogRoutes) // Logs de auditoría (solo ADMIN)
 
 // Error handler (debe ser el último middleware)
 app.use(errorHandler)
