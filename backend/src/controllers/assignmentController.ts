@@ -12,47 +12,9 @@ import { notifyFormAssigned } from '@/services/notificationService'
 import { notifyFormCompleted } from '@/services/notificationService'
 import { submitResponseSchema } from '@/validators/responseValidator'
 import type { Field, FieldType } from '@/types/formBuilder'
+import { createAuditLog, AUDIT_MODULES } from '@/utils/auditLog'
 
 const prisma = new PrismaClient()
-const ASSIGNMENTS_MODULE = 'ASSIGNMENTS'
-
-/**
- * Helper para obtener user agent de forma segura
- */
-const safeUserAgent = (req: Request) => {
-  const header = req.headers['user-agent']
-  return Array.isArray(header) ? header.join(',') : header ?? undefined
-}
-
-/**
- * Crea un registro de auditoría para acciones de asignaciones
- */
-const createAuditLog = async (
-  actorId: string | undefined,
-  action: string,
-  details: Prisma.InputJsonValue | undefined,
-  req: Request,
-) => {
-  if (!actorId) {
-    return
-  }
-
-  try {
-    await prisma.auditLog.create({
-      data: {
-        userId: actorId,
-        action,
-        module: ASSIGNMENTS_MODULE,
-        details,
-        ipAddress: req.ip,
-        userAgent: safeUserAgent(req),
-      },
-    })
-  } catch (error) {
-    // No fallar la operación principal si el audit log falla
-    console.error('[audit] Error al crear log de auditoría:', error)
-  }
-}
 
 /**
  * Construye filtros para búsqueda de asignaciones
@@ -306,10 +268,11 @@ export const createAssignments = async (req: Request, res: Response, next: NextF
     )
 
     // Crear audit log
-    await createAuditLog(
+    await createAuditLog({
       userId,
-      'ASSIGNMENTS_CREATED',
-      {
+      action: 'ASSIGNMENTS_CREATED',
+      module: AUDIT_MODULES.ASSIGNMENTS,
+      details: {
         count: assignments.length,
         formId: payload.formId,
         formTitle: form.title,
@@ -319,7 +282,7 @@ export const createAssignments = async (req: Request, res: Response, next: NextF
         endDate: payload.endDate,
       },
       req,
-    )
+    })
 
     // Notificar a cada usuario sobre su nueva asignación
     // No bloquear la respuesta si alguna notificación falla
@@ -469,17 +432,18 @@ export const updateAssignment = async (req: Request, res: Response, next: NextFu
     })
 
     // Crear audit log
-    await createAuditLog(
+    await createAuditLog({
       userId,
-      'ASSIGNMENT_UPDATED',
-      {
+      action: 'ASSIGNMENT_UPDATED',
+      module: AUDIT_MODULES.ASSIGNMENTS,
+      details: {
         assignmentId: updatedAssignment.id,
         formId: updatedAssignment.formId,
         userId: updatedAssignment.userId,
         changes: Object.keys(payload),
       },
       req,
-    )
+    })
 
     return res.status(200).json({
       id: updatedAssignment.id,
@@ -553,10 +517,11 @@ export const deleteAssignment = async (req: Request, res: Response, next: NextFu
     })
 
     // Crear audit log
-    await createAuditLog(
+    await createAuditLog({
       userId,
-      'ASSIGNMENT_DELETED',
-      {
+      action: 'ASSIGNMENT_DELETED',
+      module: AUDIT_MODULES.ASSIGNMENTS,
+      details: {
         assignmentId: existingAssignment.id,
         formId: existingAssignment.formId,
         formTitle: existingAssignment.form.title,
@@ -564,7 +529,7 @@ export const deleteAssignment = async (req: Request, res: Response, next: NextFu
         userName: existingAssignment.user.name,
       },
       req,
-    )
+    })
 
     return res.status(200).json({
       message: 'Asignación eliminada correctamente',
@@ -769,10 +734,11 @@ export const submitAssignmentResponse = async (
     }
 
     // Crear audit log (no bloqueante)
-    createAuditLog(
+    void createAuditLog({
       userId,
-      'RESPONSE_SUBMITTED',
-      {
+      action: 'RESPONSE_SUBMITTED',
+      module: AUDIT_MODULES.RESPONSES,
+      details: {
         responseId: response.id,
         formId: assignment.formId,
         formTitle: assignment.form.title,
@@ -780,7 +746,7 @@ export const submitAssignmentResponse = async (
         hasLocation: !!(payload.latitude && payload.longitude),
       },
       req,
-    ).catch((err) => {
+    }).catch((err) => {
       console.error('[submitAssignmentResponse] Error al crear audit log (no crítico):', err)
     })
 
@@ -898,16 +864,17 @@ export const markAsCompleted = async (req: Request, res: Response, next: NextFun
     })
 
     // Crear audit log
-    await createAuditLog(
+    await createAuditLog({
       userId,
-      'ASSIGNMENT_COMPLETED',
-      {
+      action: 'ASSIGNMENT_COMPLETED',
+      module: AUDIT_MODULES.ASSIGNMENTS,
+      details: {
         assignmentId: updatedAssignment.id,
         formId: updatedAssignment.formId,
         formTitle: updatedAssignment.form.title,
       },
       req,
-    )
+    })
 
     return res.status(200).json({
       id: updatedAssignment.id,

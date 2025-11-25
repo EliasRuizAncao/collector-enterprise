@@ -8,47 +8,9 @@ import {
   updateFormSchema,
   listFormsQuerySchema,
 } from '@/validators/formValidator'
+import { createAuditLog, AUDIT_MODULES } from '@/utils/auditLog'
 
 const prisma = new PrismaClient()
-const FORMS_MODULE = 'FORMS'
-
-/**
- * Helper para obtener user agent de forma segura
- */
-const safeUserAgent = (req: Request) => {
-  const header = req.headers['user-agent']
-  return Array.isArray(header) ? header.join(',') : header ?? undefined
-}
-
-/**
- * Crea un registro de auditoría para acciones de formularios
- */
-const createAuditLog = async (
-  actorId: string | undefined,
-  action: string,
-  details: Prisma.InputJsonValue | undefined,
-  req: Request,
-) => {
-  if (!actorId) {
-    return
-  }
-
-  try {
-    await prisma.auditLog.create({
-      data: {
-        userId: actorId,
-        action,
-        module: FORMS_MODULE,
-        details,
-        ipAddress: req.ip,
-        userAgent: safeUserAgent(req),
-      },
-    })
-  } catch (error) {
-    // No fallar la operación principal si el audit log falla
-    console.error('[audit] Error al crear log de auditoría:', error)
-  }
-}
 
 /**
  * Construye filtros para búsqueda de formularios
@@ -252,16 +214,17 @@ export const createForm = async (req: Request, res: Response, next: NextFunction
     })
 
     // Crear audit log
-    await createAuditLog(
+    await createAuditLog({
       userId,
-      'FORM_CREATED',
-      {
+      action: 'FORM_CREATED',
+      module: AUDIT_MODULES.FORMS,
+      details: {
         formId: createdForm.id,
         title: createdForm.title,
         fieldsCount: payload.fields.length,
       },
       req,
-    )
+    })
 
     return res.status(201).json({
       id: createdForm.id,
@@ -354,17 +317,18 @@ export const updateForm = async (req: Request, res: Response, next: NextFunction
     })
 
     // Crear audit log
-    await createAuditLog(
+    await createAuditLog({
       userId,
-      'FORM_UPDATED',
-      {
+      action: 'FORM_UPDATED',
+      module: AUDIT_MODULES.FORMS,
+      details: {
         formId: updatedForm.id,
         title: updatedForm.title,
         version: updatedForm.version,
         changes: Object.keys(payload),
       },
       req,
-    )
+    })
 
     return res.status(200).json({
       id: updatedForm.id,
@@ -434,15 +398,16 @@ export const deleteForm = async (req: Request, res: Response, next: NextFunction
     })
 
     // Crear audit log
-    await createAuditLog(
+    await createAuditLog({
       userId,
-      'FORM_DELETED',
-      {
+      action: 'FORM_DELETED',
+      module: AUDIT_MODULES.FORMS,
+      details: {
         formId: archivedForm.id,
         title: archivedForm.title,
       },
       req,
-    )
+    })
 
     return res.status(200).json({
       id: archivedForm.id,
@@ -515,16 +480,17 @@ export const publishForm = async (req: Request, res: Response, next: NextFunctio
     })
 
     // Crear audit log
-    await createAuditLog(
+    await createAuditLog({
       userId,
-      'FORM_PUBLISHED',
-      {
+      action: 'FORM_PUBLISHED',
+      module: AUDIT_MODULES.FORMS,
+      details: {
         formId: publishedForm.id,
         title: publishedForm.title,
         version: publishedForm.version,
       },
       req,
-    )
+    })
 
     return res.status(200).json({
       id: publishedForm.id,
@@ -592,15 +558,16 @@ export const archiveForm = async (req: Request, res: Response, next: NextFunctio
     })
 
     // Crear audit log
-    await createAuditLog(
+    await createAuditLog({
       userId,
-      'FORM_ARCHIVED',
-      {
+      action: 'FORM_ARCHIVED',
+      module: AUDIT_MODULES.FORMS,
+      details: {
         formId: archivedForm.id,
         title: archivedForm.title,
       },
       req,
-    )
+    })
 
     return res.status(200).json({
       id: archivedForm.id,

@@ -3,6 +3,7 @@ import { PrismaClient, Role } from '@prisma/client'
 import { z } from 'zod'
 
 import admin from '@/config/firebase'
+import { createAuditLog, AUDIT_MODULES } from '@/utils/auditLog'
 
 const prisma = new PrismaClient()
 
@@ -47,6 +48,18 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
 
     const token = issueToken(idToken)
 
+    // Crear log de auditoría para login exitoso
+    await createAuditLog({
+      userId: user.id,
+      action: 'LOGIN',
+      module: AUDIT_MODULES.AUTH,
+      details: {
+        email: user.email,
+        role: user.role,
+      },
+      req,
+    })
+
     return res.status(200).json({
       user: {
         id: user.id,
@@ -88,6 +101,20 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
       },
     })
 
+    // Crear log de auditoría para registro exitoso
+    // Nota: En este caso, el usuario que se registra es el mismo que realiza la acción
+    await createAuditLog({
+      userId: user.id,
+      action: 'REGISTER',
+      module: AUDIT_MODULES.AUTH,
+      details: {
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      },
+      req,
+    })
+
     return res.status(201).json({
       id: user.id,
       firebaseUid: user.firebaseUid,
@@ -114,7 +141,23 @@ export const getCurrentUser = async (req: Request, res: Response) => {
 }
 
 // POST /auth/logout
-export const logoutUser = async (_req: Request, res: Response) => {
+export const logoutUser = async (req: Request, res: Response) => {
+  // Obtener el usuario del request (debe estar autenticado para hacer logout)
+  const user = (req as any).user
+
+  // Crear log de auditoría para logout
+  if (user?.id) {
+    await createAuditLog({
+      userId: user.id,
+      action: 'LOGOUT',
+      module: AUDIT_MODULES.AUTH,
+      details: {
+        email: user.email,
+      },
+      req,
+    })
+  }
+
   return res.status(200).json({ message: 'Logout exitoso' })
 }
 
