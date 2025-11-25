@@ -33,6 +33,7 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu'
 import ConfirmDialog from '@/shared/components/common/ConfirmDialog'
+import LoadingOverlay from '@/shared/components/common/LoadingOverlay'
 import useForms, { type FormSummary } from '@/shared/hooks/useForms'
 import { type FormStatus } from '@/shared/types/formBuilder'
 import { useAuthStore } from '@/shared/store/authStore'
@@ -223,6 +224,7 @@ const Forms = () => {
       </div>
 
       {/* Contenido */}
+      {/* Mostrar skeletons solo si no hay formularios previos */}
       {loading && forms.length === 0 ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, index) => (
@@ -429,6 +431,9 @@ const Forms = () => {
         cancelText="Cancelar"
         variant="destructive"
       />
+
+      {/* Loading Overlay */}
+      <LoadingOverlay isLoading={loading} message="Cargando formularios..." />
     </div>
   )
 }

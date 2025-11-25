@@ -35,6 +35,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '
 import { Input } from '@/shared/components/ui/input'
 import { Label } from '@/shared/components/ui/label'
 import { Alert, AlertDescription } from '@/shared/components/ui/alert'
+import LoadingOverlay from '@/shared/components/common/LoadingOverlay'
 import useFormResponses, { type FormResponseWithDetails } from '@/shared/hooks/useFormResponses'
 import { useForms } from '@/shared/hooks/useForms'
 import { type Field, FieldType } from '@/shared/types/formBuilder'
@@ -184,13 +185,7 @@ const FormResponses = () => {
     )
   }
 
-  if (loading && !form) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    )
-  }
+  // No retornar early, mostrar overlay mientras carga
 
   return (
     <div className="container mx-auto py-8 space-y-6">
@@ -262,11 +257,8 @@ const FormResponses = () => {
       {/* Tabla de respuestas */}
       <Card>
         <CardContent className="p-0">
-          {loading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-          ) : error ? (
+          {/* Mostrar mensaje de error o vacío solo si no está cargando o hay datos */}
+          {error ? (
             <div className="p-6">
               <Alert variant="destructive">
                 <AlertDescription>{error}</AlertDescription>
@@ -583,6 +575,9 @@ const FormResponses = () => {
           )}
         </SheetContent>
       </Sheet>
+
+      {/* Loading Overlay */}
+      <LoadingOverlay isLoading={loading} message="Cargando respuestas..." />
     </div>
   )
 }
