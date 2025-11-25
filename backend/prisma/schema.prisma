@@ -1,0 +1,115 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  SUPERVISOR
+  OPERATOR
+}
+
+enum FormStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum AssignmentFrequency {
+  DAILY
+  WEEKLY
+  BIWEEKLY
+  MONTHLY
+  ONCE
+  CUSTOM
+}
+
+model User {
+  id            String   @id @default(uuid())
+  firebaseUid   String   @unique
+  email         String   @unique
+  name          String
+  role          Role     @default(OPERATOR)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  createdForms  Form[]   @relation("FormCreator")
+  assignments   FormAssignment[]
+  auditLogs     AuditLog[]
+}
+
+model Form {
+  id          String     @id @default(uuid())
+  title       String
+  description String?
+  fields      Json       // Array de campos dinámicos
+  version     Int        @default(1)
+  status      FormStatus @default(DRAFT)
+  
+  createdById String
+  createdBy   User       @relation("FormCreator", fields: [createdById], references: [id])
+  
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  
+  assignments FormAssignment[]
+  responses   FormResponse[]
+  
+  @@index([status, createdAt])
+}
+
+model FormAssignment {
+  id          String              @id @default(uuid())
+  formId      String
+  userId      String
+  frequency   AssignmentFrequency
+  startDate   DateTime
+  endDate     DateTime?
+  isCompleted Boolean             @default(false)
+  
+  form        Form                @relation(fields: [formId], references: [id], onDelete: Cascade)
+  user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  
+  @@unique([formId, userId, startDate])
+  @@index([userId, isCompleted])
+}
+
+model FormResponse {
+  id          String   @id @default(uuid())
+  formId      String
+  userId      String
+  data        Json     // Respuestas del formulario
+  latitude    Float?
+  longitude   Float?
+  submittedAt DateTime @default(now())
+  
+  form        Form     @relation(fields: [formId], references: [id])
+  
+  @@index([formId, submittedAt])
+  @@index([userId, submittedAt])
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  userId      String
+  action      String
+  module      String
+  details     Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+  
+  user        User     @relation(fields: [userId], references: [id])
+  
+  @@index([userId, createdAt])
+  @@index([module, createdAt])
+}

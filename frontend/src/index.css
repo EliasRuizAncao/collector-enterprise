@@ -1,0 +1,196 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Animaciones para componentes offline y mobile */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+  20%, 40%, 60%, 80% { transform: translateX(4px); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Shimmer effect para skeleton loaders */
+@keyframes shimmer {
+  0% {
+    background-position: -468px 0;
+  }
+  100% {
+    background-position: 468px 0;
+  }
+}
+
+.shimmer {
+  animation: shimmer 1.5s infinite linear;
+  background: linear-gradient(
+    to right,
+    #f0f0f0 0%,
+    #f8f8f8 50%,
+    #f0f0f0 100%
+  );
+  background-size: 800px 104px;
+}
+
+/* Shimmer mejorado para skeleton cards */
+.shimmer-bg {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 0%,
+    #f0f0f0 40%,
+    #f8f8f8 50%,
+    #f0f0f0 60%,
+    #f0f0f0 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Dark mode shimmer */
+.dark .shimmer,
+.dark .shimmer-bg {
+  background: linear-gradient(
+    90deg,
+    #1a1a1a 0%,
+    #1a1a1a 40%,
+    #2a2a2a 50%,
+    #1a1a1a 60%,
+    #1a1a1a 100%
+  );
+  background-size: 200% 100%;
+}
+
+.animate-shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+/* Reduce motion para accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@layer base {
+  :root {
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
+    --muted: 215 16% 80%;
+    --muted-foreground: 215 14% 34%;
+    --accent: 211 100% 80%;
+    --accent-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --primary: 209 100% 40%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 201 94% 86%;
+    --secondary-foreground: 203 79% 15%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+    --ring: 209 100% 40%;
+    --radius: 0.75rem;
+
+    /* Variables CSS custom para mobile */
+    --header-height: 56px;
+    --bottom-nav-height: 64px;
+    --safe-area-top: env(safe-area-inset-top, 0px);
+    --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-area-left: env(safe-area-inset-left, 0px);
+    --safe-area-right: env(safe-area-inset-right, 0px);
+
+    /* Colores mobile con alto contraste para exteriores */
+    --mobile-surface: var(--background);
+    --mobile-elevated: var(--card);
+    --mobile-text-primary: var(--foreground);
+    --mobile-text-secondary: var(--muted-foreground);
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+
+  .theme-amaranto {
+    --primary: 182 76% 42%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 181 65% 92%;
+    --secondary-foreground: 182 72% 20%;
+    --accent: 184 58% 88%;
+    --accent-foreground: 182 85% 20%;
+  }
+
+  a {
+    @apply text-primary transition-colors hover:text-primary/80;
+  }
+
+  ::selection {
+    @apply bg-primary/15 text-primary;
+  }
+}
+
+@layer utilities {
+  /* Safe area utilities para iOS notch/home indicator */
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top, 0);
+  }
+
+  .safe-area-left {
+    padding-left: env(safe-area-inset-left, 0);
+  }
+
+  .safe-area-right {
+    padding-right: env(safe-area-inset-right, 0);
+  }
+
+  /* Touch optimization para mejor experiencia móvil */
+  .touch-manipulation {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Prevenir zoom en inputs en iOS (mejora UX móvil) */
+  @supports (-webkit-touch-callout: none) {
+    input[type='text'],
+    input[type='email'],
+    input[type='number'],
+    input[type='tel'],
+    input[type='url'],
+    input[type='password'],
+    textarea,
+    select {
+      font-size: 16px;
+    }
+  }
+
+  /* Scroll suave en mobile */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  /* Hide scrollbar pero mantener scroll funcional */
+  .scrollbar-hide {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+}

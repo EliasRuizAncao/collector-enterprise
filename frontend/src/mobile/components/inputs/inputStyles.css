@@ -1,0 +1,101 @@
+/**
+ * Estilos y animaciones para inputs mobile
+ */
+
+/* Animación shake para errores */
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-4px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(4px);
+  }
+}
+
+.input-shake {
+  animation: shake 0.4s ease-in-out;
+}
+
+/* Respetar preferencia de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  .input-shake {
+    animation: none;
+  }
+}
+
+/* Estilos para inputs mobile */
+.mobile-input-container {
+  @apply w-full space-y-2;
+}
+
+.mobile-input-label {
+  @apply block text-base font-semibold;
+}
+
+.mobile-input-label-required {
+  @apply ml-1 text-destructive;
+}
+
+.mobile-input-helper {
+  @apply text-sm text-muted-foreground;
+}
+
+.mobile-input-error {
+  @apply flex items-center gap-2 text-sm text-destructive;
+}
+
+.mobile-input-success {
+  @apply flex items-center gap-2 text-sm text-green-600;
+}
+
+.mobile-input-warning {
+  @apply flex items-center gap-2 text-sm text-amber-600;
+}
+
+.mobile-input-info {
+  @apply flex items-center gap-2 text-sm text-blue-600;
+}
+
+/* Character counter */
+.mobile-input-counter {
+  @apply text-xs text-muted-foreground text-right mt-1;
+}
+
+.mobile-input-counter-warning {
+  @apply text-amber-600;
+}
+
+.mobile-input-counter-error {
+  @apply text-destructive;
+}
+
+/* Ocultar icono nativo del date picker en navegadores */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  display: none;
+  -webkit-appearance: none;
+  width: 0;
+  height: 0;
+  opacity: 0;
+}
+
+input[type="date"]::-webkit-inner-spin-button {
+  display: none;
+  -webkit-appearance: none;
+}
+
+input[type="date"]::-webkit-clear-button {
+  display: none;
+  -webkit-appearance: none;
+}
+
+/* Firefox */
+input[type="date"]::-moz-calendar-picker-indicator {
+  display: none;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
