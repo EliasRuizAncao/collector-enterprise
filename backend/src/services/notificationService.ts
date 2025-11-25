@@ -150,9 +150,10 @@ export const notifyDeadlineApproaching = async (
 /**
  * Marca una notificación como leída
  * @param notificationId - ID de la notificación a marcar como leída
+ * @param userId - ID del usuario (opcional, para verificar propiedad)
  */
-export const markAsRead = async (notificationId: string) => {
-  console.info('[notificationService] markAsRead', notificationId)
+export const markAsRead = async (notificationId: string, userId?: string) => {
+  console.info('[notificationService] markAsRead', { notificationId, userId })
 
   // Verificar que la notificación existe
   const notification = await prisma.notification.findUnique({
@@ -161,6 +162,11 @@ export const markAsRead = async (notificationId: string) => {
 
   if (!notification) {
     throw new Error('NOTIFICATION_NOT_FOUND')
+  }
+
+  // Si se proporciona userId, verificar que la notificación pertenece al usuario
+  if (userId && notification.userId !== userId) {
+    throw new Error('NOTIFICATION_NOT_BELONGS_TO_USER')
   }
 
   // Si ya está leída, no hacer nada
@@ -287,5 +293,35 @@ export const markAllAsRead = async (userId: string) => {
 
   console.info('[notificationService] marked all as read', result.count)
   return result
+}
+
+/**
+ * Elimina una notificación
+ * @param notificationId - ID de la notificación a eliminar
+ * @param userId - ID del usuario (para verificar que es el dueño)
+ */
+export const deleteNotification = async (notificationId: string, userId: string) => {
+  console.info('[notificationService] deleteNotification', { notificationId, userId })
+
+  // Verificar que la notificación existe y pertenece al usuario
+  const notification = await prisma.notification.findUnique({
+    where: { id: notificationId },
+  })
+
+  if (!notification) {
+    throw new Error('NOTIFICATION_NOT_FOUND')
+  }
+
+  if (notification.userId !== userId) {
+    throw new Error('NOTIFICATION_NOT_BELONGS_TO_USER')
+  }
+
+  // Eliminar la notificación
+  await prisma.notification.delete({
+    where: { id: notificationId },
+  })
+
+  console.info('[notificationService] notification deleted', notificationId)
+  return { success: true }
 }
 
