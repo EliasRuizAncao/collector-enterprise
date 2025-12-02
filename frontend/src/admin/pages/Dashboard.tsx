@@ -22,7 +22,6 @@ import KPICard from '@/admin/components/dashboard/KPICard'
 import { LineChartCard, BarChartCard } from '@/admin/components/dashboard/Charts'
 import ActivityTable from '@/admin/components/dashboard/ActivityTable'
 import PendingAssignments from '@/admin/components/dashboard/PendingAssignments'
-import LoadingOverlay from '@/shared/components/common/LoadingOverlay'
 import { useAuthStore } from '@/shared/store/authStore'
 import useDashboard, {
   type ActivityItem,
@@ -429,7 +428,6 @@ const Dashboard = () => {
         <>
           {/* Grid de KPIs */}
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            {/* Mostrar skeletons solo si no hay KPIs previos */}
             {loading && !useMockData && !displayKPIs
               ? Array.from({ length: 4 }).map((_, i) => (
                   <div key={i} className="space-y-3 rounded-lg border p-6">
@@ -453,8 +451,7 @@ const Dashboard = () => {
 
           {/* Gráficos principales */}
           <div className="grid gap-4 xl:grid-cols-2">
-            {/* Mostrar skeletons solo si no hay datos previos */}
-            {loading && !useMockData && displayFormsCompleted.length === 0 && displayFormsByType.length === 0 ? (
+            {loading && !useMockData && displayFormsCompleted.length === 0 ? (
               <>
                 <div className="space-y-4 rounded-lg border p-6">
                   <Skeleton className="h-6 w-64" />
@@ -467,29 +464,24 @@ const Dashboard = () => {
               </>
             ) : (
               <>
-                {displayFormsCompleted.length > 0 && (
-                  <LineChartCard
-                    title="Formularios completados"
-                    description={`Seguimiento diario de formularios completados (${dateRangeText}).`}
-                    data={displayFormsCompleted}
-                    dataKeys={['day', 'completados']}
-                  />
-                )}
+                <LineChartCard
+                  title="Formularios completados"
+                  description={`Seguimiento diario de formularios completados (${dateRangeText}).`}
+                  data={displayFormsCompleted}
+                  dataKeys={['day', 'completados']}
+                />
 
-                {displayFormsByType.length > 0 && (
-                  <BarChartCard
-                    title="Formularios más usados"
-                    description="Distribución de formularios más utilizados en el sistema."
-                    data={displayFormsByType}
-                    dataKeys={['type', 'cantidad']}
-                  />
-                )}
+                <BarChartCard
+                  title="Formularios más usados"
+                  description="Distribución de formularios más utilizados en el sistema."
+                  data={displayFormsByType}
+                  dataKeys={['type', 'cantidad']}
+                />
               </>
             )}
           </div>
 
           {/* Actividad reciente */}
-          {/* Mostrar skeleton solo si no hay actividad previa */}
           {loading && !useMockData && displayRecentActivity.length === 0 ? (
             <div className="space-y-4 rounded-lg border p-6">
               <Skeleton className="h-6 w-48" />
@@ -499,19 +491,10 @@ const Dashboard = () => {
                 ))}
               </div>
             </div>
-          ) : displayRecentActivity.length > 0 ? (
+          ) : (
             <ActivityTable activities={displayRecentActivity} />
-          ) : null}
+          )}
         </>
-      )}
-
-      {/* Loading Overlay */}
-      {!useMockData && (
-        <LoadingOverlay
-          isLoading={loading}
-          message="Cargando dashboard..."
-          icon={<BarChart3 className="h-8 w-8 text-primary" />}
-        />
       )}
     </div>
   )

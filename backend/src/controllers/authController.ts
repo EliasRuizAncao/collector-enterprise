@@ -3,7 +3,6 @@ import { PrismaClient, Role } from '@prisma/client'
 import { z } from 'zod'
 
 import admin from '@/config/firebase'
-import { createAuditLog, AUDIT_MODULES } from '@/utils/auditLog'
 
 const prisma = new PrismaClient()
 
@@ -24,14 +23,19 @@ const issueToken = (idToken: string) => idToken
 
 // POST /auth/login
 export const loginUser = async (req: Request, res: Response, next: NextFunction) => {
+  console.log('[Auth] Login request received')
   try {
     const { idToken } = loginSchema.parse(req.body)
+    console.log('[Auth] Token received, verifying...')
 
     const decoded = await admin.auth().verifyIdToken(idToken)
+    console.log('[Auth] Token verified for UID:', decoded.uid)
 
     let user = await prisma.user.findUnique({ where: { firebaseUid: decoded.uid } })
+    console.log('[Auth] User found in DB:', user ? 'Yes' : 'No')
 
     if (!user) {
+      console.log('[Auth] Creating new user...')
       user = await prisma.user.create({
         data: {
           firebaseUid: decoded.uid,
@@ -40,25 +44,16 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
           role: 'OPERATOR',
         },
       })
+      console.log('[Auth] New user created:', user.id)
     }
 
     if (!user.isActive) {
+      console.warn('[Auth] User is inactive:', user.id)
       return res.status(401).json({ error: 'Usuario inactivo' })
     }
 
     const token = issueToken(idToken)
-
-    // Crear log de auditoría para login exitoso
-    await createAuditLog({
-      userId: user.id,
-      action: 'LOGIN',
-      module: AUDIT_MODULES.AUTH,
-      details: {
-        email: user.email,
-        role: user.role,
-      },
-      req,
-    })
+    console.log('[Auth] Login successful, returning token')
 
     return res.status(200).json({
       user: {
@@ -71,7 +66,7 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
       token,
     })
   } catch (error) {
-    console.error('loginUser error:', error)
+    console.error('[Auth] loginUser error:', error)
     if (error instanceof z.ZodError) {
       return res.status(400).json({ error: 'Parámetros inválidos', details: error.flatten() })
     }
@@ -101,20 +96,6 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
       },
     })
 
-    // Crear log de auditoría para registro exitoso
-    // Nota: En este caso, el usuario que se registra es el mismo que realiza la acción
-    await createAuditLog({
-      userId: user.id,
-      action: 'REGISTER',
-      module: AUDIT_MODULES.AUTH,
-      details: {
-        email: user.email,
-        name: user.name,
-        role: user.role,
-      },
-      req,
-    })
-
     return res.status(201).json({
       id: user.id,
       firebaseUid: user.firebaseUid,
@@ -141,23 +122,7 @@ export const getCurrentUser = async (req: Request, res: Response) => {
 }
 
 // POST /auth/logout
-export const logoutUser = async (req: Request, res: Response) => {
-  // Obtener el usuario del request (debe estar autenticado para hacer logout)
-  const user = (req as any).user
-
-  // Crear log de auditoría para logout
-  if (user?.id) {
-    await createAuditLog({
-      userId: user.id,
-      action: 'LOGOUT',
-      module: AUDIT_MODULES.AUTH,
-      details: {
-        email: user.email,
-      },
-      req,
-    })
-  }
-
+export const logoutUser = async (_req: Request, res: Response) => {
   return res.status(200).json({ message: 'Logout exitoso' })
 }
 

@@ -5,10 +5,47 @@ import { z } from 'zod'
 import { AuthRequest } from '@/middleware/auth'
 import { submitResponseSchema, listResponsesQuerySchema } from '@/validators/responseValidator'
 import type { Field, FieldType } from '@/types/formBuilder'
-import { notifyFormCompleted } from '@/services/notificationService'
-import { createAuditLog, AUDIT_MODULES } from '@/utils/auditLog'
 
 const prisma = new PrismaClient()
+const RESPONSES_MODULE = 'RESPONSES'
+
+/**
+ * Helper para obtener user agent de forma segura
+ */
+const safeUserAgent = (req: Request) => {
+  const header = req.headers['user-agent']
+  return Array.isArray(header) ? header.join(',') : header ?? undefined
+}
+
+/**
+ * Crea un registro de auditoría para acciones de respuestas
+ */
+const createAuditLog = async (
+  actorId: string | undefined,
+  action: string,
+  details: Prisma.InputJsonValue | undefined,
+  req: Request,
+) => {
+  if (!actorId) {
+    return
+  }
+
+  try {
+    await prisma.auditLog.create({
+      data: {
+        userId: actorId,
+        action,
+        module: RESPONSES_MODULE,
+        details,
+        ipAddress: req.ip,
+        userAgent: safeUserAgent(req),
+      },
+    })
+  } catch (error) {
+    // No fallar la operación principal si el audit log falla
+    console.error('[audit] Error al crear log de auditoría:', error)
+  }
+}
 
 /**
  * Valida que los datos de la respuesta cumplan con el schema del formulario
@@ -316,48 +353,23 @@ export const submitResponse = async (req: Request, res: Response, next: NextFunc
 
     // Crear audit log (no esperar si falla, no debe bloquear la respuesta)
     console.log('[submitResponse] Creando audit log...')
-    createAuditLog({
+    createAuditLog(
       userId,
-      action: 'RESPONSE_SUBMITTED',
-      module: AUDIT_MODULES.RESPONSES,
-      details: {
+      'RESPONSE_SUBMITTED',
+      {
         responseId: response.id,
         formId: payload.formId,
         formTitle: form.title,
         hasLocation: !!(payload.latitude && payload.longitude),
-        assignmentId: assignment.id,
       },
       req,
-    }).catch((err) => {
+    ).catch((err) => {
       console.error('[submitResponse] Error al crear audit log (no crítico):', err)
     })
     console.log('[submitResponse] Audit log iniciado (no bloqueante)')
 
-    // Notificar a supervisores sobre la respuesta completada
-    // Buscar supervisores (MANAGER o SUPERVISOR) para notificar
-    try {
-      const supervisors = await prisma.user.findMany({
-        where: {
-          role: { in: [Role.MANAGER, Role.SUPERVISOR] },
-          isActive: true,
-        },
-        select: { id: true },
-      })
-
-      // Notificar a cada supervisor (no bloquear si falla)
-      for (const supervisor of supervisors) {
-        notifyFormCompleted(supervisor.id, userId, payload.formId).catch((err) => {
-          console.error(
-            `[submitResponse] Error al notificar supervisor ${supervisor.id}:`,
-            err,
-          )
-          // No fallar la operación principal si la notificación falla
-        })
-      }
-    } catch (err) {
-      console.error('[submitResponse] Error al buscar supervisores para notificar:', err)
-      // No fallar la operación principal si la búsqueda de supervisores falla
-    }
+    // TODO: Notificar a supervisores si es necesario
+    // await notificationService.notifySupervisors(response)
 
     // Preparar respuesta
     const responseData = {

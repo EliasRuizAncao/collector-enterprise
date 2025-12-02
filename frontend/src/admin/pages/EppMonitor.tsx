@@ -12,6 +12,7 @@ import LoadingOverlay from '@/shared/components/common/LoadingOverlay'
 import { useToast } from '@/shared/components/ui/use-toast'
 import { ToastAction } from '@/shared/components/ui/toast'
 
+
 // Interfaz actualizada con clases en español del modelo de Roboflow
 interface EPPDetection {
   casco: number
@@ -462,7 +463,9 @@ const EppMonitor = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {images.length > 0 ? (
+            {loading ? (
+              <Skeleton className="w-full h-[400px] rounded-lg" />
+            ) : images.length > 0 ? (
               <div className="space-y-4">
                 {/* Imagen principal (seleccionada o más reciente) */}
                 {/* Imagen principal (seleccionada o más reciente) */}
@@ -732,7 +735,15 @@ const EppMonitor = () => {
         </Card>
       )}
 
-      {/* Historial de Detecciones EPP */}
+      {/* Loading state inicial */}
+      {loading && !status && (
+        <Card>
+          <CardContent className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="ml-3 text-muted-foreground">Cargando estado del sistema...</p>
+          </CardContent>
+        </Card>
+{/* Historial de Detecciones EPP */}
       {history.length > 0 && (
         <div className="mt-8">
           <h2 className="text-2xl font-bold mb-4">Historial de Detecciones</h2>
@@ -1038,6 +1049,7 @@ const EppMonitor = () => {
           </div>
         </div>
       )}
+      )}
 
       {/* Error state */}
       {error && (
@@ -1047,13 +1059,6 @@ const EppMonitor = () => {
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
-
-      {/* Loading Overlay */}
-      <LoadingOverlay
-        isLoading={loading}
-        message="Cargando monitoreo EPP..."
-        icon={<Camera className="h-8 w-8 text-primary" />}
-      />
     </div>
   )
 }

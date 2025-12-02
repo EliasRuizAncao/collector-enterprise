@@ -10,6 +10,7 @@ import MobileDrawer from '../components/MobileDrawer'
 import GlobalSearch from '../components/GlobalSearch'
 import { PageTransition } from '../components/animated'
 import { OfflineBanner, SyncIndicator, ConnectionStatus } from '../components/offline'
+import ThemeToggle from '@/shared/components/theme/ThemeToggle'
 import {
   isNotificationSupported,
   subscribeToNotifications,
@@ -193,8 +194,8 @@ const MobileLayout = () => {
           </div>
         </div>
 
-        {/* Búsqueda, Notificaciones y Connection Status */}
-        <div className="flex items-center gap-2">
+        {/* Búsqueda, Notificaciones, Tema y Connection Status */}
+        <div className="flex items-center gap-1">
           <ConnectionStatus size="sm" showTooltip={true} />
           <Button
             variant="ghost"
@@ -205,6 +206,7 @@ const MobileLayout = () => {
           >
             <Search className="h-5 w-5" />
           </Button>
+          <ThemeToggle />
           <Button
             variant="ghost"
             size="icon"

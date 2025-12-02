@@ -137,6 +137,33 @@
     --mobile-text-secondary: var(--muted-foreground);
   }
 
+  /* Dark mode - Variables para tema oscuro */
+  .dark {
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 217 33% 17%;
+    --accent-foreground: 210 40% 98%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --card: 222 47% 11%;
+    --card-foreground: 210 40% 98%;
+    --primary: 209 100% 50%;
+    --primary-foreground: 222 47% 11%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+    --ring: 209 100% 50%;
+
+    /* Colores mobile dark mode */
+    --mobile-surface: var(--background);
+    --mobile-elevated: var(--card);
+    --mobile-text-primary: var(--foreground);
+    --mobile-text-secondary: var(--muted-foreground);
   .dark {
     --background: 222 47% 11%;
     --foreground: 210 40% 98%;
@@ -160,7 +187,7 @@
   }
 
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-background text-foreground antialiased transition-colors duration-300;
   }
 
   .theme-amaranto {
