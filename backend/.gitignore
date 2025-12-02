@@ -15,3 +15,6 @@ __pycache__/
 # Imágenes y archivos subidos
 uploads/
 reconocimiento/recibidos/
+
+# Archivos de entrenamiento de modelos (muy grandes y temporales)
+reconocimiento/temp_analysis/

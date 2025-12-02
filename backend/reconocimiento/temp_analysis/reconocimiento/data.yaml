@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 5
+names: ['0', '1', '2', '3', 'object']
+
+roboflow:
+  workspace: controlobra-ldahc
+  project: room-interior-djj8v
+  version: 1
+  license: CC BY 4.0
+  url: https://app.roboflow.com/controlobra-ldahc/room-interior-djj8v/1

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Ban, Edit, MoreHorizontal, Search, UserPlus, Users } from 'lucide-react'
+import { Ban, Edit, MoreHorizontal, Search, UserPlus } from 'lucide-react'
 
 import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
@@ -28,7 +28,6 @@ import UserDialog, {
   type UserStatus,
 } from '@/admin/components/users/UserDialog'
 import ConfirmDialog from '@/shared/components/common/ConfirmDialog'
-import LoadingOverlay from '@/shared/components/common/LoadingOverlay'
 import useUsers, { type UserSummary } from '@/shared/hooks/useUsers'
 
 const USERS_PER_PAGE = 10
@@ -265,8 +264,7 @@ const UsersPage = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {/* Mostrar skeletons solo si no hay usuarios previos */}
-            {loading && users.length === 0
+            {loading
               ? Array.from({ length: 5 }).map((_, index) => (
                   <TableRow key={`skeleton-${index}`}>
                     <TableCell colSpan={6}>
@@ -428,13 +426,6 @@ const UsersPage = () => {
         }
         confirmText={confirmUser?.status === 'ACTIVE' ? 'Desactivar' : 'Activar'}
         variant={confirmUser?.status === 'ACTIVE' ? 'destructive' : 'default'}
-      />
-
-      {/* Loading Overlay */}
-      <LoadingOverlay
-        isLoading={loading}
-        message="Cargando usuarios..."
-        icon={<Users className="h-8 w-8 text-primary" />}
       />
     </div>
   )

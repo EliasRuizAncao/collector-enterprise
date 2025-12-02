@@ -27,9 +27,8 @@ const AdminUsers = lazy(() => import('@/admin/pages/Users'))
 const AdminFormResponse = lazy(() => import('@/admin/pages/FormResponse'))
 const AdminFormResponses = lazy(() => import('@/admin/pages/FormResponses'))
 const AdminFormAssignments = lazy(() => import('@/admin/pages/FormAssignments'))
-const AdminReports = lazy(() => import('@/admin/pages/Reports'))
 const AdminEppMonitor = lazy(() => import('@/admin/pages/EppMonitor'))
-const AdminAuditLog = lazy(() => import('@/admin/pages/AuditLog'))
+const AdminStructureMonitor = lazy(() => import('@/admin/pages/StructureMonitor'))
 
 // Mobile Layout y Pages (lazy loading)
 const MobileLayout = lazy(() => import('@/mobile/layouts/MobileLayout'))
@@ -120,7 +119,7 @@ const AppRoutes = () => {
           element={
             <ProtectedRoute>
               <Suspense fallback={<RouteSkeleton variant="default" />}>
-              <AdminLayout />
+                <AdminLayout />
               </Suspense>
             </ProtectedRoute>
           }
@@ -193,16 +192,6 @@ const AppRoutes = () => {
             }
           />
           <Route
-            path="/admin/reportes"
-            element={
-              <RoleProtectedRoute allowedRoles={['ADMIN', 'MANAGER']}>
-                <Suspense fallback={<RouteSkeleton variant="default" />}>
-                  <AdminReports />
-                </Suspense>
-              </RoleProtectedRoute>
-            }
-          />
-          <Route
             path="/admin/epp-monitor"
             element={
               <RoleProtectedRoute allowedRoles={['ADMIN', 'MANAGER', 'SUPERVISOR']}>
@@ -213,11 +202,11 @@ const AppRoutes = () => {
             }
           />
           <Route
-            path="/admin/auditoria"
+            path="/admin/reconocimiento1"
             element={
-              <RoleProtectedRoute allowedRoles={['ADMIN']}>
+              <RoleProtectedRoute allowedRoles={['ADMIN', 'MANAGER', 'SUPERVISOR']}>
                 <Suspense fallback={<RouteSkeleton variant="default" />}>
-                  <AdminAuditLog />
+                  <AdminStructureMonitor />
                 </Suspense>
               </RoleProtectedRoute>
             }

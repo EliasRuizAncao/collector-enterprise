@@ -51,7 +51,6 @@ import { Combobox } from '@/shared/components/ui/combobox'
 import { MultiSelect } from '@/shared/components/ui/multi-select'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/card'
 import ConfirmDialog from '@/shared/components/common/ConfirmDialog'
-import LoadingOverlay from '@/shared/components/common/LoadingOverlay'
 import useFormAssignments, {
   type CreateAssignmentInput,
   type AssignmentFrequency,
@@ -217,8 +216,16 @@ const FormAssignments = () => {
       </div>
 
       {/* Tabla de asignaciones */}
-      {/* Mostrar mensaje vacío solo si no hay asignaciones y no está cargando */}
-      {!loading && assignments.length === 0 ? (
+      {loading && assignments.length === 0 ? (
+        <Card>
+          <CardContent className="flex items-center justify-center py-12">
+            <div className="text-center">
+              <div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto" />
+              <p className="text-sm text-muted-foreground">Cargando asignaciones...</p>
+            </div>
+          </CardContent>
+        </Card>
+      ) : assignments.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <CalendarIcon className="mb-4 h-12 w-12 text-muted-foreground" />
@@ -486,13 +493,6 @@ const FormAssignments = () => {
         confirmText="Eliminar"
         cancelText="Cancelar"
         variant="destructive"
-      />
-
-      {/* Loading Overlay */}
-      <LoadingOverlay
-        isLoading={loading}
-        message="Cargando asignaciones..."
-        icon={<CalendarIcon className="h-8 w-8 text-primary" />}
       />
     </div>
   )

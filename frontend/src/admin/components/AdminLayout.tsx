@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { NavLink, Outlet, useLocation, Link, useNavigate } from 'react-router-dom'
 import {
+  Bell,
   FileText,
   LayoutDashboard,
   LogOut,
@@ -8,9 +9,8 @@ import {
   Settings,
   Users,
   ClipboardList,
-  BarChart3,
   Camera,
-  FileSearch,
+  Hammer,
 } from 'lucide-react'
 
 import { cn } from '@/shared/lib/utils'
@@ -64,28 +64,22 @@ const allNavItems: NavItem[] = [
     allowedRoles: ['ADMIN', 'MANAGER'],
   },
   {
-    label: 'Usuarios',
-    to: '/admin/usuarios',
-    icon: Users,
-    allowedRoles: ['ADMIN', 'MANAGER'],
-  },
-  {
     label: 'Cámara EPP',
     to: '/admin/epp-monitor',
     icon: Camera,
     allowedRoles: ['ADMIN', 'MANAGER', 'SUPERVISOR'],
   },
   {
-    label: 'Reportes',
-    to: '/admin/reportes',
-    icon: BarChart3,
-    allowedRoles: ['ADMIN', 'MANAGER'],
+    label: 'Avance de obra',
+    to: '/admin/reconocimiento1',
+    icon: Hammer,
+    allowedRoles: ['ADMIN', 'MANAGER', 'SUPERVISOR'],
   },
   {
-    label: 'Auditoría',
-    to: '/admin/auditoria',
-    icon: FileSearch,
-    allowedRoles: ['ADMIN'],
+    label: 'Usuarios',
+    to: '/admin/usuarios',
+    icon: Users,
+    allowedRoles: ['ADMIN', 'MANAGER'],
   },
   {
     label: 'Configuración',

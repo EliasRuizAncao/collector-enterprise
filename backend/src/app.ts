@@ -12,8 +12,9 @@ import dashboardRoutes from './routes/dashboard.routes'
 import assignmentRoutes from './routes/assignment.routes'
 import responseRoutes from './routes/response.routes'
 import searchRoutes from './routes/search.routes'
-import reportRoutes from './routes/report.routes'
 import eppRoutes from './routes/epp.routes'
+import structureRoutes from './routes/structure.routes'
+import reportRoutes from './routes/report.routes'
 import notificationRoutes from './routes/notification.routes'
 import auditLogRoutes from './routes/auditLog.routes'
 
@@ -41,6 +42,14 @@ const allowedOrigins = (process.env.FRONTEND_URLS ?? process.env.FRONTEND_URL ??
   .map((origin) => origin.trim())
   .filter(Boolean)
 
+// Ensure localhost:5173 and 5174 are always allowed for development
+const devOrigins = ['http://localhost:5173', 'http://localhost:5174']
+devOrigins.forEach(origin => {
+  if (!allowedOrigins.includes(origin)) {
+    allowedOrigins.push(origin)
+  }
+})
+
 const corsOptions: CorsOptions = {
   origin: (origin, callback) => {
     if (!origin) {
@@ -63,7 +72,7 @@ app.use(cors(corsOptions))
 // Rate limiting general
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 100, // 100 requests por IP
+  max: 1000, // 1000 requests por IP (aumentado para desarrollo)
 })
 
 // Rate limiting específico para EPP (más permisivo para monitoreo en tiempo real)
@@ -90,12 +99,15 @@ app.get('/health', (req, res) => {
 // Usamos path.resolve con __dirname para ser más robustos
 const uploadsDir = path.join(__dirname, '..', 'uploads')
 const deteccionesDir = path.join(__dirname, '..', 'reconocimiento', 'recibidos', 'detecciones')
+const structureDeteccionesDir = path.join(__dirname, '..', 'reconocimiento', 'recibidos', 'detecciones_structure')
 
 console.log('[app] Serving static files from:', uploadsDir)
 console.log('[app] Serving static files from:', deteccionesDir)
 
 app.use('/static/epp-images', express.static(deteccionesDir))
 app.use('/static/epp-images', express.static(uploadsDir))
+app.use('/static/structure-images', express.static(structureDeteccionesDir))
+app.use('/static/uploads', express.static(uploadsDir))
 
 // Rutas API
 app.use('/api/auth', authRoutes)
@@ -108,6 +120,7 @@ app.use('/api/form-responses', responseRoutes) // Mantener compatibilidad
 app.use('/api/search', searchRoutes) // Búsqueda global
 app.use('/api/reports', reportRoutes) // Reportes (solo ADMIN y MANAGER)
 app.use('/api/v1/epp', eppLimiter, eppRoutes) // Rutas de EPP con rate limiter específico
+app.use('/api/v1/structure', structureRoutes) // Rutas de Estructura
 app.use('/api/notifications', notificationRoutes) // Notificaciones
 app.use('/api/audit-logs', auditLogRoutes) // Logs de auditoría (solo ADMIN)
 

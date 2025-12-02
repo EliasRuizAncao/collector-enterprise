@@ -4,9 +4,9 @@ import { z } from 'zod'
 
 import admin from '@/config/firebase'
 import { AuthRequest } from '@/middleware/auth'
-import { createAuditLog, AUDIT_MODULES } from '@/utils/auditLog'
 
 const prisma = new PrismaClient()
+const USERS_MODULE = 'USERS'
 
 const querySchema = z.object({
   page: z.coerce.number().int().min(1).optional(),
@@ -91,6 +91,32 @@ const buildFilters = (
   return where
 }
 
+const safeUserAgent = (req: Request) => {
+  const header = req.headers['user-agent']
+  return Array.isArray(header) ? header.join(',') : header ?? undefined
+}
+
+const createAuditLog = async (
+  actorId: string | undefined,
+  action: string,
+  details: Prisma.InputJsonValue | undefined,
+  req: Request,
+) => {
+  if (!actorId) {
+    return
+  }
+
+  await prisma.auditLog.create({
+    data: {
+      userId: actorId,
+      action,
+      module: USERS_MODULE,
+      details,
+      ipAddress: req.ip,
+      userAgent: safeUserAgent(req),
+    },
+  })
+}
 
 // GET /api/users
 export const listUsers = async (req: Request, res: Response, next: NextFunction) => {
@@ -206,13 +232,7 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
     })
 
     const actorId = (req as AuthRequest).user?.id
-    await createAuditLog({
-      userId: actorId,
-      action: 'USER_CREATED',
-      module: AUDIT_MODULES.USERS,
-      details: { targetUserId: createdUser.id },
-      req,
-    })
+    await createAuditLog(actorId, 'USER_CREATED', { targetUserId: createdUser.id }, req)
 
     return res.status(201).json(formatUserResponse(createdUser))
   } catch (error) {
@@ -288,13 +308,7 @@ export const updateUser = async (req: Request, res: Response, next: NextFunction
     })
 
     const actorId = (req as AuthRequest).user?.id
-    await createAuditLog({
-      userId: actorId,
-      action: 'USER_UPDATED',
-      module: AUDIT_MODULES.USERS,
-      details: { targetUserId: id, changes: payload },
-      req,
-    })
+    await createAuditLog(actorId, 'USER_UPDATED', { targetUserId: id, changes: payload }, req)
 
     return res.status(200).json(formatUserResponse(updatedUser))
   } catch (error) {
@@ -324,13 +338,7 @@ export const deactivateUser = async (req: Request, res: Response, next: NextFunc
     await admin.auth().updateUser(user.firebaseUid, { disabled: true })
 
     const actorId = (req as AuthRequest).user?.id
-    await createAuditLog({
-      userId: actorId,
-      action: 'USER_DEACTIVATED',
-      module: AUDIT_MODULES.USERS,
-      details: { targetUserId: id },
-      req,
-    })
+    await createAuditLog(actorId, 'USER_DEACTIVATED', { targetUserId: id }, req)
 
     return res.status(200).json({ message: 'Usuario desactivado correctamente' })
   } catch (error) {
@@ -363,13 +371,7 @@ export const changeUserRole = async (req: Request, res: Response, next: NextFunc
     })
 
     const actorId = (req as AuthRequest).user?.id
-    await createAuditLog({
-      userId: actorId,
-      action: 'USER_ROLE_CHANGED',
-      module: AUDIT_MODULES.USERS,
-      details: { targetUserId: id, role },
-      req,
-    })
+    await createAuditLog(actorId, 'USER_ROLE_CHANGED', { targetUserId: id, role }, req)
 
     return res.status(200).json(formatUserResponse(updatedUser))
   } catch (error) {

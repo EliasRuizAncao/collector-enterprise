@@ -9,7 +9,6 @@ import {
   updateAssignment,
   deleteAssignment,
   markAsCompleted,
-  submitAssignmentResponse,
 } from '../controllers/assignmentController'
 
 // Rutas protegidas para la gestión de asignaciones de formularios
@@ -38,10 +37,6 @@ router.delete('/:id', authenticate, authorize(Role.ADMIN, Role.MANAGER), deleteA
 // Marcar una asignación como completada
 // Solo el usuario asignado puede marcar como completada
 router.put('/:id/complete', authenticate, markAsCompleted)
-
-// Enviar respuesta de formulario desde una asignación (usado por mobile)
-// Solo el usuario asignado puede enviar respuestas
-router.post('/:id/submit', authenticate, submitAssignmentResponse)
 
 export default router
 
