@@ -2,7 +2,7 @@ import { Router } from 'express'
 import multer from 'multer'
 import { authenticate } from '../middleware/auth'
 import { apiKeyAuth } from '../middleware/apiKeyAuth'
-import { analyzeEPP, getEPPStatus } from '../controllers/eppController'
+import { analyzeEPP, getEPPStatus, getHistory } from '../controllers/eppController'
 
 const router = Router()
 
@@ -64,12 +64,12 @@ router.post(
   apiKeyAuth, // Middleware de API Key en lugar de authenticate
   (req, res, next) => {
     const contentType = req.headers['content-type'] || ''
-    
+
     // Si viene como multipart, usar multer
     if (contentType.includes('multipart/form-data')) {
       return upload.single('image')(req, res, next)
     }
-    
+
     // Para raw binary, responder inmediatamente y leer en background
     if (contentType.includes('image/') || contentType.includes('application/octet-stream')) {
       // Responder 202 inmediatamente (antes de leer todo el body)
@@ -109,7 +109,7 @@ router.post(
 
       return // No llamar next() - ya respondimos
     }
-    
+
     // Para otros tipos, usar handler normal
     return rawImageHandler(req, res, next)
   },
@@ -119,6 +119,10 @@ router.post(
 // GET /api/v1/epp/status
 // Mantiene autenticación Firebase para el panel administrativo
 router.get('/status', authenticate, getEPPStatus)
+
+// GET /api/v1/epp/history
+// Devuelve el historial completo de detecciones
+router.get('/history', authenticate, getHistory)
 
 export default router
 

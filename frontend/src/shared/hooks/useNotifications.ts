@@ -65,9 +65,13 @@ export const useNotifications = () => {
           setNotifications(response.data.data)
           setPagination(response.data.pagination)
         }
-      } catch (err) {
-        console.error('useNotifications fetchNotifications error', err)
-        setError('No fue posible cargar las notificaciones.')
+      } catch (err: any) {
+        if (err.response?.status === 429) {
+          console.warn('Rate limit exceeded for notifications.')
+        } else {
+          console.error('useNotifications fetchNotifications error', err)
+          setError('No fue posible cargar las notificaciones.')
+        }
         setNotifications([])
       } finally {
         setLoading(false)
@@ -88,8 +92,10 @@ export const useNotifications = () => {
       if (response.data.success) {
         setUnreadCount(response.data.count)
       }
-    } catch (err) {
-      console.error('useNotifications fetchUnreadCount error', err)
+    } catch (err: any) {
+      if (err.response?.status !== 429) {
+        console.error('useNotifications fetchUnreadCount error', err)
+      }
       // No mostrar error en el conteo, solo loguear
     }
   }, [])

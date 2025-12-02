@@ -4,14 +4,38 @@
 
 /* Animaciones para componentes offline y mobile */
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
-  20%, 40%, 60%, 80% { transform: translateX(4px); }
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-4px);
+  }
+
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(4px);
+  }
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
 }
 
 /* Shimmer effect para skeleton loaders */
@@ -19,6 +43,7 @@
   0% {
     background-position: -468px 0;
   }
+
   100% {
     background-position: 468px 0;
   }
@@ -26,25 +51,21 @@
 
 .shimmer {
   animation: shimmer 1.5s infinite linear;
-  background: linear-gradient(
-    to right,
-    #f0f0f0 0%,
-    #f8f8f8 50%,
-    #f0f0f0 100%
-  );
+  background: linear-gradient(to right,
+      #f0f0f0 0%,
+      #f8f8f8 50%,
+      #f0f0f0 100%);
   background-size: 800px 104px;
 }
 
 /* Shimmer mejorado para skeleton cards */
 .shimmer-bg {
-  background: linear-gradient(
-    90deg,
-    #f0f0f0 0%,
-    #f0f0f0 40%,
-    #f8f8f8 50%,
-    #f0f0f0 60%,
-    #f0f0f0 100%
-  );
+  background: linear-gradient(90deg,
+      #f0f0f0 0%,
+      #f0f0f0 40%,
+      #f8f8f8 50%,
+      #f0f0f0 60%,
+      #f0f0f0 100%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
@@ -52,14 +73,12 @@
 /* Dark mode shimmer */
 .dark .shimmer,
 .dark .shimmer-bg {
-  background: linear-gradient(
-    90deg,
-    #1a1a1a 0%,
-    #1a1a1a 40%,
-    #2a2a2a 50%,
-    #1a1a1a 60%,
-    #1a1a1a 100%
-  );
+  background: linear-gradient(90deg,
+      #1a1a1a 0%,
+      #1a1a1a 40%,
+      #2a2a2a 50%,
+      #1a1a1a 60%,
+      #1a1a1a 100%);
   background-size: 200% 100%;
 }
 
@@ -69,6 +88,7 @@
 
 /* Reduce motion para accesibilidad */
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {
@@ -144,6 +164,26 @@
     --mobile-elevated: var(--card);
     --mobile-text-primary: var(--foreground);
     --mobile-text-secondary: var(--muted-foreground);
+  .dark {
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+    --card: 222 47% 11%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222 47% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
   }
 
   body {
@@ -169,6 +209,7 @@
 }
 
 @layer utilities {
+
   /* Safe area utilities para iOS notch/home indicator */
   .safe-area-bottom {
     padding-bottom: env(safe-area-inset-bottom, 0);
@@ -194,6 +235,7 @@
 
   /* Prevenir zoom en inputs en iOS (mejora UX móvil) */
   @supports (-webkit-touch-callout: none) {
+
     input[type='text'],
     input[type='email'],
     input[type='number'],
@@ -215,11 +257,69 @@
 
   /* Hide scrollbar pero mantener scroll funcional */
   .scrollbar-hide {
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
   }
 
   .scrollbar-hide::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera */
+    display: none;
+    /* Chrome, Safari, Opera */
+  }
+
+  /* Custom scrollbar styles */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    border-radius: 4px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    opacity: 0.8;
+  }
+
+  /* Red scrollbar */
+  .scrollbar-thumb-red-300::-webkit-scrollbar-thumb {
+    background-color: rgb(252 165 165);
+  }
+
+  .scrollbar-track-red-50::-webkit-scrollbar-track {
+    background-color: rgb(254 242 242);
+  }
+
+  .dark .scrollbar-thumb-red-700::-webkit-scrollbar-thumb {
+    background-color: rgb(185 28 28);
+  }
+
+  .dark .scrollbar-track-red-950::-webkit-scrollbar-track {
+    background-color: rgb(69 10 10);
+  }
+
+  /* Green scrollbar */
+  .scrollbar-thumb-green-300::-webkit-scrollbar-thumb {
+    background-color: rgb(134 239 172);
+  }
+
+  .scrollbar-track-green-50::-webkit-scrollbar-track {
+    background-color: rgb(240 253 244);
+  }
+
+  .dark .scrollbar-thumb-green-700::-webkit-scrollbar-thumb {
+    background-color: rgb(21 128 61);
+  }
+
+  .dark .scrollbar-track-green-950::-webkit-scrollbar-track {
+    background-color: rgb(5 46 22);
   }
 }

@@ -26,6 +26,16 @@ export interface EPPStatus {
   missingItems: string[]
 }
 
+// Interfaz para el historial de detecciones
+export interface HistoryRecord {
+  timestamp: string
+  imageUrl: string | null
+  processedImageUrl: string | null
+  detections: EPPDetection
+  isCompliant: boolean
+  missingItems: string[]
+}
+
 // Estado global del último análisis
 let lastStatus: EPPStatus | null = null
 
@@ -47,10 +57,13 @@ const UPLOADS_DIR = path.join(BACKEND_ROOT, 'uploads')
 const RECIBIDOS_DIR = path.join(BACKEND_ROOT, 'reconocimiento', 'recibidos', 'detecciones')
 const PYTHON_SCRIPT_PATH = path.join(BACKEND_ROOT, 'reconocimiento', 'detect.py')
 const MODEL_PATH = path.join(BACKEND_ROOT, 'reconocimiento', 'best.pt')
+const DATA_DIR = path.join(BACKEND_ROOT, 'data')
+const HISTORY_FILE = path.join(DATA_DIR, 'history.json')
 
 console.log('[epp] Configured paths:')
 console.log('[epp] ROOT:', BACKEND_ROOT)
 console.log('[epp] RECIBIDOS:', RECIBIDOS_DIR)
+console.log('[epp] DATA_DIR:', DATA_DIR)
 
 /**
  * Asegurar que las carpetas existan
@@ -59,6 +72,7 @@ const ensureDirectories = async () => {
   try {
     await fs.mkdir(UPLOADS_DIR, { recursive: true })
     await fs.mkdir(RECIBIDOS_DIR, { recursive: true })
+    await fs.mkdir(DATA_DIR, { recursive: true })
   } catch (error) {
     console.error('[epp] Error al crear directorios:', error)
   }
@@ -171,25 +185,47 @@ const findLatestProcessedImage = async (): Promise<string | null> => {
 
 /**
  * Determinar si el EPP es compliant
+ * Lógica exacta según modelo de Python:
+ * - Casco OK: (casco > 0) && (!result['no casco'] || result['no casco'] === 0)
+ * - Chaleco OK: (chaleco > 0) && (!result['no chaleco'] || result['no chaleco'] === 0)
+ * - Guantes OK: (guante > 0) && (!result['no guante'] || result['no guante'] === 0)
+ * - zapato: IGNORADO completamente
  */
 const checkCompliance = (detections: EPPDetection): { isCompliant: boolean; missingItems: string[] } => {
   const missingItems: string[] = []
 
-  // Verificar elementos críticos
-  if (detections.casco === 0 || detections['no casco'] > 0) {
-    missingItems.push('Casco')
+  // Verificar Casco: debe estar presente Y no debe haber detección negativa
+  const cascoOK = (detections.casco > 0) && (!detections['no casco'] || detections['no casco'] === 0)
+  if (!cascoOK) {
+    if (detections['no casco'] > 0) {
+      missingItems.push('Detectado: No-Casco')
+    } else {
+      missingItems.push('Falta Casco')
+    }
   }
 
-  if (detections.chaleco === 0 || detections['no chaleco'] > 0) {
-    missingItems.push('Chaleco')
+  // Verificar Chaleco: debe estar presente Y no debe haber detección negativa
+  const chalecoOK = (detections.chaleco > 0) && (!detections['no chaleco'] || detections['no chaleco'] === 0)
+  if (!chalecoOK) {
+    if (detections['no chaleco'] > 0) {
+      missingItems.push('Detectado: No-Chaleco')
+    } else {
+      missingItems.push('Falta Chaleco')
+    }
   }
 
-  // Los guantes son opcionales pero se reportan
-  if (detections.guante === 0 && detections['no guante'] > 0) {
-    missingItems.push('Guantes')
+  // Verificar Guantes: debe estar presente Y no debe haber detección negativa
+  const guantesOK = (detections.guante > 0) && (!detections['no guante'] || detections['no guante'] === 0)
+  if (!guantesOK) {
+    if (detections['no guante'] > 0) {
+      missingItems.push('Detectado: No-Guante')
+    } else {
+      missingItems.push('Falta Guantes')
+    }
   }
 
-  const isCompliant = missingItems.length === 0
+  // isCompliant es true SOLO si todos los requisitos pasan
+  const isCompliant = cascoOK && chalecoOK && guantesOK
 
   return { isCompliant, missingItems }
 }
@@ -205,6 +241,48 @@ const hasAnyDetections = (detections: EPPDetection): boolean => {
     detections.chaleco > 0 ||
     detections.zapato > 0
   )
+}
+
+/**
+ * Guardar registro en el historial
+ */
+const saveToHistory = async (record: HistoryRecord) => {
+  try {
+    await ensureDirectories()
+
+    let history: HistoryRecord[] = []
+
+    // Leer historial existente
+    try {
+      const data = await fs.readFile(HISTORY_FILE, 'utf-8')
+      history = JSON.parse(data)
+    } catch (error) {
+      // Si no existe el archivo, empezar con array vacío
+      console.log('[epp] Creando nuevo archivo de historial')
+    }
+
+    // Agregar nuevo registro al inicio (más recientes primero)
+    history.unshift(record)
+
+    // Guardar historial actualizado
+    await fs.writeFile(HISTORY_FILE, JSON.stringify(history, null, 2))
+    console.log('[epp] Registro guardado en historial:', record.timestamp)
+  } catch (error) {
+    console.error('[epp] Error al guardar en historial:', error)
+  }
+}
+
+/**
+ * Obtener historial completo
+ */
+const getHistoryRecords = async (): Promise<HistoryRecord[]> => {
+  try {
+    const data = await fs.readFile(HISTORY_FILE, 'utf-8')
+    return JSON.parse(data)
+  } catch (error) {
+    // Si no existe el archivo, retornar array vacío
+    return []
+  }
 }
 
 /**
@@ -263,6 +341,9 @@ const processImageInBackground = async (imagePath: string, imageFilename: string
       isCompliant,
       missingItems,
     }
+
+    // Guardar en historial
+    await saveToHistory(lastStatus)
 
     console.log(`[epp] Procesamiento completado: ${processedFilename}`, {
       isCompliant,
@@ -593,3 +674,23 @@ export const getEPPStatus = async (req: AuthRequest, res: Response, next: NextFu
   }
 }
 
+/**
+ * GET /api/v1/epp/history
+ * Devuelve el historial completo de detecciones
+ */
+export const getHistory = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const history = await getHistoryRecords()
+
+    console.log(`[epp] getHistory: Devolviendo ${history.length} registros`)
+
+    res.json({
+      success: true,
+      history,
+      totalRecords: history.length,
+    })
+  } catch (error) {
+    console.error('[epp] Error en getHistory:', error)
+    next(error)
+  }
+}

@@ -87,7 +87,14 @@ export const LineChartCard = <TData extends Record<string, unknown>>({
               tickLine={false}
               axisLine={false}
             />
-            <Tooltip contentStyle={{ borderRadius: 12, borderColor: 'hsl(var(--border))' }} />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: 'hsl(var(--popover))',
+                color: 'hsl(var(--popover-foreground))',
+                borderRadius: '12px',
+                borderColor: 'hsl(var(--border))',
+              }}
+            />
             <Legend wrapperStyle={{ fontSize: 12 }} />
             {seriesKeys.map((key, index) => (
               <Line
@@ -156,7 +163,15 @@ export const BarChartCard = <TData extends Record<string, unknown>>({
               tickLine={false}
               axisLine={false}
             />
-            <Tooltip contentStyle={{ borderRadius: 12, borderColor: 'hsl(var(--border))' }} />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: 'hsl(var(--popover))',
+                color: 'hsl(var(--popover-foreground))',
+                borderRadius: '12px',
+                borderColor: 'hsl(var(--border))',
+              }}
+              cursor={{ fill: 'hsl(var(--muted) / 0.2)' }}
+            />
             <Legend wrapperStyle={{ fontSize: 12 }} />
             {seriesKeys.map((key, index) => (
               <Bar

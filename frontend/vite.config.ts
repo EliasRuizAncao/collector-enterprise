@@ -36,7 +36,22 @@ export default defineConfig({
         ],
         // Estrategias de runtime caching
         runtimeCaching: [
-          // 1. Network First para API calls (con timeout de 5s)
+          // 0. Network Only para endpoints de monitoreo en tiempo real y dashboard
+          // Esto evita que el SW intercepte y reintente polling frecuente, causando 429
+          {
+            urlPattern: /^https?:\/\/.*\/api\/(v1\/epp|dashboard|notifications)\/.*/i,
+            handler: 'NetworkOnly',
+            options: {
+              cacheName: 'realtime-api',
+              backgroundSync: {
+                name: 'api-queue',
+                options: {
+                  maxRetentionTime: 1 // No reintentar mucho tiempo
+                }
+              }
+            },
+          },
+          // 1. Network First para API calls generales (con timeout de 5s)
           {
             urlPattern: /^https?:\/\/.*\/api\/.*/i,
             handler: 'NetworkFirst',
@@ -72,18 +87,6 @@ export default defineConfig({
               expiration: {
                 maxEntries: 100,
                 maxAgeSeconds: 30 * 24 * 60 * 60, // 30 días
-              },
-            },
-          },
-          // 3. Stale While Revalidate para datos frecuentes (dashboard)
-          {
-            urlPattern: /^https?:\/\/.*\/api\/(dashboard|stats|forms)/i,
-            handler: 'StaleWhileRevalidate',
-            options: {
-              cacheName: 'dashboard-cache',
-              expiration: {
-                maxEntries: 20,
-                maxAgeSeconds: 5 * 60, // 5 minutos
               },
             },
           },
