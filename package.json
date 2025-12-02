@@ -23,5 +23,9 @@
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "pdfkit": "^0.17.2",
+    "xlsx": "^0.18.5"
   }
 }

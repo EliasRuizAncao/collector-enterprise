@@ -1,15 +1,16 @@
 import { useState, useEffect, useRef } from 'react'
-import { Camera, HardHat, Shield, Hand, AlertTriangle, CheckCircle2, Loader2 } from 'lucide-react'
+import { Camera, HardHat, Shield, Hand, AlertTriangle, CheckCircle2 } from 'lucide-react'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/card'
 import { Badge } from '@/shared/components/ui/badge'
 import { Alert, AlertDescription, AlertTitle } from '@/shared/components/ui/alert'
-import { Skeleton } from '@/shared/components/ui/skeleton'
 import { cn } from '@/shared/lib/utils'
 import api from '@/shared/lib/api'
 import LoadingOverlay from '@/shared/components/common/LoadingOverlay'
+import { useToast } from '@/shared/components/ui/use-toast'
+import { ToastAction } from '@/shared/components/ui/toast'
 
 // Interfaz actualizada con clases en español del modelo de Roboflow
 interface EPPDetection {
@@ -39,13 +40,31 @@ interface ProcessedImage {
   hasDetections: boolean
 }
 
+interface HistoryRecord {
+  timestamp: string
+  imageUrl: string | null
+  processedImageUrl: string | null
+  detections: EPPDetection
+  isCompliant: boolean
+  missingItems: string[]
+}
+
 const EppMonitor = () => {
   const [status, setStatus] = useState<EPPStatus | null>(null)
   const [images, setImages] = useState<ProcessedImage[]>([])
+  const [history, setHistory] = useState<HistoryRecord[]>([])
   const [selectedImage, setSelectedImage] = useState<ProcessedImage | null>(null)
   const selectedImageRef = useRef<ProcessedImage | null>(null)
 
-  // Zoom & Pan state
+  // Modal state for history detail
+  const [selectedRecord, setSelectedRecord] = useState<HistoryRecord | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [modalZoom, setModalZoom] = useState(1)
+  const [modalPan, setModalPan] = useState({ x: 0, y: 0 })
+  const [isModalDragging, setIsModalDragging] = useState(false)
+  const [modalDragStart, setModalDragStart] = useState({ x: 0, y: 0 })
+
+  // Zoom & Pan state for main image
   const [zoom, setZoom] = useState(1)
   const [pan, setPan] = useState({ x: 0, y: 0 })
   const [isDragging, setIsDragging] = useState(false)
@@ -55,7 +74,36 @@ const EppMonitor = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [imageError, setImageError] = useState(false)
+
+  const [isPollingPaused, setIsPollingPaused] = useState(false)
   const pollingIntervalRef = useRef<number | null>(null)
+
+  // Notificaciones
+  const { toast } = useToast()
+  const lastNotificationRef = useRef<number>(0)
+  const lastMissingItemsRef = useRef<string>('')
+
+  // Función para obtener el historial
+  const fetchHistory = async () => {
+    try {
+      const response = await api.get('/v1/epp/history')
+      if (response.data.success) {
+        setHistory(response.data.history || [])
+        console.log('[EPP Monitor] Historial recibido:', response.data.history?.length || 0)
+      }
+    } catch (err: any) {
+      if (err.response?.status === 429) {
+        console.warn('Rate limit exceeded. Pausing polling.')
+        setIsPollingPaused(true)
+        if (pollingIntervalRef.current) {
+          clearInterval(pollingIntervalRef.current)
+          pollingIntervalRef.current = null
+        }
+      } else {
+        console.error('Error al obtener historial EPP:', err)
+      }
+    }
+  }
 
   // Función para obtener el estado
   const fetchStatus = async () => {
@@ -63,7 +111,34 @@ const EppMonitor = () => {
       const response = await api.get('/v1/epp/status')
       if (response.data.success) {
         if (response.data.status) {
-          setStatus(response.data.status)
+          const newStatus = response.data.status
+          setStatus(newStatus)
+
+          // Verificar infracciones y notificar
+          if (!newStatus.isCompliant && newStatus.missingItems.length > 0) {
+            const currentMissing = newStatus.missingItems.sort().join(',')
+            const now = Date.now()
+
+            // Notificar si:
+            // 1. Los items faltantes son diferentes a la última vez
+            // 2. O ha pasado más de 60 segundos desde la última notificación
+            if (currentMissing !== lastMissingItemsRef.current || (now - lastNotificationRef.current > 60000)) {
+              toast({
+                variant: 'destructive',
+                title: '¡Infracción Detectada!',
+                description: `Se ha detectado personal sin: ${newStatus.missingItems.join(', ')}`,
+                action: <ToastAction altText="Entendido">Entendido</ToastAction>,
+                duration: 5000,
+              })
+              lastNotificationRef.current = now
+              lastMissingItemsRef.current = currentMissing
+            }
+          } else {
+            // Resetear tracking si cumple
+            if (newStatus.isCompliant) {
+              lastMissingItemsRef.current = ''
+            }
+          }
         }
         // Actualizar lista de imágenes
         if (response.data.images && Array.isArray(response.data.images)) {
@@ -97,10 +172,20 @@ const EppMonitor = () => {
         setStatus(null)
       }
     } catch (err: any) {
-      console.error('Error al obtener estado EPP:', err)
-      // Solo mostrar error si no es el primer intento
-      if (status !== null) {
-        setError(err.response?.data?.error || 'Error al obtener estado')
+      if (err.response?.status === 429) {
+        console.warn('Rate limit exceeded. Pausing polling.')
+        setIsPollingPaused(true)
+        if (pollingIntervalRef.current) {
+          clearInterval(pollingIntervalRef.current)
+          pollingIntervalRef.current = null
+        }
+        setError('Conexión pausada temporalmente por alta carga. Reintentando en breve...')
+      } else {
+        console.error('Error al obtener estado EPP:', err)
+        // Solo mostrar error si no es el primer intento
+        if (status !== null) {
+          setError(err.response?.data?.error || 'Error al obtener estado')
+        }
       }
     } finally {
       setLoading(false)
@@ -155,15 +240,83 @@ const EppMonitor = () => {
     setIsDragging(false)
   }
 
-  // Polling cada 1 segundo
+  // Modal handlers
+  const openModal = (record: HistoryRecord) => {
+    setSelectedRecord(record)
+    setIsModalOpen(true)
+    setModalZoom(1)
+    setModalPan({ x: 0, y: 0 })
+  }
+
+  const closeModal = () => {
+    setIsModalOpen(false)
+    setSelectedRecord(null)
+    setModalZoom(1)
+    setModalPan({ x: 0, y: 0 })
+  }
+
+  const navigateModal = (direction: 'prev' | 'next') => {
+    if (!selectedRecord) return
+
+    // Determinar si el registro actual es de cumplimiento o infracción
+    const currentList = selectedRecord.isCompliant
+      ? history.filter(r => r.isCompliant)
+      : history.filter(r => !r.isCompliant)
+
+    const currentIndex = currentList.findIndex(r => r.timestamp === selectedRecord.timestamp)
+
+    if (direction === 'prev' && currentIndex > 0) {
+      setSelectedRecord(currentList[currentIndex - 1])
+      setModalZoom(1)
+      setModalPan({ x: 0, y: 0 })
+    } else if (direction === 'next' && currentIndex < currentList.length - 1) {
+      setSelectedRecord(currentList[currentIndex + 1])
+      setModalZoom(1)
+      setModalPan({ x: 0, y: 0 })
+    }
+  }
+
+  const handleModalWheel = (e: React.WheelEvent) => {
+    e.stopPropagation()
+    e.preventDefault() // Prevenir scroll de la página de fondo
+    const scale = e.deltaY > 0 ? 0.9 : 1.1
+    setModalZoom(z => Math.max(1, Math.min(4, z * scale)))
+  }
+
+  const handleModalMouseDown = (e: React.MouseEvent) => {
+    if (modalZoom > 1) {
+      setIsModalDragging(true)
+      setModalDragStart({ x: e.clientX - modalPan.x, y: e.clientY - modalPan.y })
+    }
+  }
+
+  const handleModalMouseMove = (e: React.MouseEvent) => {
+    if (isModalDragging && modalZoom > 1) {
+      e.preventDefault()
+      setModalPan({
+        x: e.clientX - modalDragStart.x,
+        y: e.clientY - modalDragStart.y
+      })
+    }
+  }
+
+  const handleModalMouseUp = () => {
+    setIsModalDragging(false)
+  }
+
+  // Polling cada 5 segundos (sincronizado con ESP32)
   useEffect(() => {
     // Cargar inmediatamente
     fetchStatus()
+    fetchHistory()
 
     // Configurar polling
-    pollingIntervalRef.current = window.setInterval(() => {
-      fetchStatus()
-    }, 1000)
+    if (!isPollingPaused) {
+      pollingIntervalRef.current = window.setInterval(() => {
+        fetchStatus()
+        fetchHistory()
+      }, 10000) // 10 segundos para evitar 429
+    }
 
     // Cleanup
     return () => {
@@ -171,7 +324,41 @@ const EppMonitor = () => {
         clearInterval(pollingIntervalRef.current)
       }
     }
-  }, []) // Remove dependency on selectedImage to avoid resetting poll loop
+  }, [isPollingPaused]) // Dependencia agregada para reiniciar si se quita la pausa
+
+  // Navegación con teclado en el modal
+  useEffect(() => {
+    if (!isModalOpen) return
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault()
+        navigateModal('prev')
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault()
+        navigateModal('next')
+      } else if (e.key === 'Escape') {
+        e.preventDefault()
+        closeModal()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [isModalOpen, selectedRecord, history]) // Dependencias necesarias para navigateModal
+
+  // Bloquear scroll del body cuando el modal está abierto
+  useEffect(() => {
+    if (isModalOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [isModalOpen])
 
   // Determinar color de borde según compliance
   const borderColor = status
@@ -242,6 +429,23 @@ const EppMonitor = () => {
         </Alert>
       )}
 
+      {/* Alerta de Polling Pausado */}
+      {isPollingPaused && (
+        <Alert className="border-amber-500 bg-amber-50 dark:bg-amber-950/20">
+          <AlertTriangle className="h-4 w-4 text-amber-600" />
+          <AlertTitle className="text-amber-800 dark:text-amber-200">Conexión Pausada</AlertTitle>
+          <AlertDescription className="text-amber-700 dark:text-amber-300">
+            Se ha pausado la actualización automática debido a una alta carga en el servidor.
+            <button
+              onClick={() => setIsPollingPaused(false)}
+              className="ml-2 underline font-semibold hover:text-amber-900"
+            >
+              Reintentar ahora
+            </button>
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Grid principal */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {/* Galería de imágenes - Ocupa 2 columnas */}
@@ -279,7 +483,7 @@ const EppMonitor = () => {
                       </div>
                     ) : (
                       <div
-                        className="transition-transform duration-75 ease-out"
+                        className="transition-transform duration-75 ease-out origin-center w-full h-full flex items-center justify-center"
                         style={{
                           transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
                           cursor: zoom > 1 ? (isDragging ? 'grabbing' : 'grab') : 'zoom-in'
@@ -516,13 +720,323 @@ const EppMonitor = () => {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Elementos faltantes</p>
-                <p className="text-lg font-semibold">
+                <p className={cn(
+                  "text-lg font-semibold",
+                  status.missingItems.length > 0 && "text-red-600 font-bold"
+                )}>
                   {status.missingItems.length > 0 ? status.missingItems.join(', ') : 'Ninguno'}
                 </p>
               </div>
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* Historial de Detecciones EPP */}
+      {history.length > 0 && (
+        <div className="mt-8">
+          <h2 className="text-2xl font-bold mb-4">Historial de Detecciones</h2>
+          <div className="grid gap-6 md:grid-cols-2">
+            {/* Columna Izquierda: Infracciones */}
+            <div className="space-y-4">
+              <h3 className="text-xl font-semibold text-red-600 dark:text-red-400 flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5" />
+                Infracciones
+              </h3>
+              {/* Scrollable container */}
+              <div className="max-h-[60vh] overflow-y-auto pr-2 space-y-3 scrollbar-thin scrollbar-thumb-red-300 scrollbar-track-red-50 dark:scrollbar-thumb-red-700 dark:scrollbar-track-red-950">
+                {history
+                  .filter(record => !record.isCompliant)
+                  .map((record, index) => (
+                    <Card
+                      key={index}
+                      className="border-red-500 border-2 bg-red-50 dark:bg-red-950/20 cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all duration-200"
+                      onClick={() => openModal(record)}
+                    >
+                      <CardHeader className="pb-3">
+                        <div className="flex items-start justify-between">
+                          <CardTitle className="text-base text-red-700 dark:text-red-300">
+                            Falta EPP
+                          </CardTitle>
+                          <Badge variant="destructive" className="text-xs">
+                            {format(new Date(record.timestamp), 'dd/MM HH:mm', { locale: es })}
+                          </Badge>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        {/* Imagen */}
+                        {record.processedImageUrl && (
+                          <div className="relative w-full h-48 rounded-lg overflow-hidden border-2 border-red-300">
+                            <img
+                              src={`${import.meta.env.VITE_API_URL?.replace('/api', '') || ''}${record.processedImageUrl}`}
+                              alt="Detección con infracciones"
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        )}
+                        {/* Lista de elementos faltantes */}
+                        <div className="space-y-1">
+                          {record.missingItems.map((item, idx) => (
+                            <div key={idx} className="flex items-center gap-2 text-red-700 dark:text-red-300">
+                              <AlertTriangle className="h-4 w-4" />
+                              <p className="text-sm font-semibold">{item}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                {history.filter(record => !record.isCompliant).length === 0 && (
+                  <Card className="border-dashed">
+                    <CardContent className="py-8 text-center text-muted-foreground">
+                      <CheckCircle2 className="h-12 w-12 mx-auto mb-2 text-green-500" />
+                      <p>No hay infracciones registradas</p>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            </div>
+
+            {/* Columna Derecha: Cumplimiento */}
+            <div className="space-y-4">
+              <h3 className="text-xl font-semibold text-blue-700 dark:text-blue-400 flex items-center gap-2">
+                <CheckCircle2 className="h-5 w-5" />
+                Cumplimiento
+              </h3>
+              {/* Scrollable container */}
+              <div className="max-h-[60vh] overflow-y-auto pr-2 space-y-3 scrollbar-thin scrollbar-thumb-green-300 scrollbar-track-green-50 dark:scrollbar-thumb-green-700 dark:scrollbar-track-green-950">
+                {history
+                  .filter(record => record.isCompliant)
+                  .map((record, index) => (
+                    <Card
+                      key={index}
+                      className="border-green-500 border-2 bg-green-50 dark:bg-green-950/20 cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all duration-200"
+                      onClick={() => openModal(record)}
+                    >
+                      <CardHeader className="pb-3">
+                        <div className="flex items-start justify-between">
+                          <CardTitle className="text-base text-blue-800 dark:text-blue-400">
+                            EPP Completo
+                          </CardTitle>
+                          <Badge className="text-xs bg-green-600">
+                            {format(new Date(record.timestamp), 'dd/MM HH:mm', { locale: es })}
+                          </Badge>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        {/* Imagen */}
+                        {record.processedImageUrl && (
+                          <div className="relative w-full h-48 rounded-lg overflow-hidden border-2 border-green-300">
+                            <img
+                              src={`${import.meta.env.VITE_API_URL?.replace('/api', '') || ''}${record.processedImageUrl}`}
+                              alt="Detección con cumplimiento"
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        )}
+                        {/* Check de cumplimiento */}
+                        <div className="flex items-center gap-2 text-blue-800 dark:text-blue-400">
+                          <CheckCircle2 className="h-5 w-5" />
+                          <p className="text-sm font-semibold">
+                            Todos los elementos de protección detectados
+                          </p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                {history.filter(record => record.isCompliant).length === 0 && (
+                  <Card className="border-dashed">
+                    <CardContent className="py-8 text-center text-muted-foreground">
+                      <AlertTriangle className="h-12 w-12 mx-auto mb-2 text-amber-500" />
+                      <p>No hay registros de cumplimiento</p>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Detalles */}
+      {isModalOpen && selectedRecord && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 overflow-hidden"
+          onClick={closeModal}
+        >
+          <div
+            className="bg-background rounded-lg shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex flex-col md:flex-row h-full max-h-[90vh]">
+              {/* Lado Izquierdo: Imagen con Zoom */}
+              <div className="md:w-1/2 bg-muted p-4 flex flex-col">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold">Imagen de Detección</h3>
+                  <div className="flex items-center gap-2">
+                    {/* Navegación */}
+                    {selectedRecord && (() => {
+                      const currentList = selectedRecord.isCompliant
+                        ? history.filter(r => r.isCompliant)
+                        : history.filter(r => !r.isCompliant)
+                      const currentIndex = currentList.findIndex(r => r.timestamp === selectedRecord.timestamp)
+                      return (
+                        <>
+                          <button
+                            onClick={() => navigateModal('prev')}
+                            disabled={currentIndex === 0}
+                            className="px-3 py-1 rounded bg-secondary text-secondary-foreground hover:bg-secondary/80 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            ← Anterior
+                          </button>
+                          <span className="text-sm text-muted-foreground">
+                            {currentIndex + 1} / {currentList.length}
+                          </span>
+                          <button
+                            onClick={() => navigateModal('next')}
+                            disabled={currentIndex === currentList.length - 1}
+                            className="px-3 py-1 rounded bg-secondary text-secondary-foreground hover:bg-secondary/80 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            Siguiente →
+                          </button>
+                        </>
+                      )
+                    })()}
+                    <button
+                      onClick={closeModal}
+                      className="text-muted-foreground hover:text-foreground ml-2"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+                <div
+                  className="flex-1 relative overflow-hidden rounded-lg border-2 border-border bg-background flex items-center justify-center"
+                  onWheel={handleModalWheel}
+                  onMouseDown={handleModalMouseDown}
+                  onMouseMove={handleModalMouseMove}
+                  onMouseUp={handleModalMouseUp}
+                  onMouseLeave={handleModalMouseUp}
+                >
+                  {selectedRecord.processedImageUrl && (
+                    <img
+                      src={`${import.meta.env.VITE_API_URL?.replace('/api', '') || ''}${selectedRecord.processedImageUrl}`}
+                      alt="Detección"
+                      className="max-w-full max-h-full object-contain select-none"
+                      style={{
+                        transform: `scale(${modalZoom}) translate(${modalPan.x / modalZoom}px, ${modalPan.y / modalZoom}px)`,
+                        cursor: modalZoom > 1 ? (isModalDragging ? 'grabbing' : 'grab') : 'default'
+                      }}
+                      draggable={false}
+                    />
+                  )}
+                </div>
+                {/* Controles de Zoom */}
+                <div className="mt-4 flex items-center justify-center gap-2">
+                  <Badge
+                    variant="secondary"
+                    className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
+                    onClick={() => setModalZoom(z => Math.max(1, z - 0.5))}
+                  >
+                    -
+                  </Badge>
+                  <Badge variant="outline">{Math.round(modalZoom * 100)}%</Badge>
+                  <Badge
+                    variant="secondary"
+                    className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
+                    onClick={() => setModalZoom(z => Math.min(4, z + 0.5))}
+                  >
+                    +
+                  </Badge>
+                  {modalZoom > 1 && (
+                    <Badge
+                      variant="destructive"
+                      className="cursor-pointer"
+                      onClick={() => { setModalZoom(1); setModalPan({ x: 0, y: 0 }) }}
+                    >
+                      Reset
+                    </Badge>
+                  )}
+                </div>
+                {modalZoom === 1 && (
+                  <p className="text-xs text-muted-foreground text-center mt-2">
+                    Usa la rueda del mouse para hacer zoom
+                  </p>
+                )}
+              </div>
+
+              {/* Lado Derecho: Metadatos */}
+              <div className="md:w-1/2 p-6 overflow-y-auto">
+                <h3 className="text-xl font-bold mb-4">Detalles de la Detección</h3>
+                <div className="space-y-4">
+                  {/* Fecha y Hora */}
+                  <div>
+                    <p className="text-sm text-muted-foreground">Fecha y Hora</p>
+                    <p className="text-lg font-semibold">
+                      {format(new Date(selectedRecord.timestamp), "dd/MM/yyyy 'a las' HH:mm:ss", { locale: es })}
+                    </p>
+                  </div>
+
+                  {/* Detecciones */}
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-2">Detecciones</p>
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="text-center p-2 bg-muted rounded">
+                        <p className="text-xs text-muted-foreground">Cascos</p>
+                        <p className="text-lg font-bold">{selectedRecord.detections.casco}</p>
+                      </div>
+                      <div className="text-center p-2 bg-muted rounded">
+                        <p className="text-xs text-muted-foreground">Chalecos</p>
+                        <p className="text-lg font-bold">{selectedRecord.detections.chaleco}</p>
+                      </div>
+                      <div className="text-center p-2 bg-muted rounded">
+                        <p className="text-xs text-muted-foreground">Guantes</p>
+                        <p className="text-lg font-bold">{selectedRecord.detections.guante}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Estado de Cumplimiento o Elementos Faltantes */}
+                  {selectedRecord.isCompliant ? (
+                    <Card className="border-green-500 bg-green-50 dark:bg-green-950/20">
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-sm text-blue-800 dark:text-blue-400">
+                          Estado de Cumplimiento
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex items-center gap-2 text-blue-800 dark:text-blue-400">
+                          <CheckCircle2 className="h-6 w-6" />
+                          <p className="font-semibold">
+                            Todos los elementos de protección detectados correctamente
+                          </p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ) : (
+                    <Card className="border-red-500 bg-red-50 dark:bg-red-950/20">
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-2xl text-red-900 dark:text-red-100 font-bold">
+                          Elementos Faltantes
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-3">
+                          {selectedRecord.missingItems.map((item, idx) => (
+                            <div key={idx} className="flex items-center gap-3 text-red-900 dark:text-red-100">
+                              <AlertTriangle className="h-7 w-7 text-red-900 dark:text-red-100" />
+                              <p className="font-bold text-xl">{item}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Error state */}

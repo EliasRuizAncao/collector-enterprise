@@ -124,20 +124,23 @@ export const useDashboard = () => {
       const response = await api.get<DashboardStatsResponse>('/dashboard/stats')
       setKpis(response.data.kpis)
     } catch (err: any) {
-      console.error('useDashboard fetchStats error', err)
-      
       // Silenciar errores 404 en desarrollo (backend no implementado completamente)
       if (err?.response?.status === 404 || err?.response?.status === 501) {
         console.warn('Dashboard stats endpoint not implemented yet')
         return
       }
 
-      setError('No fue posible cargar las estadísticas del dashboard.')
-      toast({
-        title: 'Error al cargar estadísticas',
-        description: 'Intenta nuevamente en unos minutos.',
-        variant: 'destructive',
-      })
+      if (err?.response?.status === 429) {
+        console.warn('Rate limit exceeded for dashboard stats.')
+      } else {
+        console.error('useDashboard fetchStats error', err)
+        setError('No fue posible cargar las estadísticas del dashboard.')
+        toast({
+          title: 'Error al cargar estadísticas',
+          description: 'Intenta nuevamente en unos minutos.',
+          variant: 'destructive',
+        })
+      }
     } finally {
       setLoading(false)
     }
@@ -166,20 +169,23 @@ export const useDashboard = () => {
 
         setFormsCompletedSeries(response.data.series)
       } catch (err: any) {
-        console.error('useDashboard fetchFormsCompleted error', err)
-        
         // Silenciar errores 404 en desarrollo
         if (err?.response?.status === 404 || err?.response?.status === 501) {
           console.warn('Forms completed endpoint not implemented yet')
           return
         }
 
-        setError('No fue posible cargar los formularios completados.')
-        toast({
-          title: 'Error al cargar formularios completados',
-          description: 'Intenta nuevamente en unos minutos.',
-          variant: 'destructive',
-        })
+        if (err?.response?.status === 429) {
+          console.warn('Rate limit exceeded for forms completed.')
+        } else {
+          console.error('useDashboard fetchFormsCompleted error', err)
+          setError('No fue posible cargar los formularios completados.')
+          toast({
+            title: 'Error al cargar formularios completados',
+            description: 'Intenta nuevamente en unos minutos.',
+            variant: 'destructive',
+          })
+        }
       } finally {
         setLoading(false)
       }
@@ -199,20 +205,23 @@ export const useDashboard = () => {
       setFormsByType(response.data.byStatus)
       setTopForms(response.data.topForms)
     } catch (err: any) {
-      console.error('useDashboard fetchFormsByType error', err)
-      
       // Silenciar errores 404 en desarrollo
       if (err?.response?.status === 404 || err?.response?.status === 501) {
         console.warn('Forms by type endpoint not implemented yet')
         return
       }
 
-      setError('No fue posible cargar los formularios por tipo.')
-      toast({
-        title: 'Error al cargar formularios por tipo',
-        description: 'Intenta nuevamente en unos minutos.',
-        variant: 'destructive',
-      })
+      if (err?.response?.status === 429) {
+        console.warn('Rate limit exceeded for forms by type.')
+      } else {
+        console.error('useDashboard fetchFormsByType error', err)
+        setError('No fue posible cargar los formularios por tipo.')
+        toast({
+          title: 'Error al cargar formularios por tipo',
+          description: 'Intenta nuevamente en unos minutos.',
+          variant: 'destructive',
+        })
+      }
     } finally {
       setLoading(false)
     }
@@ -229,20 +238,23 @@ export const useDashboard = () => {
       const response = await api.get<RecentActivityResponse>('/dashboard/activity')
       setRecentActivity(response.data.activities)
     } catch (err: any) {
-      console.error('useDashboard fetchRecentActivity error', err)
-      
       // Silenciar errores 404 en desarrollo
       if (err?.response?.status === 404 || err?.response?.status === 501) {
         console.warn('Recent activity endpoint not implemented yet')
         return
       }
 
-      setError('No fue posible cargar la actividad reciente.')
-      toast({
-        title: 'Error al cargar actividad reciente',
-        description: 'Intenta nuevamente en unos minutos.',
-        variant: 'destructive',
-      })
+      if (err?.response?.status === 429) {
+        console.warn('Rate limit exceeded for recent activity.')
+      } else {
+        console.error('useDashboard fetchRecentActivity error', err)
+        setError('No fue posible cargar la actividad reciente.')
+        toast({
+          title: 'Error al cargar actividad reciente',
+          description: 'Intenta nuevamente en unos minutos.',
+          variant: 'destructive',
+        })
+      }
     } finally {
       setLoading(false)
     }
