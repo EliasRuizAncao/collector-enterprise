@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { PrismaClient, Prisma, Role, AssignmentFrequency } from '@prisma/client'
+import { PrismaClient, Prisma, AssignmentFrequency } from '@prisma/client'
 import { z } from 'zod'
 
 import { AuthRequest } from '@/middleware/auth'
@@ -440,8 +440,8 @@ export const getResponses = async (req: Request, res: Response, next: NextFuncti
 
     const authReq = req as AuthRequest
     const currentUserId = authReq.user?.id
-    const isAdmin = authReq.user?.role === Role.ADMIN
-    const isManager = authReq.user?.role === Role.MANAGER
+    const isAdmin = authReq.user?.role === 'ADMIN'
+    const isManager = authReq.user?.role === 'MANAGER'
 
     // Construir filtros
     const where: Prisma.FormResponseWhereInput = {}
@@ -542,8 +542,8 @@ export const getResponse = async (req: Request, res: Response, next: NextFunctio
     const { id } = req.params
     const authReq = req as AuthRequest
     const currentUserId = authReq.user?.id
-    const isAdmin = authReq.user?.role === Role.ADMIN
-    const isManager = authReq.user?.role === Role.MANAGER
+    const isAdmin = authReq.user?.role === 'ADMIN'
+    const isManager = authReq.user?.role === 'MANAGER'
 
     const response = await prisma.formResponse.findUnique({
       where: { id },

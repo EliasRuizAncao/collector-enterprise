@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { PrismaClient, Prisma, FormStatus, Role, AssignmentFrequency } from '@prisma/client'
+import { PrismaClient, Prisma, FormStatus, AssignmentFrequency } from '@prisma/client'
 import { z } from 'zod'
 
 import { AuthRequest } from '@/middleware/auth'
@@ -87,7 +87,7 @@ export const getAssignments = async (req: Request, res: Response, next: NextFunc
 
     const authReq = req as AuthRequest
     const currentUserId = authReq.user?.id
-    const isAdmin = authReq.user?.role === Role.ADMIN
+    const isAdmin = authReq.user?.role === 'ADMIN'
 
     // Si no es admin, solo mostrar sus propias asignaciones
     const effectiveUserId = isAdmin ? parsed.userId : currentUserId
@@ -160,7 +160,7 @@ export const getAssignmentById = async (req: Request, res: Response, next: NextF
     const { id } = req.params
     const authReq = req as AuthRequest
     const currentUserId = authReq.user?.id
-    const isAdmin = authReq.user?.role === Role.ADMIN
+    const isAdmin = authReq.user?.role === 'ADMIN'
 
     const assignment = await prisma.formAssignment.findUnique({
       where: { id },
@@ -363,7 +363,7 @@ export const updateAssignment = async (req: Request, res: Response, next: NextFu
     const payload = updateAssignmentSchema.parse(req.body)
     const authReq = req as AuthRequest
     const userId = authReq.user?.id
-    const isAdmin = authReq.user?.role === Role.ADMIN
+    const isAdmin = authReq.user?.role === 'ADMIN'
 
     if (!userId) {
       return res.status(401).json({ error: 'Usuario no autenticado' })
@@ -496,7 +496,7 @@ export const deleteAssignment = async (req: Request, res: Response, next: NextFu
     const { id } = req.params
     const authReq = req as AuthRequest
     const userId = authReq.user?.id
-    const isAdmin = authReq.user?.role === Role.ADMIN
+    const isAdmin = authReq.user?.role === 'ADMIN'
 
     if (!userId) {
       return res.status(401).json({ error: 'Usuario no autenticado' })
@@ -527,7 +527,7 @@ export const deleteAssignment = async (req: Request, res: Response, next: NextFu
 
     // Validar permisos: solo admin o manager puede eliminar asignaciones
     // (El middleware authorize ya valida esto, pero lo dejamos como doble verificación)
-    if (!isAdmin && authReq.user?.role !== Role.MANAGER) {
+    if (!isAdmin && authReq.user?.role !== 'MANAGER') {
       return res.status(403).json({ error: 'Solo los administradores y managers pueden eliminar asignaciones' })
     }
 
@@ -556,6 +556,123 @@ export const deleteAssignment = async (req: Request, res: Response, next: NextFu
     })
   } catch (error) {
     console.error('deleteAssignment error:', error)
+    next(error)
+  }
+}
+
+/**
+ * GET /api/assignments/today
+ * Obtiene las asignaciones del día de hoy para el usuario actual
+ */
+export const getTodayAssignments = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const authReq = req as AuthRequest
+    const userId = authReq.user?.id
+
+    if (!userId) {
+      return res.status(401).json({ error: 'Usuario no autenticado' })
+    }
+
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const tomorrow = new Date(today)
+    tomorrow.setDate(tomorrow.getDate() + 1)
+
+    const assignments = await prisma.formAssignment.findMany({
+      where: {
+        userId,
+        isCompleted: false,
+        OR: [
+          {
+            startDate: {
+              lte: tomorrow,
+            },
+            endDate: {
+              gte: today,
+            },
+          },
+          {
+            endDate: null,
+            startDate: {
+              lte: tomorrow,
+            },
+          },
+        ],
+      },
+      include: {
+        form: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            status: true,
+          },
+        },
+      },
+      orderBy: {
+        startDate: 'asc',
+      },
+    })
+
+    const tasks = assignments.map((assignment) => ({
+      id: assignment.id,
+      formId: assignment.form.id,
+      formName: assignment.form.title,
+      dueDate: assignment.endDate?.toISOString() || assignment.startDate.toISOString(),
+      priority: 'normal' as const,
+      status: assignment.isCompleted ? ('completed' as const) : ('pending' as const),
+    }))
+
+    const stats = {
+      pending: assignments.filter((a) => !a.isCompleted).length,
+      completedToday: 0, // Se puede calcular si es necesario
+    }
+
+    return res.status(200).json({
+      tasks,
+      stats,
+    })
+  } catch (error) {
+    console.error('getTodayAssignments error:', error)
+    next(error)
+  }
+}
+
+/**
+ * GET /api/assignments/stats
+ * Obtiene estadísticas de asignaciones para el usuario actual
+ */
+export const getAssignmentStats = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const authReq = req as AuthRequest
+    const userId = authReq.user?.id
+
+    if (!userId) {
+      return res.status(401).json({ error: 'Usuario no autenticado' })
+    }
+
+    const [pending, completed] = await prisma.$transaction([
+      prisma.formAssignment.count({
+        where: {
+          userId,
+          isCompleted: false,
+        },
+      }),
+      prisma.formAssignment.count({
+        where: {
+          userId,
+          isCompleted: true,
+        },
+      }),
+    ])
+
+    return res.status(200).json({
+      pending,
+      completed,
+      notifications: false, // Se puede implementar lógica de notificaciones aquí
+    })
+  } catch (error) {
+    console.error('getAssignmentStats error:', error)
     next(error)
   }
 }
@@ -672,5 +789,7 @@ export default {
   updateAssignment,
   deleteAssignment,
   markAsCompleted,
+  getTodayAssignments,
+  getAssignmentStats,
 }
 

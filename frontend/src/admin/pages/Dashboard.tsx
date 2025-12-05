@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo } from 'react'
 import { format, subDays, startOfDay, endOfDay } from 'date-fns'
 import { es } from 'date-fns/locale'
 import {
-  BarChart3,
   Calendar,
   FileCheck,
   FileSpreadsheet,
@@ -10,6 +9,7 @@ import {
   Users,
   Play,
   Database,
+  LayoutDashboard,
 } from 'lucide-react'
 
 import { Button } from '@/shared/components/ui/button'
@@ -22,13 +22,17 @@ import KPICard from '@/admin/components/dashboard/KPICard'
 import { LineChartCard, BarChartCard } from '@/admin/components/dashboard/Charts'
 import ActivityTable from '@/admin/components/dashboard/ActivityTable'
 import PendingAssignments from '@/admin/components/dashboard/PendingAssignments'
-import { useAuthStore } from '@/shared/store/authStore'
+import EPPStats from '@/admin/components/dashboard/EPPStats'
+import { usePermission } from '@/shared/hooks/usePermission'
+import { useAuth } from '@/shared/hooks/useAuth'
+import { Permission } from '@/shared/types/permissions'
 import useDashboard, {
   type ActivityItem,
   type FormsCompletedSeries,
   type FormsByTypeData,
 } from '@/shared/hooks/useDashboard'
 import { cn } from '@/shared/lib/utils'
+import PageLoader from '@/shared/components/common/PageLoader'
 
 // Datos mock para demostración
 const MOCK_KPI_CARDS = [
@@ -168,10 +172,23 @@ const MOCK_RECENT_ACTIVITY: ActivityItem[] = [
 ]
 
 const Dashboard = () => {
-  const user = useAuthStore((state) => state.user)
   const { toast } = useToast()
-  const isOperator = user?.role === 'OPERATOR' || user?.role === 'SUPERVISOR'
-  const isAdminOrManager = user?.role === 'ADMIN' || user?.role === 'MANAGER'
+  const { hasPermission, permissions } = usePermission()
+  const { user } = useAuth()
+  const hasMobileAccess = hasPermission(Permission.ACCESS_MOBILE_APP)
+  const hasAdminAccess = hasPermission(Permission.ACCESS_ADMIN_PANEL)
+
+  // Debug: Log de permisos y acceso
+  useEffect(() => {
+    console.log('[Dashboard] Estado de permisos:', {
+      hasUser: !!user,
+      permissionsCount: permissions?.length || 0,
+      hasAdminAccess,
+      hasMobileAccess,
+      permissions: permissions?.slice(0, 10), // Primeros 10
+      userRole: user?.role,
+    })
+  }, [user, permissions, hasAdminAccess, hasMobileAccess])
 
   // Estado para usar datos mock
   const [useMockData, setUseMockData] = useState(() => {
@@ -202,23 +219,40 @@ const Dashboard = () => {
 
   // Cargar datos al montar y cuando cambia el rango de fechas
   useEffect(() => {
-    if (isAdminOrManager && !useMockData) {
+    if (hasAdminAccess && !useMockData) {
       void fetchAll({
         startDate: dateRange.from.toISOString(),
         endDate: dateRange.to.toISOString(),
       })
     }
-  }, [isAdminOrManager, useMockData, dateRange, fetchAll])
+  }, [hasAdminAccess, useMockData, dateRange, fetchAll])
+
+  // Si hay errores persistentes y no estamos usando mock, sugerir activarlo
+  useEffect(() => {
+    if (error && !useMockData && hasAdminAccess && !loading) {
+      // Esperar un poco antes de sugerir mock (por si es un error temporal)
+      const timer = setTimeout(() => {
+        toast({
+          title: 'Problema de conexión',
+          description:
+            'No se pudo conectar a la base de datos. ¿Quieres activar el modo demostración para ver el dashboard?',
+          variant: 'destructive',
+          duration: 10000,
+        })
+      }, 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [error, useMockData, hasAdminAccess, loading, toast])
 
   // Iniciar auto-refresh cada 30 segundos (solo si no estamos usando mock)
   useEffect(() => {
-    if (isAdminOrManager && !useMockData) {
+    if (hasAdminAccess && !useMockData) {
       startAutoRefresh(30000)
       return () => {
         stopAutoRefresh()
       }
     }
-  }, [isAdminOrManager, useMockData, startAutoRefresh, stopAutoRefresh])
+  }, [hasAdminAccess, useMockData, startAutoRefresh, stopAutoRefresh])
 
   // Toggle para usar datos mock
   const toggleMockData = () => {
@@ -318,6 +352,71 @@ const Dashboard = () => {
     return `${format(dateRange.from, 'dd MMM', { locale: es })} - ${format(dateRange.to, 'dd MMM', { locale: es })}`
   }, [dateRange])
 
+  // Mostrar loader inicial solo si está cargando y no hay datos (con timeout)
+  const [loadingTimeout, setLoadingTimeout] = useState(false)
+  
+  useEffect(() => {
+    if (loading && !useMockData && hasAdminAccess && !displayKPIs) {
+      const timer = setTimeout(() => {
+        setLoadingTimeout(true)
+      }, 5000) // Mostrar mensaje después de 5 segundos
+      return () => clearTimeout(timer)
+    } else {
+      setLoadingTimeout(false)
+    }
+  }, [loading, useMockData, hasAdminAccess, displayKPIs])
+
+  // Si está cargando por mucho tiempo, mostrar mensaje de error en lugar de loader infinito
+  if (loading && !useMockData && hasAdminAccess && !displayKPIs && loadingTimeout) {
+    return (
+      <div className="space-y-6">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight text-foreground">Dashboard</h1>
+            <p className="text-sm text-muted-foreground">
+              {hasMobileAccess
+                ? 'Visualiza tus formularios asignados y completa tus tareas pendientes.'
+                : 'Visualiza el estado general de los formularios y la actividad reciente de Amaranto.'}
+            </p>
+          </div>
+        </div>
+        <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-8 text-center">
+          <Database className="mx-auto mb-4 h-12 w-12 text-destructive" />
+          <h3 className="mb-2 text-lg font-semibold text-destructive">Problema de conexión</h3>
+          <p className="mb-4 text-sm text-muted-foreground">
+            No se pudo conectar a la base de datos. El servidor de base de datos puede estar inactivo o no disponible.
+          </p>
+          <Button onClick={toggleMockData} variant="default" className="gap-2">
+            <Database className="h-4 w-4" />
+            Activar Modo Demostración
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
+  // Mostrar loader normal si está cargando sin timeout
+  if (loading && !useMockData && hasAdminAccess && !displayKPIs && !loadingTimeout) {
+    return (
+      <div className="space-y-6">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight text-foreground">Dashboard</h1>
+            <p className="text-sm text-muted-foreground">
+              {hasMobileAccess
+                ? 'Visualiza tus formularios asignados y completa tus tareas pendientes.'
+                : 'Visualiza el estado general de los formularios y la actividad reciente de Amaranto.'}
+            </p>
+          </div>
+        </div>
+        <PageLoader
+          message="Cargando dashboard..."
+          icon={<LayoutDashboard className="h-12 w-12 text-primary" />}
+        />
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       {/* Encabezado con controles */}
@@ -325,12 +424,12 @@ const Dashboard = () => {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-foreground">Dashboard</h1>
           <p className="text-sm text-muted-foreground">
-            {isOperator
+            {hasMobileAccess
               ? 'Visualiza tus formularios asignados y completa tus tareas pendientes.'
               : 'Visualiza el estado general de los formularios y la actividad reciente de Amaranto.'}
           </p>
         </div>
-        {isAdminOrManager && (
+        {hasAdminAccess && (
           <div className="flex flex-wrap items-center gap-2">
             {/* Selector de rango de fechas */}
             <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
@@ -413,18 +512,47 @@ const Dashboard = () => {
         )}
       </div>
 
-      {/* Mensaje de error */}
+      {/* Mensaje de error mejorado */}
       {error && !useMockData && (
-        <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">
-          {error}
+        <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1">
+              <h3 className="mb-1 font-semibold text-destructive">Error de conexión</h3>
+              <p className="text-sm text-destructive/80">{error}</p>
+              <p className="mt-2 text-xs text-muted-foreground">
+                La base de datos puede estar inactiva o no disponible. Activa el modo demostración para ver el dashboard con datos de ejemplo.
+              </p>
+            </div>
+            <Button onClick={toggleMockData} variant="outline" size="sm" className="shrink-0">
+              <Database className="mr-2 h-4 w-4" />
+              Activar Demo
+            </Button>
+          </div>
         </div>
       )}
 
       {/* Formularios asignados (solo para operadores y supervisores) - Prioridad alta */}
-      {isOperator && <PendingAssignments />}
+      {hasMobileAccess && <PendingAssignments />}
+
+      {/* Mensaje si no tiene acceso a ningún dashboard */}
+      {!hasAdminAccess && !hasMobileAccess && (
+        <div className="rounded-lg border border-yellow-500/50 bg-yellow-500/10 p-8 text-center">
+          <LayoutDashboard className="mx-auto mb-4 h-12 w-12 text-yellow-600" />
+          <h3 className="mb-2 text-lg font-semibold">Sin acceso al dashboard</h3>
+          <p className="mb-4 text-sm text-muted-foreground">
+            No tienes permisos para acceder al panel administrativo ni a la aplicación móvil.
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Permisos disponibles: {permissions?.length || 0}
+            {permissions && permissions.length > 0 && (
+              <span className="ml-2">({permissions.slice(0, 3).join(', ')}...)</span>
+            )}
+          </p>
+        </div>
+      )}
 
       {/* KPIs y gráficos (solo para ADMIN y MANAGER) */}
-      {isAdminOrManager && (
+      {hasAdminAccess && (
         <>
           {/* Grid de KPIs */}
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -467,19 +595,22 @@ const Dashboard = () => {
                 <LineChartCard
                   title="Formularios completados"
                   description={`Seguimiento diario de formularios completados (${dateRangeText}).`}
-                  data={displayFormsCompleted}
+                  data={displayFormsCompleted as unknown as Record<string, unknown>[]}
                   dataKeys={['day', 'completados']}
                 />
 
                 <BarChartCard
                   title="Formularios más usados"
                   description="Distribución de formularios más utilizados en el sistema."
-                  data={displayFormsByType}
+                  data={displayFormsByType as unknown as Record<string, unknown>[]}
                   dataKeys={['type', 'cantidad']}
                 />
               </>
             )}
           </div>
+
+          {/* Estadísticas EPP */}
+          <EPPStats useMockData={useMockData} />
 
           {/* Actividad reciente */}
           {loading && !useMockData && displayRecentActivity.length === 0 ? (

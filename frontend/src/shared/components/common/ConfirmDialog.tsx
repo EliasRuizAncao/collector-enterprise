@@ -21,6 +21,7 @@ interface ConfirmDialogProps {
   confirmText?: string
   cancelText?: string
   variant?: 'default' | 'destructive'
+  loading?: boolean
 }
 
 const ConfirmDialog = ({
@@ -32,16 +33,24 @@ const ConfirmDialog = ({
   confirmText = 'Confirmar',
   cancelText = 'Cancelar',
   variant = 'default',
+  loading: externalLoading,
 }: ConfirmDialogProps) => {
-  const [isLoading, setIsLoading] = useState(false)
+  const [internalLoading, setInternalLoading] = useState(false)
+  const isLoading = externalLoading !== undefined ? externalLoading : internalLoading
 
   const handleConfirm = async () => {
+    if (externalLoading !== undefined) {
+      // Si loading es controlado externamente, solo llamamos onConfirm
+      await Promise.resolve(onConfirm())
+      return
+    }
+    // Si loading es interno, lo manejamos aquí
     try {
-      setIsLoading(true)
+      setInternalLoading(true)
       await Promise.resolve(onConfirm())
       onClose()
     } finally {
-      setIsLoading(false)
+      setInternalLoading(false)
     }
   }
 

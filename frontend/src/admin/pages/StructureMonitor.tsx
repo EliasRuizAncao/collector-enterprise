@@ -10,6 +10,7 @@ import { Button } from '@/shared/components/ui/button'
 // import { Progress } from '@/shared/components/ui/progress'
 import { cn } from '@/shared/lib/utils'
 import api from '@/shared/lib/api'
+import PageLoader from '@/shared/components/common/PageLoader'
 
 interface StructureResult {
     type: 'image' | 'video'
@@ -117,11 +118,34 @@ const StructureMonitor = () => {
         if (score < 20) return 'bg-red-500'
         if (score < 50) return 'bg-orange-500'
         if (score < 80) return 'bg-yellow-500'
-        return 'bg-green-500'
-    }
+    return 'bg-green-500'
+  }
 
+  // Mostrar loader inicial si está cargando y no hay estado
+  if (loading && !status && !processing) {
     return (
-        <div className="space-y-6">
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
+              <Hammer className="h-8 w-8 text-primary" />
+              Avance de obra
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              Análisis de avance de obra y estructuras
+            </p>
+          </div>
+        </div>
+        <PageLoader
+          message="Cargando sistema de análisis..."
+          icon={<Hammer className="h-12 w-12 text-primary" />}
+        />
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6">
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>

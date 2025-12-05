@@ -1,7 +1,6 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { NavLink, Outlet, useLocation, Link, useNavigate } from 'react-router-dom'
 import {
-  Bell,
   FileText,
   LayoutDashboard,
   LogOut,
@@ -11,6 +10,10 @@ import {
   ClipboardList,
   Camera,
   Hammer,
+  BarChart3,
+  Shield,
+  Package,
+  PackageCheck,
 } from 'lucide-react'
 
 import { cn } from '@/shared/lib/utils'
@@ -35,15 +38,20 @@ import { Separator } from '@/shared/components/ui/separator'
 import { Sheet, SheetContent, SheetTrigger } from '@/shared/components/ui/sheet'
 import { Avatar, AvatarFallback } from '@/shared/components/ui/avatar'
 import { useAuth } from '@/shared/hooks/useAuth'
+import { usePermission } from '@/shared/hooks/usePermission'
+import { Permission } from '@/shared/types/permissions'
 import { useAuthStore } from '@/shared/store/authStore'
+import { authService } from '@/shared/services/authService'
 import NotificationBell from '@/components/layout/NotificationBell'
 import ThemeToggle from '@/shared/components/theme/ThemeToggle'
+import logoImage from '@/assets/logo.jpg'
 
 type NavItem = {
   label: string
   to: string
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>
-  allowedRoles?: ('ADMIN' | 'MANAGER' | 'SUPERVISOR' | 'OPERATOR')[]
+  allowedRoles?: ('ADMIN' | 'MANAGER' | 'SUPERVISOR' | 'OPERATOR')[] // Deprecated: usar permissions
+  permissions?: Permission[] // Permisos requeridos (cualquiera de ellos)
 }
 
 const allNavItems: NavItem[] = [
@@ -51,48 +59,75 @@ const allNavItems: NavItem[] = [
     label: 'Dashboard',
     to: '/admin/dashboard',
     icon: LayoutDashboard,
+    permissions: [Permission.ACCESS_ADMIN_PANEL],
   },
   {
     label: 'Formularios',
     to: '/admin/formularios',
     icon: FileText,
+    permissions: [Permission.FORMS_VIEW],
   },
   {
     label: 'Asignaciones',
     to: '/admin/asignaciones',
     icon: ClipboardList,
-    allowedRoles: ['ADMIN', 'MANAGER'],
+    permissions: [Permission.ASSIGNMENTS_VIEW],
   },
   {
     label: 'Cámara EPP',
     to: '/admin/epp-monitor',
     icon: Camera,
-    allowedRoles: ['ADMIN', 'MANAGER', 'SUPERVISOR'],
+    permissions: [Permission.EPP_MONITOR_VIEW],
   },
   {
     label: 'Avance de obra',
     to: '/admin/reconocimiento1',
     icon: Hammer,
-    allowedRoles: ['ADMIN', 'MANAGER', 'SUPERVISOR'],
+    permissions: [Permission.STRUCTURE_MONITOR_VIEW],
   },
   {
     label: 'Usuarios',
     to: '/admin/usuarios',
     icon: Users,
-    allowedRoles: ['ADMIN', 'MANAGER'],
+    permissions: [Permission.USERS_VIEW],
+  },
+  {
+    label: 'Reportes',
+    to: '/admin/reportes',
+    icon: BarChart3,
+    permissions: [Permission.REPORTS_VIEW],
+  },
+  {
+    label: 'Roles y Permisos',
+    to: '/admin/roles-permisos',
+    icon: Shield,
+    permissions: [Permission.ROLES_VIEW],
+  },
+  {
+    label: 'Stock de Bodega',
+    to: '/admin/warehouse/stock',
+    icon: Package,
+    permissions: [Permission.WAREHOUSE_MANAGE_STOCK, Permission.WAREHOUSE_VIEW_STOCK],
+  },
+  {
+    label: 'Solicitudes',
+    to: '/admin/warehouse/requests',
+    icon: PackageCheck,
+    permissions: [Permission.WAREHOUSE_AUTHORIZE_REQUESTS],
   },
   {
     label: 'Configuración',
     to: '/admin/settings',
     icon: Settings,
-    allowedRoles: ['ADMIN'],
+    permissions: [Permission.ACCESS_SETTINGS],
   },
 ]
 
 const AdminLayout = () => {
   const location = useLocation()
   const { user, logout } = useAuth()
-  const userRole = useAuthStore((state) => state.user?.role)
+  const { hasAnyPermission } = usePermission()
+  const { permissions, setPermissions } = useAuthStore()
   const navigate = useNavigate()
   const [isSheetOpen, setIsSheetOpen] = useState(false)
   const userInitials = useMemo(() => {
@@ -104,16 +139,39 @@ const AdminLayout = () => {
       .slice(0, 2)
   }, [user?.email, user?.name])
 
-  // Filtrar items de navegación según el rol del usuario
+  // Recargar permisos si no están cargados
+  useEffect(() => {
+    if (user && !permissions) {
+      console.log('[AdminLayout] Permisos no cargados, recargando...')
+      authService.refreshPermissions()
+        .then((newPermissions) => {
+          console.log('[AdminLayout] Permisos recargados:', newPermissions?.length)
+          if (newPermissions) {
+            setPermissions(newPermissions)
+          }
+        })
+        .catch((error) => {
+          console.error('[AdminLayout] Error al recargar permisos:', error)
+        })
+    }
+  }, [user, permissions, setPermissions])
+
+  // Filtrar items de navegación según los permisos del usuario
   const navItems = useMemo(() => {
-    if (!userRole) return []
+    if (!user) return []
     return allNavItems.filter((item) => {
-      // Si no tiene restricción de roles, está disponible para todos
-      if (!item.allowedRoles) return true
-      // Si tiene restricción, verificar que el rol del usuario esté incluido
-      return item.allowedRoles.includes(userRole as 'ADMIN' | 'MANAGER' | 'SUPERVISOR' | 'OPERATOR')
+      // Si tiene permisos definidos, verificar que el usuario tenga al menos uno
+      if (item.permissions && item.permissions.length > 0) {
+        return hasAnyPermission(item.permissions)
+      }
+      // Si solo tiene allowedRoles (deprecated), mantener compatibilidad
+      if (item.allowedRoles && item.allowedRoles.length > 0) {
+        return item.allowedRoles.includes(user.role as 'ADMIN' | 'MANAGER' | 'SUPERVISOR' | 'OPERATOR')
+      }
+      // Si no tiene restricciones, está disponible para todos
+      return true
     })
-  }, [userRole])
+  }, [user, hasAnyPermission])
 
   // Construye los breadcrumbs dinámicamente a partir de la ruta actual
   const breadcrumbs = useMemo(() => {
@@ -174,8 +232,8 @@ const AdminLayout = () => {
       {/* Sidebar en desktop */}
       <aside className="hidden w-64 flex-col border-r border-border/60 bg-card/60 px-4 py-6 backdrop-blur lg:flex">
         <div className="mb-6 flex items-center gap-3 px-2">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground font-semibold">
-            CE
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl overflow-hidden bg-white">
+            <img src={logoImage} alt="Amaranto Logo" className="h-full w-full object-contain p-1" />
           </div>
           <div>
             <p className="text-base font-semibold tracking-tight">Collector Enterprise</p>
@@ -231,8 +289,8 @@ const AdminLayout = () => {
               </SheetTrigger>
               <SheetContent side="left" className="w-full max-w-xs border-r border-border/60 bg-background/95 px-4 py-6">
                 <div className="mb-6 flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground font-semibold">
-                    CE
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl overflow-hidden bg-white">
+                    <img src={logoImage} alt="Amaranto Logo" className="h-full w-full object-contain p-1" />
                   </div>
                   <div>
                     <p className="text-base font-semibold">Collector Enterprise</p>

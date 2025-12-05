@@ -7,11 +7,61 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  ADMIN
-  MANAGER
-  SUPERVISOR
-  OPERATOR
+// Enum de permisos disponibles en el sistema
+enum Permission {
+  // Formularios
+  FORMS_VIEW
+  FORMS_CREATE
+  FORMS_EDIT
+  FORMS_DELETE
+  FORMS_PUBLISH
+  FORMS_ARCHIVE
+  FORMS_VIEW_RESPONSES
+
+  // Usuarios
+  USERS_VIEW
+  USERS_CREATE
+  USERS_EDIT
+  USERS_DELETE
+  USERS_CHANGE_ROLE
+  USERS_DEACTIVATE
+
+  // Asignaciones
+  ASSIGNMENTS_VIEW
+  ASSIGNMENTS_CREATE
+  ASSIGNMENTS_EDIT
+  ASSIGNMENTS_DELETE
+
+  // Reportes
+  REPORTS_VIEW
+  REPORTS_EXPORT
+
+  // EPP Monitor
+  EPP_MONITOR_VIEW
+  EPP_MONITOR_MANAGE
+
+  // Structure Monitor (Avance de obra)
+  STRUCTURE_MONITOR_VIEW
+  STRUCTURE_MONITOR_MANAGE
+
+  // Panel de administración
+  ACCESS_ADMIN_PANEL
+  ACCESS_MOBILE_APP
+  ACCESS_SETTINGS
+
+  // Gestión de permisos y roles
+  ROLES_VIEW
+  ROLES_CREATE
+  ROLES_EDIT
+  ROLES_DELETE
+  PERMISSIONS_MANAGE
+
+  // Bodega - Solicitudes
+  WAREHOUSE_REQUEST_MATERIALS
+  WAREHOUSE_AUTHORIZE_REQUESTS
+  WAREHOUSE_SCAN_QR
+  WAREHOUSE_MANAGE_STOCK
+  WAREHOUSE_VIEW_STOCK
 }
 
 enum FormStatus {
@@ -29,38 +79,88 @@ enum AssignmentFrequency {
   CUSTOM
 }
 
+enum MaterialRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  READY_FOR_PICKUP
+  DELIVERED
+  CANCELLED
+}
+
+enum NotificationType {
+  FORM_ASSIGNED
+  FORM_COMPLETED
+  DEADLINE
+  SYSTEM
+  MATERIAL_REQUEST_PENDING
+  MATERIAL_REQUEST_APPROVED
+  MATERIAL_REQUEST_REJECTED
+  MATERIAL_REQUEST_READY
+}
+
+// Roles dinámicos creados por el admin
+model Role {
+  id          String       @id @default(uuid())
+  name        String       @unique // Nombre único del rol (ej: "Supervisor", "Jefe de Obra")
+  displayName String // Nombre para mostrar (ej: "Supervisor de Obra")
+  description String? // Descripción del rol
+  isSystem    Boolean      @default(false) // Roles del sistema (ADMIN, MANAGER, etc.) no se pueden eliminar
+  permissions Permission[] // Permisos asociados al rol
+  users       User[] // Usuarios con este rol
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([name])
+}
+
 model User {
-  id            String   @id @default(uuid())
-  firebaseUid   String   @unique
-  email         String   @unique
-  name          String
-  role          Role     @default(OPERATOR)
-  isActive      Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  
-  createdForms  Form[]   @relation("FormCreator")
+  id                String       @id @default(uuid())
+  firebaseUid       String       @unique
+  email             String       @unique
+  name              String
+  roleId            String // Relación con Role (reemplaza el enum)
+  role              Role         @relation(fields: [roleId], references: [id])
+  customPermissions Permission[] @default([]) // Permisos personalizados que sobrescriben los del rol
+  isActive          Boolean      @default(true)
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  createdForms  Form[]           @relation("FormCreator")
   assignments   FormAssignment[]
   auditLogs     AuditLog[]
+  notifications Notification[]
+
+  // Relaciones de bodega
+  materialRequests      MaterialRequest[]      @relation("RequestRequester")
+  authorizedRequests    MaterialRequest[]      @relation("RequestAuthorizer")
+  deliveredRequests     MaterialRequest[]      @relation("RequestDeliverer")
+  receivedRequests      MaterialRequest[]      @relation("RequestReceiver")
+
+  // Relaciones de supervisión
+  supervisors           UserSupervisor[]       @relation("SupervisorUser")
+  subordinates          UserSupervisor[]       @relation("SubordinateUser")
+
+  @@index([roleId])
 }
 
 model Form {
   id          String     @id @default(uuid())
   title       String
   description String?
-  fields      Json       // Array de campos dinámicos
+  fields      Json // Array de campos dinámicos
   version     Int        @default(1)
   status      FormStatus @default(DRAFT)
-  
+
   createdById String
-  createdBy   User       @relation("FormCreator", fields: [createdById], references: [id])
-  
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  
+  createdBy   User   @relation("FormCreator", fields: [createdById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   assignments FormAssignment[]
   responses   FormResponse[]
-  
+
   @@index([status, createdAt])
 }
 
@@ -72,13 +172,13 @@ model FormAssignment {
   startDate   DateTime
   endDate     DateTime?
   isCompleted Boolean             @default(false)
-  
-  form        Form                @relation(fields: [formId], references: [id], onDelete: Cascade)
-  user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  createdAt   DateTime            @default(now())
-  updatedAt   DateTime            @updatedAt
-  
+
+  form Form @relation(fields: [formId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@unique([formId, userId, startDate])
   @@index([userId, isCompleted])
 }
@@ -87,29 +187,130 @@ model FormResponse {
   id          String   @id @default(uuid())
   formId      String
   userId      String
-  data        Json     // Respuestas del formulario
+  data        Json // Respuestas del formulario
   latitude    Float?
   longitude   Float?
   submittedAt DateTime @default(now())
-  
-  form        Form     @relation(fields: [formId], references: [id])
-  
+
+  form Form @relation(fields: [formId], references: [id])
+
   @@index([formId, submittedAt])
   @@index([userId, submittedAt])
 }
 
 model AuditLog {
-  id          String   @id @default(uuid())
-  userId      String
-  action      String
-  module      String
-  details     Json?
-  ipAddress   String?
-  userAgent   String?
-  createdAt   DateTime @default(now())
-  
-  user        User     @relation(fields: [userId], references: [id])
-  
+  id        String   @id @default(uuid())
+  userId    String
+  action    String
+  module    String
+  details   Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
   @@index([userId, createdAt])
   @@index([module, createdAt])
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  title     String
+  message   String
+  type      NotificationType
+  read      Boolean          @default(false)
+  link      String?
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read, createdAt])
+  @@index([userId, createdAt])
+}
+
+// Relación muchos a muchos entre usuarios y sus superiores
+model UserSupervisor {
+  id           String   @id @default(uuid())
+  userId       String   // Usuario subordinado
+  supervisorId String   // Usuario superior
+  createdAt    DateTime @default(now())
+
+  user       User @relation("SubordinateUser", fields: [userId], references: [id], onDelete: Cascade)
+  supervisor User @relation("SupervisorUser", fields: [supervisorId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, supervisorId])
+  @@index([userId])
+  @@index([supervisorId])
+}
+
+// Productos de bodega
+model WarehouseProduct {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  unit        String   // Unidad de medida (ej: "kg", "unidades", "m²")
+  stock       Int      @default(0) // Stock actual
+  minStock    Int      @default(0) // Stock mínimo para alerta
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relaciones
+  requestItems MaterialRequestItem[]
+
+  @@index([isActive, stock])
+  @@index([name])
+}
+
+// Solicitudes de materiales
+model MaterialRequest {
+  id          String                @id @default(uuid())
+  requestNumber String              @unique // Número único de solicitud (ej: REQ-2025-001)
+  requesterId   String              // Usuario que solicita
+  authorizerId  String?             // Usuario que autoriza (puede ser null si está pendiente)
+  delivererId   String?             // Recepcionista/Encargado que entrega
+  receiverId    String?             // Usuario que recibe (puede ser el mismo que solicita)
+  status        MaterialRequestStatus @default(PENDING)
+  notes         String?             // Notas adicionales de la solicitud
+  rejectionReason String?           // Razón de rechazo (si aplica)
+  qrCode        String?             @unique // Código QR único para la entrega
+  signature     String?             // Firma digital en base64 (cuando se entrega)
+  requestedAt   DateTime            @default(now())
+  authorizedAt  DateTime?
+  rejectedAt    DateTime?
+  readyAt       DateTime?
+  deliveredAt   DateTime?
+
+  // Relaciones
+  requester  User                  @relation("RequestRequester", fields: [requesterId], references: [id])
+  authorizer User?                 @relation("RequestAuthorizer", fields: [authorizerId], references: [id])
+  deliverer  User?                 @relation("RequestDeliverer", fields: [delivererId], references: [id])
+  receiver   User?                 @relation("RequestReceiver", fields: [receiverId], references: [id])
+  items      MaterialRequestItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([requesterId, status])
+  @@index([authorizerId, status])
+  @@index([status, requestedAt])
+  @@index([qrCode])
+}
+
+// Items de una solicitud de materiales
+model MaterialRequestItem {
+  id                String   @id @default(uuid())
+  requestId         String
+  productId         String
+  quantity          Int      // Cantidad solicitada
+  quantityDelivered Int      @default(0) // Cantidad entregada (puede ser menor si no hay stock suficiente)
+
+  // Relaciones
+  request MaterialRequest  @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  product WarehouseProduct @relation(fields: [productId], references: [id])
+
+  @@index([requestId])
+  @@index([productId])
 }

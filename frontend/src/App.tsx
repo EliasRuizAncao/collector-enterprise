@@ -2,7 +2,9 @@ import { lazy, Suspense, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 
 import ProtectedRoute from '@/shared/components/auth/ProtectedRoute'
-import RoleProtectedRoute from '@/shared/components/common/RoleProtectedRoute'
+import AuthInitializer from '@/shared/components/auth/AuthInitializer'
+import PermissionGate from '@/shared/components/common/PermissionGate'
+import { Permission } from '@/shared/types/permissions'
 import RouteSkeleton from '@/shared/components/common/RouteSkeleton'
 import UpdatePrompt from '@/mobile/components/UpdatePrompt'
 import { ThemeProvider } from '@/shared/components/theme/ThemeProvider'
@@ -27,8 +29,12 @@ const AdminUsers = lazy(() => import('@/admin/pages/Users'))
 const AdminFormResponse = lazy(() => import('@/admin/pages/FormResponse'))
 const AdminFormResponses = lazy(() => import('@/admin/pages/FormResponses'))
 const AdminFormAssignments = lazy(() => import('@/admin/pages/FormAssignments'))
+const AdminReports = lazy(() => import('@/admin/pages/Reports'))
+const AdminRolesAndPermissions = lazy(() => import('@/admin/pages/RolesAndPermissions'))
 const AdminEppMonitor = lazy(() => import('@/admin/pages/EppMonitor'))
 const AdminStructureMonitor = lazy(() => import('@/admin/pages/StructureMonitor'))
+const AdminWarehouseStock = lazy(() => import('@/admin/pages/WarehouseStock'))
+const AdminWarehouseRequests = lazy(() => import('@/admin/pages/WarehouseRequests'))
 
 // Mobile Layout y Pages (lazy loading)
 const MobileLayout = lazy(() => import('@/mobile/layouts/MobileLayout'))
@@ -49,6 +55,10 @@ const MobileSupport = lazy(() => import('@/mobile/pages/Support'))
 const MobileReport = lazy(() => import('@/mobile/pages/Report'))
 const ReportsDashboard = lazy(() => import('@/mobile/pages/ReportsDashboard'))
 const PersonalReports = lazy(() => import('@/mobile/pages/PersonalReports'))
+const MobileMaterialRequest = lazy(() => import('@/mobile/pages/MaterialRequest'))
+const MobileMaterialRequestsList = lazy(() => import('@/mobile/pages/MaterialRequestsList'))
+const MobileQRScanner = lazy(() => import('@/mobile/pages/QRScanner'))
+const MobileDeliverMaterial = lazy(() => import('@/mobile/pages/DeliverMaterial'))
 
 /**
  * Componente para prefetch de rutas críticas
@@ -144,71 +154,111 @@ const AppRoutes = () => {
           <Route
             path="/admin/formularios/nuevo"
             element={
-              <RoleProtectedRoute allowedRoles={['ADMIN', 'MANAGER']}>
+              <PermissionGate anyPermission={[Permission.FORMS_CREATE, Permission.FORMS_EDIT]}>
                 <Suspense fallback={<RouteSkeleton variant="default" />}>
                   <AdminFormBuilder />
                 </Suspense>
-              </RoleProtectedRoute>
+              </PermissionGate>
             }
           />
           <Route
             path="/admin/formularios/:id"
             element={
-              <RoleProtectedRoute allowedRoles={['ADMIN', 'MANAGER']}>
+              <PermissionGate anyPermission={[Permission.FORMS_EDIT, Permission.FORMS_VIEW]}>
                 <Suspense fallback={<RouteSkeleton variant="default" />}>
                   <AdminFormBuilder />
                 </Suspense>
-              </RoleProtectedRoute>
+              </PermissionGate>
             }
           />
           <Route
             path="/admin/formularios/:formId/respuestas"
             element={
-              <RoleProtectedRoute allowedRoles={['ADMIN', 'MANAGER']}>
+              <PermissionGate permission={Permission.FORMS_VIEW_RESPONSES}>
                 <Suspense fallback={<RouteSkeleton variant="default" />}>
                   <AdminFormResponses />
                 </Suspense>
-              </RoleProtectedRoute>
+              </PermissionGate>
             }
           />
           <Route
             path="/admin/asignaciones"
             element={
-              <RoleProtectedRoute allowedRoles={['ADMIN', 'MANAGER']}>
+              <PermissionGate permission={Permission.ASSIGNMENTS_VIEW}>
                 <Suspense fallback={<RouteSkeleton variant="default" />}>
                   <AdminFormAssignments />
                 </Suspense>
-              </RoleProtectedRoute>
+              </PermissionGate>
             }
           />
           <Route
             path="/admin/usuarios"
             element={
-              <RoleProtectedRoute allowedRoles={['ADMIN', 'MANAGER']}>
+              <PermissionGate permission={Permission.USERS_VIEW}>
                 <Suspense fallback={<RouteSkeleton variant="default" />}>
                   <AdminUsers />
                 </Suspense>
-              </RoleProtectedRoute>
+              </PermissionGate>
+            }
+          />
+          <Route
+            path="/admin/reportes"
+            element={
+              <PermissionGate permission={Permission.REPORTS_VIEW}>
+                <Suspense fallback={<RouteSkeleton variant="default" />}>
+                  <AdminReports />
+                </Suspense>
+              </PermissionGate>
+            }
+          />
+          <Route
+            path="/admin/roles-permisos"
+            element={
+              <PermissionGate permission={Permission.ROLES_VIEW}>
+                <Suspense fallback={<RouteSkeleton variant="default" />}>
+                  <AdminRolesAndPermissions />
+                </Suspense>
+              </PermissionGate>
             }
           />
           <Route
             path="/admin/epp-monitor"
             element={
-              <RoleProtectedRoute allowedRoles={['ADMIN', 'MANAGER', 'SUPERVISOR']}>
+              <PermissionGate permission={Permission.EPP_MONITOR_VIEW}>
                 <Suspense fallback={<RouteSkeleton variant="default" />}>
                   <AdminEppMonitor />
                 </Suspense>
-              </RoleProtectedRoute>
+              </PermissionGate>
             }
           />
           <Route
             path="/admin/reconocimiento1"
             element={
-              <RoleProtectedRoute allowedRoles={['ADMIN', 'MANAGER', 'SUPERVISOR']}>
+              <PermissionGate permission={Permission.STRUCTURE_MONITOR_VIEW}>
                 <Suspense fallback={<RouteSkeleton variant="default" />}>
                   <AdminStructureMonitor />
                 </Suspense>
-              </RoleProtectedRoute>
+              </PermissionGate>
+            }
+          />
+          <Route
+            path="/admin/warehouse/stock"
+            element={
+              <PermissionGate permission={Permission.WAREHOUSE_MANAGE_STOCK}>
+                <Suspense fallback={<RouteSkeleton variant="default" />}>
+                  <AdminWarehouseStock />
+                </Suspense>
+              </PermissionGate>
+            }
+          />
+          <Route
+            path="/admin/warehouse/requests"
+            element={
+              <PermissionGate permission={Permission.WAREHOUSE_AUTHORIZE_REQUESTS}>
+                <Suspense fallback={<RouteSkeleton variant="default" />}>
+                  <AdminWarehouseRequests />
+                </Suspense>
+              </PermissionGate>
             }
           />
           <Route
@@ -368,6 +418,38 @@ const AppRoutes = () => {
               </Suspense>
             }
           />
+          <Route
+            path="/mobile/warehouse/request"
+            element={
+              <Suspense fallback={<RouteSkeleton variant="mobile" />}>
+                <MobileMaterialRequest />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/mobile/warehouse/requests"
+            element={
+              <Suspense fallback={<RouteSkeleton variant="mobile" />}>
+                <MobileMaterialRequestsList />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/mobile/warehouse/scan"
+            element={
+              <Suspense fallback={<RouteSkeleton variant="mobile" />}>
+                <MobileQRScanner />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/mobile/warehouse/deliver/:id"
+            element={
+              <Suspense fallback={<RouteSkeleton variant="mobile" />}>
+                <MobileDeliverMaterial />
+              </Suspense>
+            }
+          />
         </Route>
 
         {/* 404 - Redirigir según rol si está autenticado */}
@@ -387,6 +469,7 @@ const AppRoutes = () => {
 function App() {
   return (
     <ThemeProvider defaultTheme="system">
+      <AuthInitializer />
       <UpdatePrompt autoShow={true} />
       <BrowserRouter>
         <AppRoutes />

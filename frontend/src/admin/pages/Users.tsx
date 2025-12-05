@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Ban, Edit, MoreHorizontal, Search, UserPlus } from 'lucide-react'
+import { Ban, Edit, Search, UserPlus, Users } from 'lucide-react'
 
 import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
@@ -27,16 +27,19 @@ import UserDialog, {
   type UserRole,
   type UserStatus,
 } from '@/admin/components/users/UserDialog'
+import SupervisorDialog from '@/admin/components/users/SupervisorDialog'
 import ConfirmDialog from '@/shared/components/common/ConfirmDialog'
 import useUsers, { type UserSummary } from '@/shared/hooks/useUsers'
+import { useRoles } from '@/shared/hooks/useRoles'
+import PageLoader from '@/shared/components/common/PageLoader'
+import { Users as UsersIcon } from 'lucide-react'
 
 const USERS_PER_PAGE = 10
 
-const roleLabels: Record<UserRole, string> = {
-  ADMIN: 'Administrador',
-  MANAGER: 'Manager',
-  SUPERVISOR: 'Supervisor',
-  OPERATOR: 'Operador',
+// Función para obtener el label de un rol (dinámico)
+const getRoleLabel = (roleName: string, roles: Array<{ name: string; displayName: string }>): string => {
+  const role = roles.find(r => r.name === roleName)
+  return role?.displayName || roleName
 }
 
 const statusLabels: Record<UserStatus, string> = {
@@ -69,6 +72,8 @@ const UsersPage = () => {
     updateUser,
     toggleUserStatus,
   } = useUsers()
+  
+  const { roles } = useRoles()
 
   const [searchTerm, setSearchTerm] = useState('')
   const [roleFilter, setRoleFilter] = useState<'all' | UserRole>('all')
@@ -80,6 +85,8 @@ const UsersPage = () => {
   const [editingUser, setEditingUser] = useState<UserSummary | null>(null)
 
   const [confirmUser, setConfirmUser] = useState<UserSummary | null>(null)
+  const [supervisorDialogOpen, setSupervisorDialogOpen] = useState(false)
+  const [selectedUserForSupervisors, setSelectedUserForSupervisors] = useState<UserSummary | null>(null)
 
   const filteredUsers = useMemo(() => {
     const normalizedSearch = searchTerm.trim().toLowerCase()
@@ -156,6 +163,26 @@ const UsersPage = () => {
     }
   }
 
+  // Mostrar loader inicial si está cargando y no hay usuarios
+  if (loading && users.length === 0) {
+    return (
+      <div className="space-y-6">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight text-foreground">Usuarios</h1>
+            <p className="text-sm text-muted-foreground">
+              Gestiona los accesos, roles y estados de los colaboradores de Amaranto.
+            </p>
+          </div>
+        </div>
+        <PageLoader
+          message="Cargando usuarios..."
+          icon={<UsersIcon className="h-12 w-12 text-primary" />}
+        />
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       {/* Encabezado y acciones */}
@@ -211,10 +238,11 @@ const UsersPage = () => {
             <SelectContent>
               <SelectGroup>
                 <SelectItem value="all">Todos</SelectItem>
-                <SelectItem value="ADMIN">Administrador</SelectItem>
-                <SelectItem value="MANAGER">Manager</SelectItem>
-                <SelectItem value="SUPERVISOR">Supervisor</SelectItem>
-                <SelectItem value="OPERATOR">Operador</SelectItem>
+                {roles.map((role) => (
+                  <SelectItem key={role.id} value={role.name}>
+                    {role.displayName}
+                  </SelectItem>
+                ))}
               </SelectGroup>
             </SelectContent>
           </Select>
@@ -295,8 +323,8 @@ const UsersPage = () => {
                       <p className="text-sm text-muted-foreground">{user.email}</p>
                     </TableCell>
                     <TableCell>
-                      <Badge variant={roleBadgeVariants[user.role as UserRole]} className="capitalize">
-                        {roleLabels[user.role as UserRole]}
+                      <Badge variant={roleBadgeVariants[user.role as UserRole] || 'outline'} className="capitalize">
+                        {getRoleLabel(user.role, roles)}
                       </Badge>
                     </TableCell>
                     <TableCell>
@@ -333,10 +361,14 @@ const UsersPage = () => {
                           variant="ghost"
                           size="icon"
                           className="h-8 w-8"
-                          title="Más acciones"
+                          title="Gestionar superiores"
                           disabled={loading}
+                          onClick={() => {
+                            setSelectedUserForSupervisors(user)
+                            setSupervisorDialogOpen(true)
+                          }}
                         >
-                          <MoreHorizontal className="h-4 w-4" />
+                          <Users className="h-4 w-4" />
                         </Button>
                       </div>
                     </TableCell>
@@ -427,6 +459,20 @@ const UsersPage = () => {
         confirmText={confirmUser?.status === 'ACTIVE' ? 'Desactivar' : 'Activar'}
         variant={confirmUser?.status === 'ACTIVE' ? 'destructive' : 'default'}
       />
+
+      {selectedUserForSupervisors && (
+        <SupervisorDialog
+          open={supervisorDialogOpen}
+          onOpenChange={(open) => {
+            setSupervisorDialogOpen(open)
+            if (!open) {
+              setSelectedUserForSupervisors(null)
+            }
+          }}
+          userId={selectedUserForSupervisors.id}
+          userName={selectedUserForSupervisors.name}
+        />
+      )}
     </div>
   )
 }

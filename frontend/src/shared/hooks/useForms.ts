@@ -127,6 +127,36 @@ export const useForms = () => {
   )
 
   /**
+   * Elimina un formulario permanentemente
+   */
+  const deleteForm = useCallback(
+    async (id: string) => {
+      try {
+        setLoading(true)
+        setError(null)
+        await api.delete(`/forms/${id}`)
+        setForms((prev) => prev.filter((form) => form.id !== id))
+        toast({
+          title: 'Formulario eliminado',
+          description: 'El formulario fue eliminado permanentemente.',
+        })
+      } catch (err: any) {
+        console.error('useForms deleteForm error', err)
+        const errorMessage = err.response?.data?.message || err.response?.data?.error || 'Error desconocido'
+        toast({
+          title: 'No pudimos eliminar el formulario',
+          description: errorMessage,
+          variant: 'destructive',
+        })
+        throw err
+      } finally {
+        setLoading(false)
+      }
+    },
+    [toast],
+  )
+
+  /**
    * Duplica un formulario
    */
   const duplicateForm = useCallback(
@@ -207,6 +237,7 @@ export const useForms = () => {
     lastFilters: lastFiltersRef.current,
     fetchForms,
     archiveForm,
+    deleteForm,
     duplicateForm,
     publishForm,
   }

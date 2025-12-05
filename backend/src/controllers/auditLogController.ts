@@ -1,6 +1,5 @@
 import { Response, NextFunction } from 'express'
 import { z } from 'zod'
-import { Role } from '@prisma/client'
 
 import { AuthRequest } from '@/middleware/auth'
 import { getAuditLogs, getAuditLogModules, getAuditLogActions } from '@/services/auditLogService'
@@ -32,7 +31,7 @@ export const getAuditLogsList = async (
     }
 
     // Validar que sea ADMIN
-    if (req.user.role !== Role.ADMIN) {
+    if (req.user.role !== 'ADMIN') {
       return res.status(403).json({
         error: 'Solo los administradores pueden acceder a los logs de auditoría',
       })
@@ -88,7 +87,7 @@ export const getModules = async (req: AuthRequest, res: Response, _next: NextFun
     }
 
     // Validar que sea ADMIN
-    if (req.user.role !== Role.ADMIN) {
+    if (req.user.role !== 'ADMIN') {
       return res.status(403).json({
         error: 'Solo los administradores pueden acceder a los logs de auditoría',
       })
@@ -120,7 +119,7 @@ export const getActions = async (req: AuthRequest, res: Response, _next: NextFun
     }
 
     // Validar que sea ADMIN
-    if (req.user.role !== Role.ADMIN) {
+    if (req.user.role !== 'ADMIN') {
       return res.status(403).json({
         error: 'Solo los administradores pueden acceder a los logs de auditoría',
       })

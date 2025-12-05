@@ -8,11 +8,11 @@ import {
   CheckCircle2,
   ClipboardList,
   QrCode,
-  Camera,
   AlertTriangle,
   History,
   ChevronRight,
-  Sparkles,
+  Package,
+  PackageCheck,
 } from 'lucide-react'
 
 import { cn } from '@/shared/lib/utils'
@@ -74,12 +74,20 @@ const HeroCard = () => {
           navigator.geolocation.getCurrentPosition(
             async (position) => {
               try {
-                // Usar API de geocodificación inversa (ejemplo con OpenStreetMap Nominatim)
-                const response = await fetch(
-                  `https://nominatim.openstreetmap.org/reverse?format=json&lat=${position.coords.latitude}&lon=${position.coords.longitude}`,
-                )
-                const data = await response.json()
-                setLocation(data.address?.city || data.address?.town || 'Ubicación actual')
+                // Intentar obtener ubicación desde el backend (evita problemas de CORS)
+                try {
+                  const response = await api.get('/geocoding/reverse', {
+                    params: {
+                      lat: position.coords.latitude,
+                      lon: position.coords.longitude,
+                    },
+                    timeout: 3000,
+                  })
+                  setLocation(response.data.address || 'Ubicación actual')
+                } catch {
+                  // Si el backend no tiene el endpoint, usar fallback
+                  setLocation('Ubicación actual')
+                }
               } catch {
                 setLocation('Ubicación actual')
               }
@@ -312,7 +320,8 @@ const TaskCard = ({
 const QuickAccessChips = ({ onChipTap }: { onChipTap: (action: string) => void }) => {
   const chips = [
     { id: 'qr', label: 'Escanear QR', icon: QrCode, color: 'bg-blue-500' },
-    { id: 'photo', label: 'Tomar foto', icon: Camera, color: 'bg-purple-500' },
+    { id: 'material-request', label: 'Solicitar Materiales', icon: Package, color: 'bg-green-500' },
+    { id: 'warehouse-scan', label: 'Escanear QR Bodega', icon: PackageCheck, color: 'bg-orange-500' },
     { id: 'incident', label: 'Reportar', icon: AlertTriangle, color: 'bg-red-500' },
     { id: 'history', label: 'Historial', icon: History, color: 'bg-gray-500' },
   ]
@@ -341,22 +350,6 @@ const QuickAccessChips = ({ onChipTap }: { onChipTap: (action: string) => void }
   )
 }
 
-/**
- * Componente Empty State mejorado usando NoAssignments
- */
-const EmptyState = () => {
-  return (
-    <div className="flex flex-col items-center justify-center py-12 text-center">
-      <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-        <Sparkles className="h-8 w-8 text-primary" />
-      </div>
-      <h3 className="text-mobile-h3 mb-2 font-semibold">¡No hay tareas!</h3>
-      <p className="text-mobile-caption text-muted-foreground max-w-[250px]">
-        Estás al día. Todas tus tareas están completadas. ¡Buen trabajo!
-      </p>
-    </div>
-  )
-}
 
 /**
  * Dashboard Mobile - Vista principal para operadores de campo
@@ -375,14 +368,16 @@ const MobileDashboard = () => {
       setError(null)
 
       try {
-        // TODO: Reemplazar con endpoint real cuando esté disponible
-        const response = await api.get('/assignments/today')
+        const response = await api.get('/assignments/today', { timeout: 5000 })
         const data = response.data
 
         setTasks(data.tasks || [])
         setStats(data.stats || { pending: 0, completedToday: 0 })
-      } catch (apiError) {
-        // Si falla la API, usar datos mock para desarrollo
+      } catch (apiError: any) {
+        // Si falla la API (404, timeout, etc.), usar datos mock para desarrollo
+        if (apiError?.response?.status === 404 || apiError?.code === 'ECONNABORTED') {
+          console.warn('Endpoint /assignments/today no disponible, usando datos mock')
+        }
         const mockTasks: Assignment[] = [
           {
             id: '1',
@@ -448,8 +443,11 @@ const MobileDashboard = () => {
       case 'qr':
         navigate('/mobile/camera?mode=qr')
         break
-      case 'photo':
-        navigate('/mobile/camera')
+      case 'material-request':
+        navigate('/mobile/warehouse/request')
+        break
+      case 'warehouse-scan':
+        navigate('/mobile/warehouse/scan')
         break
       case 'incident':
         // TODO: Abrir modal de reporte
@@ -519,7 +517,7 @@ const MobileDashboard = () => {
             <AnimatedList
               enableStagger
               className="space-y-3"
-              keyExtractor={(item, index) => {
+              keyExtractor={(_item, index) => {
                 const task = tasks[index]
                 return task?.id || index
               }}

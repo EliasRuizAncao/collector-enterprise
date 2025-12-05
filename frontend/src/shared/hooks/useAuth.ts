@@ -14,9 +14,19 @@ export const useAuth = () => {
     async (email: string, password: string) => {
       try {
         setLoading(true)
-        const { user: backendUser, token } = await authService.login(email, password)
-        setAuth(backendUser, token)
+        const { user: backendUser, token, permissions } = await authService.login(email, password)
+        console.log('[useAuth] Login response:', { user: backendUser, hasToken: !!token, permissions })
+        setAuth(backendUser, token, permissions)
+        // Verificar que los permisos se guardaron
+        const stateAfterSet = useAuthStore.getState()
+        console.log('[useAuth] State after setAuth:', { 
+          hasUser: !!stateAfterSet.user, 
+          hasToken: !!stateAfterSet.token, 
+          permissions: stateAfterSet.permissions 
+        })
         toast({ title: 'Sesión iniciada', description: `Bienvenido ${backendUser.name}` })
+        // Retornar los datos del login para uso inmediato
+        return { user: backendUser, token, permissions }
       } catch (error) {
         console.error('useAuth login error', error)
         toast({
@@ -55,8 +65,10 @@ export const useAuth = () => {
     async (email: string, password: string, name: string) => {
       try {
         setLoading(true)
-        const { user: backendUser, token } = await authService.register(email, password, name)
-        setAuth(backendUser, token)
+        const { user: backendUser, permissions } = await authService.register(email, password, name)
+        // En registro, necesitamos hacer login después para obtener el token
+        const { token } = await authService.login(email, password)
+        setAuth(backendUser, token, permissions)
         toast({
           title: 'Registro exitoso',
           description: 'Tu cuenta ha sido creada y la sesión se inició automáticamente.',

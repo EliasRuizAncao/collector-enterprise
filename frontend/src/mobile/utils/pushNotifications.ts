@@ -250,16 +250,18 @@ export const sendTokenToBackend = async (token: string): Promise<void> => {
       token,
       platform: isIOS() ? 'ios' : isAndroid() ? 'android' : 'web',
       userAgent: navigator.userAgent,
+    }, {
+      timeout: 5000, // Timeout corto para no bloquear
     })
   } catch (error: any) {
-    // Solo loggear errores que no sean 404 (endpoint no implementado aún)
-    if (error?.response?.status !== 404) {
-      console.error('Error al enviar token al backend:', error)
+    // Si es 404 o timeout, no es crítico (endpoint opcional)
+    if (error?.response?.status === 404 || error?.code === 'ECONNABORTED') {
+      console.warn('Endpoint de push notifications no disponible')
+      return // No lanzar error, es opcional
     }
-    // No lanzar el error si es 404, es esperado en desarrollo
-    if (error?.response?.status !== 404) {
-      throw error
-    }
+    // Solo loggear otros errores
+    console.error('Error al enviar token al backend:', error)
+    // No lanzar el error, las notificaciones push son opcionales
   }
 }
 

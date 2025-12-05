@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { PrismaClient, Prisma, FormStatus, Role } from '@prisma/client'
+import { PrismaClient, Prisma, FormStatus } from '@prisma/client'
 import { z } from 'zod'
 
 import { AuthRequest } from '@/middleware/auth'
@@ -92,7 +92,7 @@ export const listForms = async (req: Request, res: Response, next: NextFunction)
     // Si el usuario no es ADMIN, solo mostrar sus propios formularios
     const authReq = req as AuthRequest
     const userId = authReq.user?.id
-    const isAdmin = authReq.user?.role === Role.ADMIN
+    const isAdmin = authReq.user?.role === 'ADMIN'
 
     const where = buildFilters(parsed.status, parsed.search, isAdmin ? undefined : userId)
 
@@ -153,7 +153,7 @@ export const getFormById = async (req: Request, res: Response, next: NextFunctio
     const { id } = req.params
     const authReq = req as AuthRequest
     const userId = authReq.user?.id
-    const isAdmin = authReq.user?.role === Role.ADMIN
+    const isAdmin = authReq.user?.role === 'ADMIN'
 
     const form = await prisma.form.findUnique({
       where: { id },
@@ -294,7 +294,7 @@ export const updateForm = async (req: Request, res: Response, next: NextFunction
     const payload = updateFormSchema.parse(req.body)
     const authReq = req as AuthRequest
     const userId = authReq.user?.id
-    const isAdmin = authReq.user?.role === Role.ADMIN
+    const isAdmin = authReq.user?.role === 'ADMIN'
 
     if (!userId) {
       return res.status(401).json({ error: 'Usuario no autenticado' })
@@ -396,7 +396,7 @@ export const deleteForm = async (req: Request, res: Response, next: NextFunction
     const { id } = req.params
     const authReq = req as AuthRequest
     const userId = authReq.user?.id
-    const isAdmin = authReq.user?.role === Role.ADMIN
+    const isAdmin = authReq.user?.role === 'ADMIN'
 
     if (!userId) {
       return res.status(401).json({ error: 'Usuario no autenticado' })
@@ -416,21 +416,25 @@ export const deleteForm = async (req: Request, res: Response, next: NextFunction
       return res.status(403).json({ error: 'No tienes permisos para eliminar este formulario' })
     }
 
-    // Soft delete: cambiar status a ARCHIVED
-    const archivedForm = await prisma.form.update({
+    // Verificar si el formulario tiene respuestas asociadas
+    const responseCount = await prisma.formResponse.count({
+      where: { formId: id },
+    })
+
+    if (responseCount > 0) {
+      return res.status(400).json({
+        error: 'No se puede eliminar el formulario',
+        message: `Este formulario tiene ${responseCount} respuesta(s) asociada(s). Debe archivarlo en lugar de eliminarlo.`,
+      })
+    }
+
+    // Eliminación permanente
+    const formTitle = existingForm.title
+    const formId = existingForm.id
+
+    // Eliminar el formulario de la base de datos
+    await prisma.form.delete({
       where: { id },
-      data: {
-        status: FormStatus.ARCHIVED,
-      },
-      include: {
-        createdBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-      },
     })
 
     // Crear audit log
@@ -438,23 +442,16 @@ export const deleteForm = async (req: Request, res: Response, next: NextFunction
       userId,
       'FORM_DELETED',
       {
-        formId: archivedForm.id,
-        title: archivedForm.title,
+        formId,
+        title: formTitle,
+        permanent: true,
       },
       req,
     )
 
     return res.status(200).json({
-      id: archivedForm.id,
-      title: archivedForm.title,
-      description: archivedForm.description,
-      fields: archivedForm.fields,
-      version: archivedForm.version,
-      status: archivedForm.status,
-      createdById: archivedForm.createdById,
-      createdByName: archivedForm.createdBy.name,
-      createdAt: archivedForm.createdAt.toISOString(),
-      updatedAt: archivedForm.updatedAt.toISOString(),
+      success: true,
+      message: 'Formulario eliminado permanentemente',
     })
   } catch (error) {
     console.error('deleteForm error:', error)
@@ -471,7 +468,7 @@ export const publishForm = async (req: Request, res: Response, next: NextFunctio
     const { id } = req.params
     const authReq = req as AuthRequest
     const userId = authReq.user?.id
-    const isAdmin = authReq.user?.role === Role.ADMIN
+    const isAdmin = authReq.user?.role === 'ADMIN'
 
     if (!userId) {
       return res.status(401).json({ error: 'Usuario no autenticado' })
@@ -554,7 +551,7 @@ export const archiveForm = async (req: Request, res: Response, next: NextFunctio
     const { id } = req.params
     const authReq = req as AuthRequest
     const userId = authReq.user?.id
-    const isAdmin = authReq.user?.role === Role.ADMIN
+    const isAdmin = authReq.user?.role === 'ADMIN'
 
     if (!userId) {
       return res.status(401).json({ error: 'Usuario no autenticado' })

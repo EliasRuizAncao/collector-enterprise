@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -16,8 +16,9 @@ import { Input } from '@/shared/components/ui/input'
 import { Label } from '@/shared/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select'
 import { Switch } from '@/shared/components/ui/switch'
+import { useRoles } from '@/shared/hooks/useRoles'
 
-export type UserRole = 'ADMIN' | 'MANAGER' | 'SUPERVISOR' | 'OPERATOR'
+export type UserRole = string // Ahora es dinámico, puede ser cualquier rol de la BD
 export type UserStatus = 'ACTIVE' | 'INACTIVE'
 
 export interface UserDialogFormValues {
@@ -35,15 +36,36 @@ export interface UserDialogProps {
   onSave: (data: UserDialogFormValues) => Promise<void> | void
 }
 
-const userSchema = z.object({
+// Schema dinámico que se actualiza con los roles disponibles
+const createUserSchema = (availableRoles: string[]) => z.object({
   name: z.string().min(2, 'El nombre debe tener al menos 2 caracteres'),
   email: z.string().email('Correo inválido'),
-  role: z.enum(['ADMIN', 'MANAGER', 'SUPERVISOR', 'OPERATOR']),
+  role: z.string().min(1, 'Debe seleccionar un rol'),
   password: z.string().min(6, 'Mínimo 6 caracteres').optional(),
   status: z.enum(['ACTIVE', 'INACTIVE']),
 })
 
 const UserDialog = ({ open, onClose, user, onSave }: UserDialogProps) => {
+  const { roles, loading: rolesLoading } = useRoles()
+  const [availableRoles, setAvailableRoles] = useState<Array<{ id: string; name: string; displayName: string }>>([])
+
+  // Obtener roles disponibles cuando se cargan
+  useEffect(() => {
+    if (roles && roles.length > 0) {
+      setAvailableRoles(roles.map(role => ({
+        id: role.id,
+        name: role.name,
+        displayName: role.displayName,
+      })))
+    }
+  }, [roles])
+
+  // Encontrar el rol por defecto (OPERATOR o el primero disponible)
+  const defaultRole = availableRoles.find(r => r.name === 'OPERATOR')?.name || 
+                      availableRoles.find(r => r.name === 'ADMIN')?.name || 
+                      availableRoles[0]?.name || 
+                      ''
+
   const {
     register,
     handleSubmit,
@@ -52,11 +74,11 @@ const UserDialog = ({ open, onClose, user, onSave }: UserDialogProps) => {
     formState: { errors, isSubmitting },
     setValue,
   } = useForm<UserDialogFormValues>({
-    resolver: zodResolver(userSchema),
+    resolver: zodResolver(createUserSchema(availableRoles.map(r => r.name))),
     defaultValues: {
       name: '',
       email: '',
-      role: 'OPERATOR',
+      role: defaultRole,
       password: '',
       status: 'ACTIVE',
     },
@@ -73,17 +95,26 @@ const UserDialog = ({ open, onClose, user, onSave }: UserDialogProps) => {
       reset({
         name: '',
         email: '',
-        role: 'OPERATOR',
+        role: defaultRole,
         password: '',
         status: 'ACTIVE',
       })
     }
-  }, [reset, user, open])
+  }, [reset, user, open, defaultRole])
 
   const isEditMode = Boolean(user)
 
   const onSubmit = async (values: UserDialogFormValues) => {
-    const payload = { ...values }
+    const payload: any = { ...values }
+
+    // Convertir role (nombre) a roleId (UUID) para el backend
+    if (values.role) {
+      const selectedRole = availableRoles.find(r => r.name === values.role)
+      if (selectedRole) {
+        payload.roleId = selectedRole.id
+        delete payload.role // El backend espera roleId, no role
+      }
+    }
 
     // En modo edición, omitir password si está vacío
     if (isEditMode && !values.password) {
@@ -101,8 +132,8 @@ const UserDialog = ({ open, onClose, user, onSave }: UserDialogProps) => {
           <DialogTitle>{isEditMode ? 'Editar Usuario' : 'Nuevo Usuario'}</DialogTitle>
           <DialogDescription>
             {isEditMode
-              ? 'Actualiza los datos del colaborador y ajusta su acceso al panel administrativo.'
-              : 'Completa los datos básicos del colaborador. Podrás asignar más permisos luego.'}
+              ? 'Actualiza los datos básicos del colaborador. Los permisos y accesos se gestionan desde Roles y Permisos.'
+              : 'Completa los datos básicos del colaborador. Los permisos y accesos se gestionan desde Roles y Permisos.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -130,22 +161,28 @@ const UserDialog = ({ open, onClose, user, onSave }: UserDialogProps) => {
 
           <div className="grid gap-2">
             <Label>Rol</Label>
-            <Select
-              value={watch('role')}
-              onValueChange={(value: UserRole) => {
-                setValue('role', value)
-              }}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Selecciona un rol" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ADMIN">Administrador</SelectItem>
-                <SelectItem value="MANAGER">Manager</SelectItem>
-                <SelectItem value="SUPERVISOR">Supervisor</SelectItem>
-                <SelectItem value="OPERATOR">Operador</SelectItem>
-              </SelectContent>
-            </Select>
+            {rolesLoading ? (
+              <div className="h-10 w-full rounded-md border border-input bg-muted animate-pulse" />
+            ) : (
+              <Select
+                value={watch('role')}
+                onValueChange={(value: string) => {
+                  setValue('role', value)
+                }}
+                disabled={availableRoles.length === 0}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={availableRoles.length === 0 ? "Cargando roles..." : "Selecciona un rol"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableRoles.map((role) => (
+                    <SelectItem key={role.id} value={role.name}>
+                      {role.displayName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
             {errors.role ? (
               <p className="text-xs text-destructive">{errors.role.message}</p>
             ) : null}
@@ -168,9 +205,9 @@ const UserDialog = ({ open, onClose, user, onSave }: UserDialogProps) => {
 
           <div className="flex items-center justify-between rounded-lg border border-border/70 bg-muted/20 px-3 py-2">
             <div>
-              <Label>Estado</Label>
+              <Label>Estado del Usuario</Label>
               <p className="text-xs text-muted-foreground">
-                Define si el usuario puede acceder al panel administrativo.
+                Activa o desactiva la cuenta del usuario. Los permisos y accesos se gestionan desde Roles y Permisos.
               </p>
             </div>
             <Switch

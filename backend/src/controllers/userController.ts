@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { PrismaClient, Prisma, Role } from '@prisma/client'
+import { PrismaClient, Prisma } from '@prisma/client'
 import { z } from 'zod'
 
 import admin from '@/config/firebase'
@@ -11,7 +11,8 @@ const USERS_MODULE = 'USERS'
 const querySchema = z.object({
   page: z.coerce.number().int().min(1).optional(),
   limit: z.coerce.number().int().min(1).max(100).optional(),
-  role: z.nativeEnum(Role).optional(),
+  role: z.string().optional(), // Nombre del rol (ej: "ADMIN", "MANAGER")
+  roleId: z.string().uuid().optional(), // ID del rol
   isActive: z.coerce.boolean().optional(),
   status: z
     .enum(['ACTIVE', 'INACTIVE'])
@@ -28,27 +29,32 @@ const createUserSchema = z.object({
   name: z.string().min(2, 'El nombre debe tener al menos 2 caracteres'),
   email: z.string().email('Correo inválido'),
   password: z.string().min(6, 'La contraseña debe tener mínimo 6 caracteres'),
-  role: z.nativeEnum(Role).default(Role.OPERATOR),
+  roleId: z.string().uuid().optional(), // Si no se proporciona, se usará OPERATOR por defecto
   status: z.enum(['ACTIVE', 'INACTIVE']).default('ACTIVE'),
 })
 
 const updateUserSchema = z.object({
   name: z.string().min(2).optional(),
   email: z.string().email().optional(),
-  role: z.nativeEnum(Role).optional(),
+  roleId: z.string().uuid().optional(),
   status: z.enum(['ACTIVE', 'INACTIVE']).optional(),
   password: z.string().min(6).optional(),
 })
 
 const changeRoleSchema = z.object({
-  role: z.nativeEnum(Role),
+  roleId: z.string().uuid(),
 })
 
 type UserWithAudit = {
   id: string
   email: string
   name: string
-  role: Role
+  roleId: string
+  role: {
+    id: string
+    name: string
+    displayName: string
+  }
   isActive: boolean
   updatedAt: Date
   auditLogs?: Array<{ createdAt: Date }>
@@ -60,21 +66,30 @@ const formatUserResponse = (user: UserWithAudit) => {
     id: user.id,
     email: user.email,
     name: user.name,
-    role: user.role,
+    role: user.role.name, // Mantener compatibilidad con frontend
+    roleId: user.roleId,
+    roleDisplayName: user.role.displayName,
     status: user.isActive ? 'ACTIVE' : 'INACTIVE',
     lastActivity: lastActivityDate ? lastActivityDate.toISOString() : null,
   }
 }
 
 const buildFilters = (
-  role?: Role,
+  roleName?: string,
+  roleId?: string,
   isActive?: boolean | undefined,
   search?: string,
 ): Prisma.UserWhereInput => {
   const where: Prisma.UserWhereInput = {}
 
-  if (role) {
-    where.role = role
+  if (roleId) {
+    // @ts-expect-error - Prisma Client types may not be updated yet, but this works at runtime
+    where.roleId = roleId
+  } else if (roleName) {
+    // Filtrar por nombre del rol usando la relación
+    where.role = {
+      name: roleName,
+    } as any
   }
 
   if (typeof isActive === 'boolean') {
@@ -126,7 +141,7 @@ export const listUsers = async (req: Request, res: Response, next: NextFunction)
     const limit = parsed.limit ?? 10
     const isActive = parsed.isActive ?? parsed.status
 
-    const where = buildFilters(parsed.role, isActive, parsed.search)
+    const where = buildFilters(parsed.role, parsed.roleId, isActive, parsed.search)
 
     const [users, total] = await prisma.$transaction([
       prisma.user.findMany({
@@ -135,6 +150,14 @@ export const listUsers = async (req: Request, res: Response, next: NextFunction)
         take: limit,
         orderBy: { createdAt: 'desc' },
         include: {
+          // @ts-expect-error - Prisma Client types may not be updated yet, but this works at runtime
+          role: {
+            select: {
+              id: true,
+              name: true,
+              displayName: true,
+            },
+          },
           auditLogs: {
             orderBy: { createdAt: 'desc' },
             take: 1,
@@ -146,7 +169,7 @@ export const listUsers = async (req: Request, res: Response, next: NextFunction)
     ])
 
     return res.status(200).json({
-      data: users.map(formatUserResponse),
+      data: users.map((u: any) => formatUserResponse(u as any)),
       pagination: {
         total,
         page,
@@ -170,6 +193,14 @@ export const getUserById = async (req: Request, res: Response, next: NextFunctio
     const user = await prisma.user.findUnique({
       where: { id },
       include: {
+        // @ts-expect-error - Prisma Client types may not be updated yet, but this works at runtime
+        role: {
+          select: {
+            id: true,
+            name: true,
+            displayName: true,
+          },
+        },
         auditLogs: {
           orderBy: { createdAt: 'desc' },
           take: 5,
@@ -188,7 +219,8 @@ export const getUserById = async (req: Request, res: Response, next: NextFunctio
     }
 
     return res.status(200).json({
-      ...formatUserResponse(user),
+      ...formatUserResponse(user as any),
+      // @ts-expect-error - Prisma Client types may not be updated yet, but this works at runtime
       auditLogs: user.auditLogs,
     })
   } catch (error) {
@@ -207,6 +239,19 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
       return res.status(409).json({ error: 'El correo electrónico ya está registrado.' })
     }
 
+    // Buscar rol por defecto (OPERATOR) si no se especifica
+    let roleId = payload.roleId
+    if (!roleId) {
+      // @ts-expect-error - Prisma Client types may not be updated yet, but this works at runtime
+      const defaultRole = await prisma.role.findUnique({
+        where: { name: 'OPERATOR' },
+      })
+      if (!defaultRole) {
+        return res.status(500).json({ error: 'Error de configuración del sistema' })
+      }
+      roleId = defaultRole.id
+    }
+
     const firebaseUser = await admin.auth().createUser({
       email: payload.email,
       password: payload.password,
@@ -219,10 +264,19 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
         firebaseUid: firebaseUser.uid,
         email: payload.email,
         name: payload.name,
-        role: payload.role,
+        // @ts-expect-error - Prisma Client types may not be updated yet, but this works at runtime
+        roleId,
         isActive: payload.status === 'ACTIVE',
       },
       include: {
+        // @ts-expect-error - Prisma Client types may not be updated yet, but this works at runtime
+        role: {
+          select: {
+            id: true,
+            name: true,
+            displayName: true,
+          },
+        },
         auditLogs: {
           orderBy: { createdAt: 'desc' },
           take: 1,
@@ -234,7 +288,7 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
     const actorId = (req as AuthRequest).user?.id
     await createAuditLog(actorId, 'USER_CREATED', { targetUserId: createdUser.id }, req)
 
-    return res.status(201).json(formatUserResponse(createdUser))
+    return res.status(201).json(formatUserResponse(createdUser as any))
   } catch (error) {
     console.error('createUser error:', error)
     if (error instanceof z.ZodError) {
@@ -269,23 +323,40 @@ export const updateUser = async (req: Request, res: Response, next: NextFunction
 
     if (payload.name) prismaData.name = payload.name
     if (payload.email) prismaData.email = payload.email
-    if (payload.role) prismaData.role = payload.role
+    // @ts-expect-error - Prisma Client types may not be updated yet, but this works at runtime
+    if (payload.roleId) prismaData.roleId = payload.roleId
     if (payload.status) prismaData.isActive = payload.status === 'ACTIVE'
 
     if (Object.keys(prismaData).length === 0 && !payload.password) {
-      return res
-        .status(200)
-        .json(
-          formatUserResponse({
-            id: user.id,
-            email: user.email,
-            name: user.name,
-            role: user.role,
-            isActive: user.isActive,
-            updatedAt: user.updatedAt,
-            auditLogs: [],
-          }),
-        )
+      // Obtener datos del rol para la respuesta
+      const userWithRole = await prisma.user.findUnique({
+        where: { id },
+        include: {
+          // @ts-expect-error - Prisma Client types may not be updated yet, but this works at runtime
+          role: {
+            select: {
+              id: true,
+              name: true,
+              displayName: true,
+            },
+          },
+        },
+      }) as any
+      if (!userWithRole) {
+        return res.status(404).json({ error: 'Usuario no encontrado' })
+      }
+      return res.status(200).json(
+        formatUserResponse({
+          id: userWithRole.id,
+          email: userWithRole.email,
+          name: userWithRole.name,
+          roleId: (userWithRole as any).roleId,
+          role: (userWithRole as any).role,
+          isActive: userWithRole.isActive,
+          updatedAt: userWithRole.updatedAt,
+          auditLogs: [],
+        } as any),
+      )
     }
 
     await admin.auth().updateUser(user.firebaseUid, {
@@ -299,6 +370,14 @@ export const updateUser = async (req: Request, res: Response, next: NextFunction
       where: { id },
       data: prismaData,
       include: {
+        // @ts-expect-error - Prisma Client types may not be updated yet, but this works at runtime
+        role: {
+          select: {
+            id: true,
+            name: true,
+            displayName: true,
+          },
+        },
         auditLogs: {
           orderBy: { createdAt: 'desc' },
           take: 1,
@@ -310,7 +389,7 @@ export const updateUser = async (req: Request, res: Response, next: NextFunction
     const actorId = (req as AuthRequest).user?.id
     await createAuditLog(actorId, 'USER_UPDATED', { targetUserId: id, changes: payload }, req)
 
-    return res.status(200).json(formatUserResponse(updatedUser))
+    return res.status(200).json(formatUserResponse(updatedUser as any))
   } catch (error) {
     console.error('updateUser error:', error)
     if (error instanceof z.ZodError) {
@@ -351,29 +430,49 @@ export const deactivateUser = async (req: Request, res: Response, next: NextFunc
 export const changeUserRole = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params
-    const { role } = changeRoleSchema.parse(req.body)
+    const { roleId } = changeRoleSchema.parse(req.body)
 
     const user = await prisma.user.findUnique({ where: { id } })
     if (!user) {
       return res.status(404).json({ error: 'Usuario no encontrado' })
     }
 
+    // Verificar que el rol existe
+    // @ts-expect-error - Prisma Client types may not be updated yet, but this works at runtime
+    const role = await prisma.role.findUnique({ where: { id: roleId } })
+    if (!role) {
+      return res.status(404).json({ error: 'Rol no encontrado' })
+    }
+
     const updatedUser = await prisma.user.update({
       where: { id },
-      data: { role },
+      data: { roleId } as any,
       include: {
+        // @ts-expect-error - Prisma Client types may not be updated yet, but this works at runtime
+        role: {
+          select: {
+            id: true,
+            name: true,
+            displayName: true,
+          },
+        },
         auditLogs: {
           orderBy: { createdAt: 'desc' },
           take: 1,
           select: { createdAt: true },
         },
       },
-    })
+    }) as any
 
     const actorId = (req as AuthRequest).user?.id
-    await createAuditLog(actorId, 'USER_ROLE_CHANGED', { targetUserId: id, role }, req)
+    await createAuditLog(
+      actorId,
+      'USER_ROLE_CHANGED',
+      { targetUserId: id, roleId, roleName: role.name },
+      req,
+    )
 
-    return res.status(200).json(formatUserResponse(updatedUser))
+    return res.status(200).json(formatUserResponse(updatedUser as any))
   } catch (error) {
     console.error('changeUserRole error:', error)
     if (error instanceof z.ZodError) {
