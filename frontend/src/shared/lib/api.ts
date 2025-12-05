@@ -2,8 +2,32 @@ import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios'
 import { auth } from '@/shared/lib/firebase'
 import { useAuthStore } from '@/shared/store/authStore'
 
+// Detectar si estamos accediendo desde una IP local (no localhost)
+// Si es así, usar esa IP para el backend también
+const getBaseURL = () => {
+  // Si hay una variable de entorno, usarla
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL
+  }
+
+  // Si estamos en el navegador
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname
+    const port = window.location.port || '5173'
+    
+    // Si no es localhost y es una IP de red local, usar esa IP para el backend
+    if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
+      // Es una IP local, usar el mismo hostname con puerto 3000 para el backend
+      return `http://${hostname}:3000/api`
+    }
+  }
+
+  // Por defecto, usar el proxy de Vite
+  return '/api'
+}
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
+  baseURL: getBaseURL(),
   timeout: 30000, // Aumentado a 30 segundos para operaciones que pueden tardar más
   headers: {
     'Content-Type': 'application/json',
@@ -39,10 +63,11 @@ api.interceptors.request.use(
       try {
         // Obtener el token actualizado (Firebase lo renueva automáticamente si es necesario)
         token = await auth.currentUser.getIdToken()
-        // Actualizar el token en el store
-        const currentUser = useAuthStore.getState().user
-        if (currentUser && token) {
-          useAuthStore.getState().setAuth(currentUser, token)
+        // Actualizar el token en el store preservando los permisos existentes
+        const currentState = useAuthStore.getState()
+        if (currentState.user && token) {
+          // Preservar los permisos existentes al actualizar el token
+          useAuthStore.getState().setAuth(currentState.user, token, currentState.permissions || undefined)
         }
       } catch (error) {
         console.error('Error al obtener token de Firebase:', error)
@@ -90,10 +115,11 @@ api.interceptors.response.use(
         // Intentar obtener un nuevo token de Firebase
         if (auth.currentUser) {
           const newToken = await auth.currentUser.getIdToken(true) // Force refresh
-          const currentUser = useAuthStore.getState().user
+          const currentState = useAuthStore.getState()
 
-          if (currentUser && newToken) {
-            useAuthStore.getState().setAuth(currentUser, newToken)
+          if (currentState.user && newToken) {
+            // Preservar los permisos existentes al renovar el token
+            useAuthStore.getState().setAuth(currentState.user, newToken, currentState.permissions || undefined)
             processQueue(null, newToken)
 
             // Reintentar la petición original con el nuevo token

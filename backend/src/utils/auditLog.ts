@@ -15,6 +15,7 @@ export const AUDIT_MODULES = {
   EPP: 'EPP',
   REPORTS: 'REPORTS',
   NOTIFICATIONS: 'NOTIFICATIONS',
+  WAREHOUSE: 'WAREHOUSE',
 } as const
 
 export type AuditModule = typeof AUDIT_MODULES[keyof typeof AUDIT_MODULES]

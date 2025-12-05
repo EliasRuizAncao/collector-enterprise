@@ -19,6 +19,9 @@ import {
   Hash,
   Type,
   Link as LinkIcon,
+  Maximize2,
+  Minimize2,
+  X,
 } from 'lucide-react'
 
 import { Button } from '@/shared/components/ui/button'
@@ -32,13 +35,29 @@ import {
   TableRow,
 } from '@/shared/components/ui/table'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/shared/components/ui/sheet'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/shared/components/ui/dialog'
 import { Input } from '@/shared/components/ui/input'
 import { Label } from '@/shared/components/ui/label'
 import { Alert, AlertDescription } from '@/shared/components/ui/alert'
 import useFormResponses, { type FormResponseWithDetails } from '@/shared/hooks/useFormResponses'
 import { useForms } from '@/shared/hooks/useForms'
+import useUsers from '@/shared/hooks/useUsers'
 import { type Field, FieldType } from '@/shared/types/formBuilder'
 import { cn } from '@/shared/lib/utils'
+import PageLoader from '@/shared/components/common/PageLoader'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/shared/components/ui/select'
 
 /**
  * Página para ver las respuestas de un formulario
@@ -53,12 +72,16 @@ const FormResponses = () => {
 
   const { responses, loading, error, pagination, fetchResponses, getResponse } = useFormResponses()
   const { forms } = useForms()
+  const { users } = useUsers()
 
   const [selectedResponse, setSelectedResponse] = useState<FormResponseWithDetails | null>(null)
   const [isSheetOpen, setIsSheetOpen] = useState(false)
+  const [isFullScreenOpen, setIsFullScreenOpen] = useState(false)
+  const [loadingDetail, setLoadingDetail] = useState(false)
   const [form, setForm] = useState<{ id: string; title: string; fields: Field[] } | null>(null)
   const [startDate, setStartDate] = useState<string>('')
   const [endDate, setEndDate] = useState<string>('')
+  const [userIdFilter, setUserIdFilter] = useState<string>('all')
   const [currentPage, setCurrentPage] = useState(1)
 
   const RESPONSES_PER_PAGE = 10
@@ -82,21 +105,23 @@ const FormResponses = () => {
     if (formId) {
       void fetchResponses({
         formId,
+        userId: userIdFilter !== 'all' ? userIdFilter : undefined,
         startDate: startDate || undefined,
         endDate: endDate || undefined,
         page: currentPage,
         limit: RESPONSES_PER_PAGE,
       })
     }
-  }, [formId, startDate, endDate, currentPage, fetchResponses])
+  }, [formId, userIdFilter, startDate, endDate, currentPage, fetchResponses])
 
   /**
-   * Maneja la aplicación de filtros de fecha
+   * Maneja la aplicación de filtros
    */
   const handleApplyFilters = () => {
     setCurrentPage(1)
     void fetchResponses({
       formId,
+      userId: userIdFilter !== 'all' ? userIdFilter : undefined,
       startDate: startDate || undefined,
       endDate: endDate || undefined,
       page: 1,
@@ -105,11 +130,12 @@ const FormResponses = () => {
   }
 
   /**
-   * Limpia los filtros de fecha
+   * Limpia los filtros
    */
   const handleClearFilters = () => {
     setStartDate('')
     setEndDate('')
+    setUserIdFilter('all')
     setCurrentPage(1)
   }
 
@@ -118,12 +144,33 @@ const FormResponses = () => {
    */
   const handleViewResponse = async (responseId: string) => {
     try {
+      setLoadingDetail(true)
+      setSelectedResponse(null)
+      setIsSheetOpen(true)
       const response = await getResponse(responseId)
       setSelectedResponse(response)
-      setIsSheetOpen(true)
     } catch (err) {
       console.error('Error al cargar respuesta:', err)
+      setIsSheetOpen(false)
+    } finally {
+      setLoadingDetail(false)
     }
+  }
+
+  /**
+   * Abre la vista de pantalla completa
+   */
+  const handleOpenFullScreen = () => {
+    setIsFullScreenOpen(true)
+    setIsSheetOpen(false)
+  }
+
+  /**
+   * Cierra la vista de pantalla completa y vuelve al sheet
+   */
+  const handleCloseFullScreen = () => {
+    setIsFullScreenOpen(false)
+    setIsSheetOpen(true)
   }
 
   /**
@@ -227,29 +274,55 @@ const FormResponses = () => {
       <Card>
         <CardHeader>
           <CardTitle>Filtros</CardTitle>
-          <CardDescription>Filtra las respuestas por rango de fechas</CardDescription>
+          <CardDescription>Filtra las respuestas por usuario y rango de fechas</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1 space-y-2">
-              <Label htmlFor="startDate">Fecha de inicio</Label>
-              <Input
-                id="startDate"
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-              />
+          <div className="flex flex-col gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="userFilter">Usuario</Label>
+                <Select
+                  value={userIdFilter}
+                  onValueChange={(value) => {
+                    setUserIdFilter(value)
+                    setCurrentPage(1)
+                  }}
+                >
+                  <SelectTrigger id="userFilter">
+                    <SelectValue placeholder="Todos los usuarios" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos los usuarios</SelectItem>
+                    {users
+                      .filter((user) => user.status === 'ACTIVE')
+                      .map((user) => (
+                        <SelectItem key={user.id} value={user.id}>
+                          {user.name} ({user.email})
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="startDate">Fecha de inicio</Label>
+                <Input
+                  id="startDate"
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="endDate">Fecha de fin</Label>
+                <Input
+                  id="endDate"
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                />
+              </div>
             </div>
-            <div className="flex-1 space-y-2">
-              <Label htmlFor="endDate">Fecha de fin</Label>
-              <Input
-                id="endDate"
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-              />
-            </div>
-            <div className="flex items-end gap-2">
+            <div className="flex items-center gap-2">
               <Button onClick={handleApplyFilters}>Aplicar filtros</Button>
               <Button variant="outline" onClick={handleClearFilters}>
                 Limpiar
@@ -383,15 +456,36 @@ const FormResponses = () => {
       {/* Sheet con detalles de la respuesta */}
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
         <SheetContent className="w-full sm:max-w-3xl overflow-y-auto">
-          {selectedResponse && form && (
+          {loadingDetail ? (
+            <div className="flex items-center justify-center min-h-[60vh]">
+              <PageLoader
+                message="Cargando detalles de la respuesta..."
+                icon={<FileText className="h-12 w-12 text-primary" />}
+                fullScreen={false}
+              />
+            </div>
+          ) : selectedResponse && form ? (
             <>
               <SheetHeader className="pb-4 border-b">
-                <SheetTitle className="text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
-                  Detalle de la Respuesta
-                </SheetTitle>
-                <SheetDescription className="text-base">
-                  Información completa de la respuesta enviada
-                </SheetDescription>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <SheetTitle className="text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+                      Detalle de la Respuesta
+                    </SheetTitle>
+                    <SheetDescription className="text-base">
+                      Información completa de la respuesta enviada
+                    </SheetDescription>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={handleOpenFullScreen}
+                    className="ml-4"
+                    title="Ver en pantalla completa"
+                  >
+                    <Maximize2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </SheetHeader>
 
               <div className="mt-6 space-y-6">
@@ -580,9 +674,246 @@ const FormResponses = () => {
                 </Card>
               </div>
             </>
-          )}
+          ) : null}
         </SheetContent>
       </Sheet>
+
+      {/* Dialog de pantalla completa para ver respuesta */}
+      <Dialog open={isFullScreenOpen} onOpenChange={setIsFullScreenOpen}>
+        <DialogContent className="max-w-[95vw] max-h-[95vh] w-[95vw] h-[95vh] overflow-y-auto p-6">
+          {loadingDetail ? (
+            <div className="flex items-center justify-center min-h-[60vh]">
+              <PageLoader
+                message="Cargando detalles de la respuesta..."
+                icon={<FileText className="h-12 w-12 text-primary" />}
+                fullScreen={false}
+              />
+            </div>
+          ) : selectedResponse && form ? (
+            <>
+              <DialogHeader className="pb-4 border-b sticky top-0 bg-background z-10">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <DialogTitle className="text-2xl font-bold">
+                      Detalle de la Respuesta
+                    </DialogTitle>
+                    <DialogDescription className="text-base">
+                      Información completa de la respuesta enviada
+                    </DialogDescription>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={handleCloseFullScreen}
+                      title="Volver a vista lateral"
+                    >
+                      <Minimize2 className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => {
+                        setIsFullScreenOpen(false)
+                        setIsSheetOpen(false)
+                      }}
+                      title="Cerrar"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </DialogHeader>
+
+              <div className="mt-6 space-y-6">
+                {/* Información del usuario - Card mejorado */}
+                <Card className="border-2 border-slate-200 shadow-md">
+                  <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <div className="p-2 bg-blue-500 rounded-lg">
+                        <User className="h-5 w-5 text-white" />
+                      </div>
+                      Información del Usuario
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                          <User className="h-4 w-4" />
+                          Nombre
+                        </div>
+                        <p className="text-base font-semibold text-slate-900">
+                          {selectedResponse.userName || 'N/A'}
+                        </p>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                          <Mail className="h-4 w-4" />
+                          Email
+                        </div>
+                        <p className="text-base font-semibold text-slate-900 break-all">
+                          {selectedResponse.userEmail || 'N/A'}
+                        </p>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                          <Clock className="h-4 w-4" />
+                          Fecha de envío
+                        </div>
+                        <p className="text-base font-semibold text-slate-900">
+                          {format(new Date(selectedResponse.submittedAt), 'PPpp')}
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Ubicación - Card mejorado */}
+                {selectedResponse.latitude && selectedResponse.longitude && (
+                  <Card className="border-2 border-slate-200 shadow-md">
+                    <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b">
+                      <CardTitle className="flex items-center gap-2 text-lg">
+                        <div className="p-2 bg-emerald-500 rounded-lg">
+                          <MapPin className="h-5 w-5 text-white" />
+                        </div>
+                        Ubicación
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-6 space-y-4">
+                      <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                        <div className="flex items-center gap-2">
+                          <Hash className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-sm font-mono text-slate-600">
+                            {selectedResponse.latitude.toFixed(6)}, {selectedResponse.longitude.toFixed(6)}
+                          </span>
+                        </div>
+                        <a
+                          href={getGoogleMapsUrl(selectedResponse.latitude, selectedResponse.longitude)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-md text-sm font-medium transition-colors"
+                        >
+                          Abrir en Google Maps
+                          <ExternalLink className="h-4 w-4" />
+                        </a>
+                      </div>
+                      <div className="w-full h-80 rounded-lg overflow-hidden border-2 border-slate-200 shadow-sm">
+                        <iframe
+                          width="100%"
+                          height="100%"
+                          frameBorder="0"
+                          style={{ border: 0 }}
+                          src={`https://www.google.com/maps/embed/v1/place?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY || 'YOUR_API_KEY'}&q=${selectedResponse.latitude},${selectedResponse.longitude}&zoom=15`}
+                          allowFullScreen
+                          title="Ubicación de la respuesta"
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Respuestas de los campos - Cards mejorados */}
+                <Card className="border-2 border-slate-200 shadow-md">
+                  <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 border-b">
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <div className="p-2 bg-purple-500 rounded-lg">
+                        <FileText className="h-5 w-5 text-white" />
+                      </div>
+                      Respuestas del Formulario
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-6">
+                    <div className="space-y-6">
+                      {form.fields
+                        .sort((a, b) => a.order - b.order)
+                        .map((field) => {
+                          const value = selectedResponse.data[field.id]
+                          const hasValue = value !== null && value !== undefined && value !== ''
+                          const isPhoto = field.type === FieldType.PHOTO || field.type === FieldType.FILE
+                          
+                          return (
+                            <div
+                              key={field.id}
+                              className={cn(
+                                'p-4 rounded-lg border-2 transition-all',
+                                hasValue
+                                  ? 'bg-slate-50 border-slate-200 hover:border-slate-300 hover:shadow-sm'
+                                  : 'bg-slate-50/50 border-slate-100'
+                              )}
+                            >
+                              <div className="flex items-start justify-between mb-3">
+                                <div className="flex items-center gap-2">
+                                  {field.type === FieldType.PHOTO && <ImageIcon className="h-4 w-4 text-blue-500" />}
+                                  {field.type === FieldType.FILE && <FileText className="h-4 w-4 text-purple-500" />}
+                                  {field.type === FieldType.NUMBER && <Hash className="h-4 w-4 text-green-500" />}
+                                  {field.type === FieldType.EMAIL && <Mail className="h-4 w-4 text-red-500" />}
+                                  {field.type === FieldType.URL && <LinkIcon className="h-4 w-4 text-indigo-500" />}
+                                  {!isPhoto && field.type !== FieldType.NUMBER && field.type !== FieldType.EMAIL && field.type !== FieldType.URL && (
+                                    <Type className="h-4 w-4 text-slate-500" />
+                                  )}
+                                  <Label className="text-base font-semibold text-slate-900">
+                                    {field.label}
+                                    {field.required && <span className="text-red-500 ml-1">*</span>}
+                                  </Label>
+                                </div>
+                                {hasValue ? (
+                                  <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0" />
+                                ) : (
+                                  <XCircle className="h-5 w-5 text-slate-300 flex-shrink-0" />
+                                )}
+                              </div>
+                              
+                              {isPhoto && Array.isArray(value) && value.length > 0 ? (
+                                <div className="grid grid-cols-2 gap-3 mt-3">
+                                  {value.map((photo, index) => {
+                                    if (typeof photo === 'string' && photo.startsWith('data:image')) {
+                                      return (
+                                        <div key={index} className="relative group">
+                                          <img
+                                            src={photo}
+                                            alt={`${field.label} ${index + 1}`}
+                                            className="w-full h-32 object-cover rounded-lg border-2 border-slate-200 shadow-sm group-hover:shadow-md transition-shadow"
+                                          />
+                                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 rounded-lg transition-colors" />
+                                        </div>
+                                      )
+                                    }
+                                    return null
+                                  })}
+                                </div>
+                              ) : (
+                                <div className={cn(
+                                  'p-3 rounded-md mt-2',
+                                  hasValue
+                                    ? 'bg-white border border-slate-200'
+                                    : 'bg-slate-100/50 border border-slate-100'
+                                )}>
+                                  <p className={cn(
+                                    'text-sm whitespace-pre-wrap break-words',
+                                    hasValue ? 'text-slate-900' : 'text-slate-400 italic'
+                                  )}>
+                                    {hasValue ? renderFieldValue(field, value) : 'Sin respuesta'}
+                                  </p>
+                                </div>
+                              )}
+                              
+                              {field.helperText && (
+                                <p className="text-xs text-slate-500 mt-2 italic">
+                                  {field.helperText}
+                                </p>
+                              )}
+                            </div>
+                          )
+                        })}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </>
+          ) : null}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

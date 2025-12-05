@@ -1,8 +1,9 @@
 import { Request, Response, NextFunction } from 'express'
-import { PrismaClient, Role } from '@prisma/client'
+import { PrismaClient } from '@prisma/client'
 import { z } from 'zod'
 
 import admin from '@/config/firebase'
+import { PermissionService } from '@/services/permissionService'
 
 const prisma = new PrismaClient()
 
@@ -15,7 +16,7 @@ const registerSchema = z.object({
   firebaseUid: z.string(),
   email: z.string().email(),
   name: z.string().min(2),
-  role: z.nativeEnum(Role).default(Role.OPERATOR),
+  roleId: z.string().uuid().optional(), // Opcional, se asignará OPERATOR por defecto
 })
 
 // Genera (o reusa) un JWT propio. Por ahora reutilizamos el idToken de Firebase
@@ -31,17 +32,51 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
     const decoded = await admin.auth().verifyIdToken(idToken)
     console.log('[Auth] Token verified for UID:', decoded.uid)
 
-    let user = await prisma.user.findUnique({ where: { firebaseUid: decoded.uid } })
+    let user = await prisma.user.findUnique({
+      where: { firebaseUid: decoded.uid },
+      include: {
+        // @ts-expect-error - Prisma Client types may not be updated yet, but this works at runtime
+        role: {
+          select: {
+            id: true,
+            name: true,
+            displayName: true,
+          },
+        },
+      },
+    })
     console.log('[Auth] User found in DB:', user ? 'Yes' : 'No')
 
     if (!user) {
       console.log('[Auth] Creating new user...')
+      // Buscar rol OPERATOR por defecto
+      // @ts-expect-error - Prisma Client types may not be updated yet, but this works at runtime
+      const defaultRole = await prisma.role.findUnique({
+        where: { name: 'OPERATOR' },
+      })
+
+      if (!defaultRole) {
+        console.error('[Auth] Rol OPERATOR no encontrado. Ejecuta el script de seeding primero.')
+        return res.status(500).json({ error: 'Error de configuración del sistema' })
+      }
+
       user = await prisma.user.create({
         data: {
           firebaseUid: decoded.uid,
           email: decoded.email ?? '',
           name: decoded.name ?? decoded.email ?? 'Usuario Collector',
-          role: 'OPERATOR',
+          // @ts-expect-error - Prisma Client types may not be updated yet, but this works at runtime
+          roleId: defaultRole.id,
+        },
+        include: {
+          // @ts-expect-error - Prisma Client types may not be updated yet, but this works at runtime
+          role: {
+            select: {
+              id: true,
+              name: true,
+              displayName: true,
+            },
+          },
         },
       })
       console.log('[Auth] New user created:', user.id)
@@ -52,8 +87,16 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
       return res.status(401).json({ error: 'Usuario inactivo' })
     }
 
+    if (!user.role) {
+      console.error('[Auth] User has no role assigned:', user.id)
+      return res.status(500).json({ error: 'Error de configuración del usuario' })
+    }
+
     const token = issueToken(idToken)
     console.log('[Auth] Login successful, returning token')
+
+    // Obtener permisos del usuario
+    const permissions = await PermissionService.getUserPermissions(user.id)
 
     return res.status(200).json({
       user: {
@@ -61,8 +104,12 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
         firebaseUid: user.firebaseUid,
         email: user.email,
         name: user.name,
-        role: user.role,
+        // @ts-expect-error - Prisma Client types may not be updated yet, but this works at runtime
+        role: user.role.name,
+        // @ts-expect-error - Prisma Client types may not be updated yet, but this works at runtime
+        roleId: user.roleId,
       },
+      permissions,
       token,
     })
   } catch (error) {
@@ -87,21 +134,58 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
       return res.status(409).json({ error: 'El usuario ya existe' })
     }
 
+    // Buscar rol por defecto (OPERATOR) si no se especifica
+    let roleId = payload.roleId
+    if (!roleId) {
+      // @ts-expect-error - Prisma Client types may not be updated yet, but this works at runtime
+      const defaultRole = await prisma.role.findUnique({
+        where: { name: 'OPERATOR' },
+      })
+      if (!defaultRole) {
+        return res.status(500).json({ error: 'Error de configuración del sistema' })
+      }
+      roleId = defaultRole.id
+    }
+
     const user = await prisma.user.create({
       data: {
         firebaseUid: payload.firebaseUid,
         email: payload.email,
         name: payload.name,
-        role: payload.role,
+        // @ts-expect-error - Prisma Client types may not be updated yet, but this works at runtime
+        roleId,
+      },
+      include: {
+        // @ts-expect-error - Prisma Client types may not be updated yet, but this works at runtime
+        role: {
+          select: {
+            id: true,
+            name: true,
+            displayName: true,
+          },
+        },
       },
     })
 
+    if (!user.role) {
+      return res.status(500).json({ error: 'Error de configuración del usuario' })
+    }
+
+    // Obtener permisos del usuario
+    const permissions = await PermissionService.getUserPermissions(user.id)
+
     return res.status(201).json({
-      id: user.id,
-      firebaseUid: user.firebaseUid,
-      email: user.email,
-      name: user.name,
-      role: user.role,
+      user: {
+        id: user.id,
+        firebaseUid: user.firebaseUid,
+        email: user.email,
+        name: user.name,
+        // @ts-expect-error - Prisma Client types may not be updated yet, but this works at runtime
+        role: user.role.name,
+        // @ts-expect-error - Prisma Client types may not be updated yet, but this works at runtime
+        roleId: user.roleId,
+      },
+      permissions,
     })
   } catch (error) {
     console.error('registerUser error:', error)
@@ -114,11 +198,19 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
 
 // GET /auth/me
 export const getCurrentUser = async (req: Request, res: Response) => {
-  const user = (req as any).user
+  const authReq = req as any
+  const user = authReq.user
   if (!user) {
     return res.status(401).json({ error: 'No autenticado' })
   }
-  return res.status(200).json(user)
+
+  // Obtener permisos del usuario
+  const permissions = await PermissionService.getUserPermissions(user.id)
+
+  return res.status(200).json({
+    ...user,
+    permissions,
+  })
 }
 
 // POST /auth/logout

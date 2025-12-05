@@ -40,17 +40,19 @@ import { Calendar as CalendarComponent } from '@/shared/components/ui/calendar'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/card'
 import { Alert, AlertDescription } from '@/shared/components/ui/alert'
 import { cn } from '@/shared/lib/utils'
-import { useAuthStore } from '@/shared/store/authStore'
+import { usePermission } from '@/shared/hooks/usePermission'
+import { Permission } from '@/shared/types/permissions'
 import LoadingOverlay from '@/shared/components/common/LoadingOverlay'
 import { useAuditLogs, type AuditLog } from '@/shared/hooks/useAuditLogs'
 import useUsers from '@/shared/hooks/useUsers'
 
 /**
  * Página de registro de auditoría
- * Solo accesible para ADMIN
+ * Requiere permisos de gestión de roles/permisos
  */
 const AuditLog = () => {
-  const userRole = useAuthStore((state) => state.user?.role)
+  const { hasPermission } = usePermission()
+  const canViewAuditLogs = hasPermission(Permission.ROLES_VIEW) || hasPermission(Permission.PERMISSIONS_MANAGE)
   const {
     logs,
     modules,
@@ -105,14 +107,13 @@ const AuditLog = () => {
     })
   }, [currentPage, userId, module, action, dateRange, fetchAuditLogs])
 
-  // Verificar que sea ADMIN
-  if (userRole !== 'ADMIN') {
+  // Verificar permisos
+  if (!canViewAuditLogs) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <Alert variant="destructive" className="max-w-md">
           <AlertDescription>
-            No tienes permisos para acceder a esta sección. Solo los administradores pueden ver los
-            logs de auditoría.
+            No tienes permisos para acceder a esta sección. Se requieren permisos de gestión de roles o permisos para ver los logs de auditoría.
           </AlertDescription>
         </Alert>
       </div>

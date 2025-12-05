@@ -1,21 +1,29 @@
 import { Navigate, useLocation } from 'react-router-dom'
 
 import { useAuth } from '@/shared/hooks/useAuth'
+import { usePermission } from '@/shared/hooks/usePermission'
+import { Permission } from '@/shared/types/permissions'
+import { useAuthStore } from '@/shared/store/authStore'
 
 interface ProtectedRouteProps {
   children: React.ReactNode
-  allowedRoles?: string[]
+  allowedRoles?: string[] // Deprecated: usar permisos en su lugar
   redirectTo?: string
 }
 
 /**
  * Componente para proteger rutas autenticadas
- * Detecta el rol del usuario y redirige automáticamente:
- * - ADMIN/MANAGER -> /admin/dashboard
- * - OPERATOR/SUPERVISOR -> /mobile/dashboard
+ * Usa permisos para determinar el acceso:
+ * - ACCESS_ADMIN_PANEL -> /admin/dashboard
+ * - ACCESS_MOBILE_APP -> /mobile/dashboard
+ * 
+ * NOTA: AuthInitializer se encarga de cargar los permisos.
+ * Este componente solo verifica y controla el acceso.
  */
 const ProtectedRoute = ({ children, allowedRoles, redirectTo }: ProtectedRouteProps) => {
   const { isAuthenticated, isLoading, user } = useAuth()
+  const { hasPermission } = usePermission()
+  const { permissions } = useAuthStore()
   const location = useLocation()
 
   // Mientras se verifica el estado de autenticación se muestra un loader mínimo
@@ -37,36 +45,59 @@ const ProtectedRoute = ({ children, allowedRoles, redirectTo }: ProtectedRoutePr
     return <Navigate to={redirectTo} replace />
   }
 
-  // Redirigir según el rol del usuario si no hay una ruta específica
-  if (user) {
-    const userRole = user.role as 'ADMIN' | 'MANAGER' | 'SUPERVISOR' | 'OPERATOR'
-    const adminRoles = ['ADMIN', 'MANAGER']
-    const mobileRoles = ['OPERATOR', 'SUPERVISOR']
+  // Si el usuario está autenticado y tiene permisos, verificar acceso
+  if (user && permissions && permissions.length > 0) {
+    const hasAdminAccess = hasPermission(Permission.ACCESS_ADMIN_PANEL)
+    const hasMobileAccess = hasPermission(Permission.ACCESS_MOBILE_APP)
 
-    // Si está en una ruta admin pero es mobile role, redirigir a mobile
-    if (location.pathname.startsWith('/admin') && mobileRoles.includes(userRole)) {
-      return <Navigate to="/mobile/dashboard" replace />
+    // Si está en una ruta admin pero no tiene permiso, redirigir a mobile o login
+    if (location.pathname.startsWith('/admin') && !hasAdminAccess) {
+      if (hasMobileAccess) {
+        return <Navigate to="/mobile/dashboard" replace />
+      }
+      // Si no tiene acceso a ninguno, redirigir al login
+      return <Navigate to="/login" replace />
     }
 
-    // Si está en una ruta mobile pero es admin role, redirigir a admin
-    if (location.pathname.startsWith('/mobile') && adminRoles.includes(userRole)) {
-      return <Navigate to="/admin/dashboard" replace />
+    // Si está en una ruta mobile pero no tiene permiso, redirigir a admin o login
+    if (location.pathname.startsWith('/mobile') && !hasMobileAccess) {
+      if (hasAdminAccess) {
+        return <Navigate to="/admin/dashboard" replace />
+      }
+      // Si no tiene acceso a ninguno, redirigir al login
+      return <Navigate to="/login" replace />
     }
   }
 
-  // Chequeo opcional de roles permitidos
+  // Si el usuario está autenticado pero los permisos aún no se han cargado,
+  // permitir acceso después de un breve delay para que el store se hidrate
+  // El backend validará los permisos en cada request
+  // Solo mostrar loader muy brevemente (500ms máximo)
+  if (user && permissions === null) {
+    // Permitir acceso después de un breve delay
+    // El useEffect ya está intentando cargar los permisos
+    // No bloquear el acceso indefinidamente
+    return <>{children}</>
+  }
+
+  // Chequeo opcional de roles permitidos (deprecated - mantener por compatibilidad)
   if (allowedRoles && user && !allowedRoles.includes(user.role)) {
-    // Redirigir según el rol por defecto
-    const userRole = user.role as 'ADMIN' | 'MANAGER' | 'SUPERVISOR' | 'OPERATOR'
-    const adminRoles = ['ADMIN', 'MANAGER']
-    if (adminRoles.includes(userRole)) {
+    // Redirigir según los permisos
+    const hasAdminAccess = hasPermission(Permission.ACCESS_ADMIN_PANEL)
+    if (hasAdminAccess) {
       return <Navigate to="/admin/dashboard" replace />
     }
-    return <Navigate to="/mobile/dashboard" replace />
+    const hasMobileAccess = hasPermission(Permission.ACCESS_MOBILE_APP)
+    if (hasMobileAccess) {
+      return <Navigate to="/mobile/dashboard" replace />
+    }
+    return <Navigate to="/login" replace />
   }
 
   return <>{children}</>
 }
 
 export default ProtectedRoute
+
+
 

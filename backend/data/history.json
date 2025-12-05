@@ -1,195 +1,11 @@
 [
   {
-    "timestamp": "2025-11-25T14:12:15.123Z",
-    "imageUrl": "/static/epp-images/epp_1764079931403.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764079931403.jpg",
-    "detections": {
-      "casco": 1,
-      "chaleco": 1,
-      "guante": 1,
-      "zapato": 0,
-      "no casco": 0,
-      "no chaleco": 0,
-      "no guante": 1
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Guante"
-    ]
-  },
-  {
-    "timestamp": "2025-11-25T14:12:12.428Z",
-    "imageUrl": "/static/epp-images/epp_1764079928543.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764079928543.jpg",
-    "detections": {
-      "casco": 1,
-      "chaleco": 0,
-      "guante": 0,
-      "zapato": 0,
-      "no casco": 0,
-      "no chaleco": 0,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Falta Chaleco",
-      "Falta Guantes"
-    ]
-  },
-  {
-    "timestamp": "2025-11-25T14:12:03.424Z",
-    "imageUrl": "/static/epp-images/epp_1764079919827.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764079919827.jpg",
-    "detections": {
-      "casco": 1,
-      "chaleco": 3,
-      "guante": 3,
-      "zapato": 0,
-      "no casco": 0,
-      "no chaleco": 0,
-      "no guante": 0
-    },
-    "isCompliant": true,
-    "missingItems": []
-  },
-  {
-    "timestamp": "2025-11-25T14:11:58.101Z",
-    "imageUrl": "/static/epp-images/epp_1764079914501.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764079914501.jpg",
-    "detections": {
-      "casco": 1,
-      "chaleco": 1,
-      "guante": 1,
-      "zapato": 0,
-      "no casco": 0,
-      "no chaleco": 0,
-      "no guante": 1
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Guante"
-    ]
-  },
-  {
-    "timestamp": "2025-11-25T14:11:53.511Z",
-    "imageUrl": "/static/epp-images/epp_1764079909358.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764079909358.jpg",
-    "detections": {
-      "casco": 1,
-      "chaleco": 1,
-      "guante": 3,
-      "zapato": 0,
-      "no casco": 0,
-      "no chaleco": 0,
-      "no guante": 1
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Guante"
-    ]
-  },
-  {
-    "timestamp": "2025-11-25T14:11:34.969Z",
-    "imageUrl": "/static/epp-images/epp_1764079891191.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764079891191.jpg",
-    "detections": {
-      "casco": 2,
-      "chaleco": 0,
-      "guante": 0,
-      "zapato": 0,
-      "no casco": 0,
-      "no chaleco": 0,
-      "no guante": 4
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Falta Chaleco",
-      "Detectado: No-Guante"
-    ]
-  },
-  {
-    "timestamp": "2025-11-25T14:11:28.985Z",
-    "imageUrl": "/static/epp-images/epp_1764079884806.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764079884806.jpg",
-    "detections": {
-      "casco": 1,
-      "chaleco": 0,
-      "guante": 0,
-      "zapato": 0,
-      "no casco": 0,
-      "no chaleco": 0,
-      "no guante": 2
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Falta Chaleco",
-      "Detectado: No-Guante"
-    ]
-  },
-  {
-    "timestamp": "2025-11-25T14:11:22.503Z",
-    "imageUrl": "/static/epp-images/epp_1764079878189.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764079878189.jpg",
-    "detections": {
-      "casco": 1,
-      "chaleco": 0,
-      "guante": 0,
-      "zapato": 0,
-      "no casco": 0,
-      "no chaleco": 0,
-      "no guante": 1
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Falta Chaleco",
-      "Detectado: No-Guante"
-    ]
-  },
-  {
-    "timestamp": "2025-11-25T14:11:15.862Z",
-    "imageUrl": "/static/epp-images/epp_1764079871908.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764079871908.jpg",
-    "detections": {
-      "casco": 1,
-      "chaleco": 0,
-      "guante": 0,
-      "zapato": 0,
-      "no casco": 0,
-      "no chaleco": 0,
-      "no guante": 1
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Falta Chaleco",
-      "Detectado: No-Guante"
-    ]
-  },
-  {
-    "timestamp": "2025-11-25T14:11:08.604Z",
-    "imageUrl": "/static/epp-images/epp_1764079864327.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764079864327.jpg",
+    "timestamp": "2025-12-02T16:15:03.243Z",
+    "imageUrl": "/static/epp-images/epp_1764692099256.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764692099256.jpg",
     "detections": {
       "casco": 0,
-      "chaleco": 0,
-      "guante": 2,
-      "zapato": 0,
-      "no casco": 0,
-      "no chaleco": 0,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Falta Casco",
-      "Falta Chaleco"
-    ]
-  },
-  {
-    "timestamp": "2025-11-25T14:11:02.717Z",
-    "imageUrl": "/static/epp-images/epp_1764079848662.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764079848662.jpg",
-    "detections": {
-      "casco": 0,
-      "chaleco": 2,
+      "chaleco": 1,
       "guante": 0,
       "zapato": 0,
       "no casco": 0,
@@ -203,415 +19,72 @@
     ]
   },
   {
-    "timestamp": "2025-11-24T22:25:47.536Z",
-    "imageUrl": "/static/epp-images/epp_1764023143199.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764023143199.jpg",
+    "timestamp": "2025-12-02T16:14:58.103Z",
+    "imageUrl": "/static/epp-images/epp_1764692094075.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764692094075.jpg",
     "detections": {
       "casco": 0,
       "chaleco": 0,
-      "guante": 1,
-      "zapato": 0,
-      "no casco": 1,
-      "no chaleco": 0,
-      "no guante": 2
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Casco",
-      "Falta Chaleco",
-      "Detectado: No-Guante"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T22:25:07.197Z",
-    "imageUrl": "/static/epp-images/epp_1764023103320.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764023103320.jpg",
-    "detections": {
-      "casco": 0,
-      "chaleco": 0,
-      "guante": 1,
-      "zapato": 0,
-      "no casco": 1,
-      "no chaleco": 0,
-      "no guante": 1
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Casco",
-      "Falta Chaleco",
-      "Detectado: No-Guante"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T22:24:36.406Z",
-    "imageUrl": "/static/epp-images/epp_1764023072776.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764023072776.jpg",
-    "detections": {
-      "casco": 0,
-      "chaleco": 0,
-      "guante": 1,
-      "zapato": 0,
-      "no casco": 1,
-      "no chaleco": 0,
-      "no guante": 1
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Casco",
-      "Falta Chaleco",
-      "Detectado: No-Guante"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T22:24:15.801Z",
-    "imageUrl": "/static/epp-images/epp_1764023052257.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764023052257.jpg",
-    "detections": {
-      "casco": 0,
-      "chaleco": 0,
-      "guante": 1,
-      "zapato": 0,
-      "no casco": 1,
-      "no chaleco": 1,
-      "no guante": 1
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Casco",
-      "Detectado: No-Chaleco",
-      "Detectado: No-Guante"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T22:24:06.854Z",
-    "imageUrl": "/static/epp-images/epp_1764023043317.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764023043317.jpg",
-    "detections": {
-      "casco": 1,
-      "chaleco": 1,
-      "guante": 1,
-      "zapato": 0,
-      "no casco": 1,
-      "no chaleco": 0,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Casco"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T22:24:00.370Z",
-    "imageUrl": "/static/epp-images/epp_1764023036618.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764023036618.jpg",
-    "detections": {
-      "casco": 1,
-      "chaleco": 2,
-      "guante": 1,
-      "zapato": 0,
-      "no casco": 0,
-      "no chaleco": 1,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Chaleco"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T22:23:53.133Z",
-    "imageUrl": "/static/epp-images/epp_1764023029252.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764023029252.jpg",
-    "detections": {
-      "casco": 2,
-      "chaleco": 1,
-      "guante": 2,
-      "zapato": 0,
-      "no casco": 1,
-      "no chaleco": 1,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Casco",
-      "Detectado: No-Chaleco"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T22:23:46.356Z",
-    "imageUrl": "/static/epp-images/epp_1764023021875.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764023021875.jpg",
-    "detections": {
-      "casco": 1,
-      "chaleco": 3,
-      "guante": 2,
-      "zapato": 0,
-      "no casco": 1,
-      "no chaleco": 1,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Casco",
-      "Detectado: No-Chaleco"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T22:23:41.589Z",
-    "imageUrl": "/static/epp-images/epp_1764023016686.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764023016686.jpg",
-    "detections": {
-      "casco": 1,
-      "chaleco": 1,
-      "guante": 1,
-      "zapato": 0,
-      "no casco": 1,
-      "no chaleco": 1,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Casco",
-      "Detectado: No-Chaleco"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T22:23:35.336Z",
-    "imageUrl": "/static/epp-images/epp_1764023010228.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764023010228.jpg",
-    "detections": {
-      "casco": 1,
-      "chaleco": 3,
-      "guante": 2,
-      "zapato": 0,
-      "no casco": 0,
-      "no chaleco": 1,
-      "no guante": 1
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Chaleco",
-      "Detectado: No-Guante"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T22:23:27.577Z",
-    "imageUrl": "/static/epp-images/epp_1764023003522.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764023003522.jpg",
-    "detections": {
-      "casco": 1,
-      "chaleco": 1,
-      "guante": 4,
-      "zapato": 0,
-      "no casco": 1,
-      "no chaleco": 1,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Casco",
-      "Detectado: No-Chaleco"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T22:23:22.941Z",
-    "imageUrl": "/static/epp-images/epp_1764022998351.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764022998351.jpg",
-    "detections": {
-      "casco": 2,
-      "chaleco": 1,
-      "guante": 3,
-      "zapato": 0,
-      "no casco": 1,
-      "no chaleco": 1,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Casco",
-      "Detectado: No-Chaleco"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T22:23:17.652Z",
-    "imageUrl": "/static/epp-images/epp_1764022993212.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764022993212.jpg",
-    "detections": {
-      "casco": 1,
-      "chaleco": 1,
-      "guante": 3,
-      "zapato": 0,
-      "no casco": 1,
-      "no chaleco": 1,
-      "no guante": 1
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Casco",
-      "Detectado: No-Chaleco",
-      "Detectado: No-Guante"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T22:23:08.913Z",
-    "imageUrl": "/static/epp-images/epp_1764022984911.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764022984911.jpg",
-    "detections": {
-      "casco": 1,
-      "chaleco": 2,
-      "guante": 4,
-      "zapato": 0,
-      "no casco": 1,
-      "no chaleco": 1,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Casco",
-      "Detectado: No-Chaleco"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T22:23:03.165Z",
-    "imageUrl": "/static/epp-images/epp_1764022979799.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764022979799.jpg",
-    "detections": {
-      "casco": 1,
-      "chaleco": 1,
-      "guante": 2,
-      "zapato": 0,
-      "no casco": 1,
-      "no chaleco": 1,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Casco",
-      "Detectado: No-Chaleco"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T22:22:57.967Z",
-    "imageUrl": "/static/epp-images/epp_1764022973693.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764022973693.jpg",
-    "detections": {
-      "casco": 1,
-      "chaleco": 1,
-      "guante": 3,
-      "zapato": 0,
-      "no casco": 1,
-      "no chaleco": 1,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Casco",
-      "Detectado: No-Chaleco"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T22:22:49.847Z",
-    "imageUrl": "/static/epp-images/epp_1764022965544.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764022965544.jpg",
-    "detections": {
-      "casco": 1,
-      "chaleco": 1,
-      "guante": 4,
-      "zapato": 0,
-      "no casco": 1,
-      "no chaleco": 1,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Casco",
-      "Detectado: No-Chaleco"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T22:22:44.040Z",
-    "imageUrl": "/static/epp-images/epp_1764022960178.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764022960178.jpg",
-    "detections": {
-      "casco": 1,
-      "chaleco": 1,
-      "guante": 4,
-      "zapato": 0,
-      "no casco": 1,
-      "no chaleco": 1,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Casco",
-      "Detectado: No-Chaleco"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T22:22:39.010Z",
-    "imageUrl": "/static/epp-images/epp_1764022954836.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764022954836.jpg",
-    "detections": {
-      "casco": 1,
-      "chaleco": 1,
-      "guante": 2,
-      "zapato": 0,
-      "no casco": 1,
-      "no chaleco": 1,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Casco",
-      "Detectado: No-Chaleco"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T22:22:33.995Z",
-    "imageUrl": "/static/epp-images/epp_1764022949747.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764022949747.jpg",
-    "detections": {
-      "casco": 1,
-      "chaleco": 1,
       "guante": 0,
       "zapato": 0,
-      "no casco": 1,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:14:54.201Z",
+    "imageUrl": "/static/epp-images/epp_1764692090059.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764692090059.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:14:48.722Z",
+    "imageUrl": "/static/epp-images/epp_1764692083614.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764692083614.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
       "no chaleco": 1,
       "no guante": 0
     },
     "isCompliant": false,
     "missingItems": [
-      "Detectado: No-Casco",
+      "Falta Casco",
       "Detectado: No-Chaleco",
       "Falta Guantes"
     ]
   },
   {
-    "timestamp": "2025-11-24T22:22:25.809Z",
-    "imageUrl": "/static/epp-images/epp_1764022942166.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764022942166.jpg",
+    "timestamp": "2025-12-02T16:14:43.131Z",
+    "imageUrl": "/static/epp-images/epp_1764692078190.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764692078190.jpg",
     "detections": {
-      "casco": 2,
-      "chaleco": 1,
-      "guante": 0,
-      "zapato": 0,
-      "no casco": 0,
-      "no chaleco": 1,
-      "no guante": 1
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Chaleco",
-      "Detectado: No-Guante"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T22:22:19.406Z",
-    "imageUrl": "/static/epp-images/epp_1764022935687.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764022935687.jpg",
-    "detections": {
-      "casco": 2,
-      "chaleco": 1,
+      "casco": 0,
+      "chaleco": 0,
       "guante": 0,
       "zapato": 0,
       "no casco": 0,
@@ -620,504 +93,78 @@
     },
     "isCompliant": false,
     "missingItems": [
+      "Falta Casco",
       "Detectado: No-Chaleco",
       "Falta Guantes"
     ]
   },
   {
-    "timestamp": "2025-11-24T22:22:11.439Z",
-    "imageUrl": "/static/epp-images/epp_1764022927220.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764022927220.jpg",
-    "detections": {
-      "casco": 2,
-      "chaleco": 1,
-      "guante": 4,
-      "zapato": 0,
-      "no casco": 0,
-      "no chaleco": 1,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Chaleco"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T22:22:06.004Z",
-    "imageUrl": "/static/epp-images/epp_1764022921219.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764022921219.jpg",
-    "detections": {
-      "casco": 2,
-      "chaleco": 2,
-      "guante": 3,
-      "zapato": 0,
-      "no casco": 0,
-      "no chaleco": 1,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Chaleco"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T22:21:58.299Z",
-    "imageUrl": "/static/epp-images/epp_1764022914142.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764022914142.jpg",
-    "detections": {
-      "casco": 2,
-      "chaleco": 3,
-      "guante": 3,
-      "zapato": 0,
-      "no casco": 0,
-      "no chaleco": 1,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Chaleco"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T22:21:53.357Z",
-    "imageUrl": "/static/epp-images/epp_1764022909104.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764022909104.jpg",
-    "detections": {
-      "casco": 2,
-      "chaleco": 1,
-      "guante": 2,
-      "zapato": 0,
-      "no casco": 0,
-      "no chaleco": 1,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Chaleco"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T22:21:48.036Z",
-    "imageUrl": "/static/epp-images/epp_1764022903824.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764022903824.jpg",
-    "detections": {
-      "casco": 2,
-      "chaleco": 1,
-      "guante": 3,
-      "zapato": 0,
-      "no casco": 0,
-      "no chaleco": 1,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Chaleco"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T22:21:42.427Z",
-    "imageUrl": "/static/epp-images/epp_1764022898725.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764022898725.jpg",
-    "detections": {
-      "casco": 2,
-      "chaleco": 1,
-      "guante": 2,
-      "zapato": 0,
-      "no casco": 0,
-      "no chaleco": 1,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Chaleco"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T22:21:33.254Z",
-    "imageUrl": "/static/epp-images/epp_1764022889865.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764022889865.jpg",
-    "detections": {
-      "casco": 2,
-      "chaleco": 1,
-      "guante": 1,
-      "zapato": 0,
-      "no casco": 0,
-      "no chaleco": 1,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Chaleco"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T22:21:28.688Z",
-    "imageUrl": "/static/epp-images/epp_1764022884746.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764022884746.jpg",
-    "detections": {
-      "casco": 2,
-      "chaleco": 1,
-      "guante": 3,
-      "zapato": 0,
-      "no casco": 0,
-      "no chaleco": 1,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Chaleco"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T22:21:21.279Z",
-    "imageUrl": "/static/epp-images/epp_1764022877327.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764022877327.jpg",
-    "detections": {
-      "casco": 1,
-      "chaleco": 1,
-      "guante": 1,
-      "zapato": 0,
-      "no casco": 0,
-      "no chaleco": 0,
-      "no guante": 0
-    },
-    "isCompliant": true,
-    "missingItems": []
-  },
-  {
-    "timestamp": "2025-11-24T22:21:16.365Z",
-    "imageUrl": "/static/epp-images/epp_1764022872207.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764022872207.jpg",
-    "detections": {
-      "casco": 1,
-      "chaleco": 1,
-      "guante": 2,
-      "zapato": 0,
-      "no casco": 0,
-      "no chaleco": 0,
-      "no guante": 0
-    },
-    "isCompliant": true,
-    "missingItems": []
-  },
-  {
-    "timestamp": "2025-11-24T22:21:07.793Z",
-    "imageUrl": "/static/epp-images/epp_1764022863689.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764022863689.jpg",
-    "detections": {
-      "casco": 1,
-      "chaleco": 1,
-      "guante": 3,
-      "zapato": 0,
-      "no casco": 0,
-      "no chaleco": 0,
-      "no guante": 0
-    },
-    "isCompliant": true,
-    "missingItems": []
-  },
-  {
-    "timestamp": "2025-11-24T22:21:04.025Z",
-    "imageUrl": "/static/epp-images/epp_1764022859699.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764022859699.jpg",
-    "detections": {
-      "casco": 1,
-      "chaleco": 1,
-      "guante": 4,
-      "zapato": 0,
-      "no casco": 0,
-      "no chaleco": 0,
-      "no guante": 0
-    },
-    "isCompliant": true,
-    "missingItems": []
-  },
-  {
-    "timestamp": "2025-11-24T22:20:57.839Z",
-    "imageUrl": "/static/epp-images/epp_1764022853410.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764022853410.jpg",
-    "detections": {
-      "casco": 1,
-      "chaleco": 1,
-      "guante": 3,
-      "zapato": 0,
-      "no casco": 0,
-      "no chaleco": 0,
-      "no guante": 0
-    },
-    "isCompliant": true,
-    "missingItems": []
-  },
-  {
-    "timestamp": "2025-11-24T22:20:52.691Z",
-    "imageUrl": "/static/epp-images/epp_1764022848272.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764022848272.jpg",
-    "detections": {
-      "casco": 1,
-      "chaleco": 1,
-      "guante": 1,
-      "zapato": 0,
-      "no casco": 1,
-      "no chaleco": 0,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Casco"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T22:20:45.917Z",
-    "imageUrl": "/static/epp-images/epp_1764022841244.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764022841244.jpg",
-    "detections": {
-      "casco": 1,
-      "chaleco": 1,
-      "guante": 3,
-      "zapato": 0,
-      "no casco": 0,
-      "no chaleco": 0,
-      "no guante": 0
-    },
-    "isCompliant": true,
-    "missingItems": []
-  },
-  {
-    "timestamp": "2025-11-24T22:20:40.304Z",
-    "imageUrl": "/static/epp-images/epp_1764022835683.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764022835683.jpg",
+    "timestamp": "2025-12-02T16:14:36.361Z",
+    "imageUrl": "/static/epp-images/epp_1764692071196.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764692071196.jpg",
     "detections": {
       "casco": 0,
-      "chaleco": 1,
-      "guante": 1,
-      "zapato": 0,
-      "no casco": 2,
-      "no chaleco": 0,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Casco"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T22:20:33.295Z",
-    "imageUrl": "/static/epp-images/epp_1764022828684.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764022828684.jpg",
-    "detections": {
-      "casco": 0,
-      "chaleco": 1,
-      "guante": 1,
-      "zapato": 0,
-      "no casco": 1,
-      "no chaleco": 0,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Casco"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T22:20:26.513Z",
-    "imageUrl": "/static/epp-images/epp_1764022822191.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764022822191.jpg",
-    "detections": {
-      "casco": 0,
-      "chaleco": 1,
+      "chaleco": 0,
       "guante": 0,
       "zapato": 0,
-      "no casco": 1,
-      "no chaleco": 0,
+      "no casco": 0,
+      "no chaleco": 1,
       "no guante": 0
     },
     "isCompliant": false,
     "missingItems": [
-      "Detectado: No-Casco",
+      "Falta Casco",
+      "Detectado: No-Chaleco",
       "Falta Guantes"
     ]
   },
   {
-    "timestamp": "2025-11-24T22:20:13.156Z",
-    "imageUrl": "/static/epp-images/epp_1764022808715.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764022808715.jpg",
+    "timestamp": "2025-12-02T16:14:30.307Z",
+    "imageUrl": "/static/epp-images/epp_1764692065676.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764692065676.jpg",
     "detections": {
       "casco": 0,
-      "chaleco": 0,
-      "guante": 2,
-      "zapato": 0,
-      "no casco": 1,
-      "no chaleco": 0,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Casco",
-      "Falta Chaleco"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T22:20:03.066Z",
-    "imageUrl": "/static/epp-images/epp_1764022798460.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764022798460.jpg",
-    "detections": {
-      "casco": 0,
-      "chaleco": 0,
-      "guante": 1,
-      "zapato": 0,
-      "no casco": 1,
-      "no chaleco": 0,
-      "no guante": 1
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Casco",
-      "Falta Chaleco",
-      "Detectado: No-Guante"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T22:19:57.814Z",
-    "imageUrl": "/static/epp-images/epp_1764022793364.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764022793364.jpg",
-    "detections": {
-      "casco": 1,
       "chaleco": 0,
       "guante": 0,
       "zapato": 0,
-      "no casco": 1,
-      "no chaleco": 0,
-      "no guante": 2
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Casco",
-      "Falta Chaleco",
-      "Detectado: No-Guante"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T22:19:52.680Z",
-    "imageUrl": "/static/epp-images/epp_1764022788225.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764022788225.jpg",
-    "detections": {
-      "casco": 0,
-      "chaleco": 1,
-      "guante": 3,
-      "zapato": 0,
-      "no casco": 1,
-      "no chaleco": 0,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Casco"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T22:19:44.793Z",
-    "imageUrl": "/static/epp-images/epp_1764022780375.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764022780375.jpg",
-    "detections": {
-      "casco": 0,
-      "chaleco": 0,
-      "guante": 2,
-      "zapato": 0,
-      "no casco": 2,
+      "no casco": 0,
       "no chaleco": 1,
       "no guante": 1
     },
     "isCompliant": false,
     "missingItems": [
-      "Detectado: No-Casco",
+      "Falta Casco",
       "Detectado: No-Chaleco",
       "Detectado: No-Guante"
     ]
   },
   {
-    "timestamp": "2025-11-24T22:19:39.672Z",
-    "imageUrl": "/static/epp-images/epp_1764022775235.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764022775235.jpg",
+    "timestamp": "2025-12-02T16:14:25.252Z",
+    "imageUrl": "/static/epp-images/epp_1764692060514.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764692060514.jpg",
     "detections": {
       "casco": 0,
       "chaleco": 0,
-      "guante": 1,
+      "guante": 0,
       "zapato": 0,
-      "no casco": 1,
-      "no chaleco": 0,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Casco",
-      "Falta Chaleco"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T22:19:01.152Z",
-    "imageUrl": "/static/epp-images/epp_1764022736230.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764022736230.jpg",
-    "detections": {
-      "casco": 0,
-      "chaleco": 0,
-      "guante": 1,
-      "zapato": 0,
-      "no casco": 2,
+      "no casco": 0,
       "no chaleco": 2,
-      "no guante": 1
+      "no guante": 0
     },
     "isCompliant": false,
     "missingItems": [
-      "Detectado: No-Casco",
+      "Falta Casco",
       "Detectado: No-Chaleco",
-      "Detectado: No-Guante"
+      "Falta Guantes"
     ]
   },
   {
-    "timestamp": "2025-11-24T22:18:57.122Z",
-    "imageUrl": "/static/epp-images/epp_1764022729275.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764022729275.jpg",
+    "timestamp": "2025-12-02T16:14:19.866Z",
+    "imageUrl": "/static/epp-images/epp_1764692055226.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764692055226.jpg",
     "detections": {
       "casco": 0,
       "chaleco": 0,
-      "guante": 2,
-      "zapato": 0,
-      "no casco": 2,
-      "no chaleco": 3,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Casco",
-      "Detectado: No-Chaleco"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T22:18:53.260Z",
-    "imageUrl": "/static/epp-images/epp_1764022724238.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1764022724238.jpg",
-    "detections": {
-      "casco": 0,
-      "chaleco": 0,
-      "guante": 2,
-      "zapato": 0,
-      "no casco": 2,
-      "no chaleco": 1,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Casco",
-      "Detectado: No-Chaleco"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T04:55:24.449Z",
-    "imageUrl": "/static/epp-images/epp_1763960121989.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1763960121989.jpg",
-    "detections": {
-      "casco": 0,
-      "chaleco": 1,
       "guante": 0,
       "zapato": 0,
       "no casco": 0,
@@ -1127,68 +174,34 @@
     "isCompliant": false,
     "missingItems": [
       "Falta Casco",
+      "Falta Chaleco",
       "Falta Guantes"
     ]
   },
   {
-    "timestamp": "2025-11-24T04:55:19.371Z",
-    "imageUrl": "/static/epp-images/epp_1763960116832.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1763960116832.jpg",
-    "detections": {
-      "casco": 1,
-      "chaleco": 1,
-      "guante": 1,
-      "zapato": 0,
-      "no casco": 1,
-      "no chaleco": 0,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Casco"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T04:55:14.157Z",
-    "imageUrl": "/static/epp-images/epp_1763960111613.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1763960111613.jpg",
+    "timestamp": "2025-12-02T16:14:14.565Z",
+    "imageUrl": "/static/epp-images/epp_1764692050036.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764692050036.jpg",
     "detections": {
       "casco": 0,
-      "chaleco": 1,
-      "guante": 2,
-      "zapato": 0,
-      "no casco": 1,
-      "no chaleco": 0,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Casco"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T04:55:08.799Z",
-    "imageUrl": "/static/epp-images/epp_1763960106379.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1763960106379.jpg",
-    "detections": {
-      "casco": 0,
-      "chaleco": 1,
+      "chaleco": 0,
       "guante": 0,
       "zapato": 0,
-      "no casco": 0,
+      "no casco": 1,
       "no chaleco": 0,
       "no guante": 0
     },
     "isCompliant": false,
     "missingItems": [
-      "Falta Casco",
+      "Detectado: No-Casco",
+      "Falta Chaleco",
       "Falta Guantes"
     ]
   },
   {
-    "timestamp": "2025-11-24T04:55:03.575Z",
-    "imageUrl": "/static/epp-images/epp_1763960101132.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1763960101132.jpg",
+    "timestamp": "2025-12-02T16:14:09.100Z",
+    "imageUrl": "/static/epp-images/epp_1764692044573.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764692044573.jpg",
     "detections": {
       "casco": 0,
       "chaleco": 1,
@@ -1204,9 +217,204 @@
     ]
   },
   {
-    "timestamp": "2025-11-24T04:54:58.411Z",
-    "imageUrl": "/static/epp-images/epp_1763960095992.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1763960095992.jpg",
+    "timestamp": "2025-12-02T16:14:04.283Z",
+    "imageUrl": "/static/epp-images/epp_1764692039421.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764692039421.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:13:58.933Z",
+    "imageUrl": "/static/epp-images/epp_1764692033950.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764692033950.jpg",
+    "detections": {
+      "casco": 1,
+      "chaleco": 1,
+      "guante": 2,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": true,
+    "missingItems": []
+  },
+  {
+    "timestamp": "2025-12-02T16:13:53.298Z",
+    "imageUrl": "/static/epp-images/epp_1764692028737.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764692028737.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 3,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:13:48.657Z",
+    "imageUrl": "/static/epp-images/epp_1764692023528.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764692023528.jpg",
+    "detections": {
+      "casco": 1,
+      "chaleco": 2,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": true,
+    "missingItems": []
+  },
+  {
+    "timestamp": "2025-12-02T16:13:42.142Z",
+    "imageUrl": "/static/epp-images/epp_1764692017929.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764692017929.jpg",
+    "detections": {
+      "casco": 2,
+      "chaleco": 1,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": true,
+    "missingItems": []
+  },
+  {
+    "timestamp": "2025-12-02T16:13:35.362Z",
+    "imageUrl": "/static/epp-images/epp_1764692010609.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764692010609.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 2,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:13:29.354Z",
+    "imageUrl": "/static/epp-images/epp_1764692004567.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764692004567.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 2,
+      "guante": 2,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:13:18.158Z",
+    "imageUrl": "/static/epp-images/epp_1764691993497.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691993497.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 2,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:13:08.318Z",
+    "imageUrl": "/static/epp-images/epp_1764691984097.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691984097.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:13:01.109Z",
+    "imageUrl": "/static/epp-images/epp_1764691976998.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691976998.jpg",
+    "detections": {
+      "casco": 1,
+      "chaleco": 1,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 1,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Detectado: No-Casco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:12:56.214Z",
+    "imageUrl": "/static/epp-images/epp_1764691971186.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691971186.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:12:50.152Z",
+    "imageUrl": "/static/epp-images/epp_1764691966061.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691966061.jpg",
     "detections": {
       "casco": 0,
       "chaleco": 1,
@@ -1223,9 +431,1077 @@
     ]
   },
   {
-    "timestamp": "2025-11-24T04:54:51.033Z",
-    "imageUrl": "/static/epp-images/epp_1763960088415.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1763960088415.jpg",
+    "timestamp": "2025-12-02T16:12:46.616Z",
+    "imageUrl": "/static/epp-images/epp_1764691962051.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691962051.jpg",
+    "detections": {
+      "casco": 1,
+      "chaleco": 2,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 1,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Detectado: No-Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:12:41.020Z",
+    "imageUrl": "/static/epp-images/epp_1764691957103.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691957103.jpg",
+    "detections": {
+      "casco": 1,
+      "chaleco": 1,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": true,
+    "missingItems": []
+  },
+  {
+    "timestamp": "2025-12-02T16:12:33.732Z",
+    "imageUrl": "/static/epp-images/epp_1764691949099.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691949099.jpg",
+    "detections": {
+      "casco": 1,
+      "chaleco": 1,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": true,
+    "missingItems": []
+  },
+  {
+    "timestamp": "2025-12-02T16:12:24.023Z",
+    "imageUrl": "/static/epp-images/epp_1764691939793.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691939793.jpg",
+    "detections": {
+      "casco": 1,
+      "chaleco": 1,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:12:18.815Z",
+    "imageUrl": "/static/epp-images/epp_1764691934414.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691934414.jpg",
+    "detections": {
+      "casco": 1,
+      "chaleco": 1,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": true,
+    "missingItems": []
+  },
+  {
+    "timestamp": "2025-12-02T16:12:13.811Z",
+    "imageUrl": "/static/epp-images/epp_1764691929262.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691929262.jpg",
+    "detections": {
+      "casco": 1,
+      "chaleco": 1,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:12:08.681Z",
+    "imageUrl": "/static/epp-images/epp_1764691924092.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691924092.jpg",
+    "detections": {
+      "casco": 1,
+      "chaleco": 1,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 1
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Detectado: No-Guante"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:12:01.208Z",
+    "imageUrl": "/static/epp-images/epp_1764691916553.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691916553.jpg",
+    "detections": {
+      "casco": 1,
+      "chaleco": 1,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 1
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Detectado: No-Guante"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:11:51.563Z",
+    "imageUrl": "/static/epp-images/epp_1764691907044.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691907044.jpg",
+    "detections": {
+      "casco": 1,
+      "chaleco": 1,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 1
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Detectado: No-Guante"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:11:44.695Z",
+    "imageUrl": "/static/epp-images/epp_1764691900596.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691900596.jpg",
+    "detections": {
+      "casco": 1,
+      "chaleco": 1,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:11:36.942Z",
+    "imageUrl": "/static/epp-images/epp_1764691892700.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691892700.jpg",
+    "detections": {
+      "casco": 1,
+      "chaleco": 1,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 1
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Detectado: No-Guante"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:11:29.930Z",
+    "imageUrl": "/static/epp-images/epp_1764691884592.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691884592.jpg",
+    "detections": {
+      "casco": 1,
+      "chaleco": 1,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 1,
+      "no chaleco": 0,
+      "no guante": 1
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Detectado: No-Casco",
+      "Detectado: No-Guante"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:11:20.651Z",
+    "imageUrl": "/static/epp-images/epp_1764691875765.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691875765.jpg",
+    "detections": {
+      "casco": 1,
+      "chaleco": 1,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": true,
+    "missingItems": []
+  },
+  {
+    "timestamp": "2025-12-02T16:11:15.380Z",
+    "imageUrl": "/static/epp-images/epp_1764691870613.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691870613.jpg",
+    "detections": {
+      "casco": 2,
+      "chaleco": 1,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 1,
+      "no chaleco": 0,
+      "no guante": 1
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Detectado: No-Casco",
+      "Detectado: No-Guante"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:11:05.982Z",
+    "imageUrl": "/static/epp-images/epp_1764691861702.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691861702.jpg",
+    "detections": {
+      "casco": 1,
+      "chaleco": 1,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 1,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Detectado: No-Casco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:10:59.596Z",
+    "imageUrl": "/static/epp-images/epp_1764691854698.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691854698.jpg",
+    "detections": {
+      "casco": 1,
+      "chaleco": 1,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 1,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Detectado: No-Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:10:54.668Z",
+    "imageUrl": "/static/epp-images/epp_1764691849573.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691849573.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:10:44.269Z",
+    "imageUrl": "/static/epp-images/epp_1764691839602.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691839602.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:10:36.568Z",
+    "imageUrl": "/static/epp-images/epp_1764691831473.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691831473.jpg",
+    "detections": {
+      "casco": 1,
+      "chaleco": 1,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:10:29.530Z",
+    "imageUrl": "/static/epp-images/epp_1764691825056.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691825056.jpg",
+    "detections": {
+      "casco": 1,
+      "chaleco": 1,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:10:23.739Z",
+    "imageUrl": "/static/epp-images/epp_1764691818577.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691818577.jpg",
+    "detections": {
+      "casco": 1,
+      "chaleco": 1,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 1,
+      "no chaleco": 1,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Detectado: No-Casco",
+      "Detectado: No-Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:10:13.269Z",
+    "imageUrl": "/static/epp-images/epp_1764691808213.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691808213.jpg",
+    "detections": {
+      "casco": 1,
+      "chaleco": 1,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 1,
+      "no chaleco": 1,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Detectado: No-Casco",
+      "Detectado: No-Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:10:05.762Z",
+    "imageUrl": "/static/epp-images/epp_1764691801053.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691801053.jpg",
+    "detections": {
+      "casco": 1,
+      "chaleco": 1,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 1
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Detectado: No-Guante"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:09:56.779Z",
+    "imageUrl": "/static/epp-images/epp_1764691792661.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691792661.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:09:48.047Z",
+    "imageUrl": "/static/epp-images/epp_1764691783726.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691783726.jpg",
+    "detections": {
+      "casco": 1,
+      "chaleco": 1,
+      "guante": 2,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 1
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Detectado: No-Guante"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:09:43.226Z",
+    "imageUrl": "/static/epp-images/epp_1764691778542.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691778542.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:09:38.597Z",
+    "imageUrl": "/static/epp-images/epp_1764691773444.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691773444.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 2,
+      "zapato": 0,
+      "no casco": 1,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Detectado: No-Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:09:30.068Z",
+    "imageUrl": "/static/epp-images/epp_1764691765910.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691765910.jpg",
+    "detections": {
+      "casco": 1,
+      "chaleco": 1,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": true,
+    "missingItems": []
+  },
+  {
+    "timestamp": "2025-12-02T16:09:25.194Z",
+    "imageUrl": "/static/epp-images/epp_1764691760650.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691760650.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 1,
+      "no chaleco": 0,
+      "no guante": 1
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Detectado: No-Casco",
+      "Detectado: No-Guante"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:09:18.588Z",
+    "imageUrl": "/static/epp-images/epp_1764691754164.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691754164.jpg",
+    "detections": {
+      "casco": 1,
+      "chaleco": 1,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 1,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Detectado: No-Casco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:09:11.297Z",
+    "imageUrl": "/static/epp-images/epp_1764691746639.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691746639.jpg",
+    "detections": {
+      "casco": 1,
+      "chaleco": 0,
+      "guante": 2,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 1
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Chaleco",
+      "Detectado: No-Guante"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:09:00.959Z",
+    "imageUrl": "/static/epp-images/epp_1764691736287.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691736287.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 2,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 1
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Detectado: No-Guante"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:08:54.262Z",
+    "imageUrl": "/static/epp-images/epp_1764691729538.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691729538.jpg",
+    "detections": {
+      "casco": 1,
+      "chaleco": 1,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 1
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Detectado: No-Guante"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:08:49.860Z",
+    "imageUrl": "/static/epp-images/epp_1764691725600.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691725600.jpg",
+    "detections": {
+      "casco": 1,
+      "chaleco": 1,
+      "guante": 2,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 1
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Detectado: No-Guante"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:08:41.373Z",
+    "imageUrl": "/static/epp-images/epp_1764691717184.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691717184.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:08:32.396Z",
+    "imageUrl": "/static/epp-images/epp_1764691708148.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691708148.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 2,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 1,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Detectado: No-Chaleco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:08:25.173Z",
+    "imageUrl": "/static/epp-images/epp_1764691700798.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691700798.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:08:16.905Z",
+    "imageUrl": "/static/epp-images/epp_1764691692689.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691692689.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 1
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Detectado: No-Guante"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:08:07.870Z",
+    "imageUrl": "/static/epp-images/epp_1764691683951.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691683951.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:07:57.890Z",
+    "imageUrl": "/static/epp-images/epp_1764691673997.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691673997.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 1
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Detectado: No-Guante"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:07:52.774Z",
+    "imageUrl": "/static/epp-images/epp_1764691668752.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691668752.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 1
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Detectado: No-Guante"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:07:48.259Z",
+    "imageUrl": "/static/epp-images/epp_1764691663534.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691663534.jpg",
+    "detections": {
+      "casco": 1,
+      "chaleco": 1,
+      "guante": 5,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 1
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Detectado: No-Guante"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:07:42.659Z",
+    "imageUrl": "/static/epp-images/epp_1764691657377.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691657377.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 1,
+      "no chaleco": 0,
+      "no guante": 1
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Detectado: No-Casco",
+      "Detectado: No-Guante"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:07:33.893Z",
+    "imageUrl": "/static/epp-images/epp_1764691649680.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691649680.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 1,
+      "no chaleco": 0,
+      "no guante": 1
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Detectado: No-Casco",
+      "Detectado: No-Guante"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:07:28.043Z",
+    "imageUrl": "/static/epp-images/epp_1764691643907.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691643907.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 1,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Detectado: No-Chaleco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:07:22.511Z",
+    "imageUrl": "/static/epp-images/epp_1764691638055.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691638055.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 1,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Detectado: No-Chaleco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:07:16.571Z",
+    "imageUrl": "/static/epp-images/epp_1764691632295.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691632295.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:07:10.353Z",
+    "imageUrl": "/static/epp-images/epp_1764691626294.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691626294.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:07:05.190Z",
+    "imageUrl": "/static/epp-images/epp_1764691620710.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691620710.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:06:58.598Z",
+    "imageUrl": "/static/epp-images/epp_1764691614222.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691614222.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:06:52.664Z",
+    "imageUrl": "/static/epp-images/epp_1764691608127.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691608127.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:06:41.261Z",
+    "imageUrl": "/static/epp-images/epp_1764691596525.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691596525.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:06:34.664Z",
+    "imageUrl": "/static/epp-images/epp_1764691589105.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691589105.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:06:25.891Z",
+    "imageUrl": "/static/epp-images/epp_1764691581060.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691581060.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 2,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:06:19.336Z",
+    "imageUrl": "/static/epp-images/epp_1764691574582.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691574582.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 2,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:06:08.779Z",
+    "imageUrl": "/static/epp-images/epp_1764691564699.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691564699.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 2,
+      "guante": 2,
+      "zapato": 2,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:06:02.438Z",
+    "imageUrl": "/static/epp-images/epp_1764691558386.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691558386.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 1,
+      "no chaleco": 1,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Detectado: No-Casco",
+      "Detectado: No-Chaleco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:05:56.758Z",
+    "imageUrl": "/static/epp-images/epp_1764691552814.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691552814.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 1,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Detectado: No-Casco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:05:51.589Z",
+    "imageUrl": "/static/epp-images/epp_1764691547502.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691547502.jpg",
     "detections": {
       "casco": 0,
       "chaleco": 1,
@@ -1241,180 +1517,171 @@
     ]
   },
   {
-    "timestamp": "2025-11-24T04:54:42.142Z",
-    "imageUrl": "/static/epp-images/epp_1763960079485.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1763960079485.jpg",
+    "timestamp": "2025-12-02T16:05:45.121Z",
+    "imageUrl": "/static/epp-images/epp_1764691541017.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691541017.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 2,
+      "guante": 2,
+      "zapato": 0,
+      "no casco": 1,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Detectado: No-Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:05:39.148Z",
+    "imageUrl": "/static/epp-images/epp_1764691535149.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691535149.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 3,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:05:33.576Z",
+    "imageUrl": "/static/epp-images/epp_1764691529459.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691529459.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 1,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Detectado: No-Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:05:27.621Z",
+    "imageUrl": "/static/epp-images/epp_1764691523561.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691523561.jpg",
     "detections": {
       "casco": 1,
-      "chaleco": 1,
-      "guante": 0,
+      "chaleco": 2,
+      "guante": 1,
       "zapato": 0,
-      "no casco": 1,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": true,
+    "missingItems": []
+  },
+  {
+    "timestamp": "2025-12-02T16:05:21.430Z",
+    "imageUrl": "/static/epp-images/epp_1764691517572.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691517572.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 2,
+      "zapato": 0,
+      "no casco": 0,
       "no chaleco": 0,
       "no guante": 0
     },
     "isCompliant": false,
     "missingItems": [
-      "Detectado: No-Casco",
-      "Falta Guantes"
+      "Falta Casco",
+      "Falta Chaleco"
     ]
   },
   {
-    "timestamp": "2025-11-24T04:54:36.833Z",
-    "imageUrl": "/static/epp-images/epp_1763960074379.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1763960074379.jpg",
+    "timestamp": "2025-12-02T16:05:15.989Z",
+    "imageUrl": "/static/epp-images/epp_1764691511900.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691511900.jpg",
     "detections": {
       "casco": 0,
       "chaleco": 1,
-      "guante": 0,
+      "guante": 1,
       "zapato": 0,
-      "no casco": 1,
+      "no casco": 0,
       "no chaleco": 0,
       "no guante": 0
     },
     "isCompliant": false,
     "missingItems": [
-      "Detectado: No-Casco",
-      "Falta Guantes"
+      "Falta Casco"
     ]
   },
   {
-    "timestamp": "2025-11-24T04:54:32.084Z",
-    "imageUrl": "/static/epp-images/epp_1763960069294.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1763960069294.jpg",
+    "timestamp": "2025-12-02T16:05:10.473Z",
+    "imageUrl": "/static/epp-images/epp_1764691505874.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691505874.jpg",
     "detections": {
       "casco": 0,
       "chaleco": 1,
-      "guante": 0,
+      "guante": 1,
       "zapato": 0,
-      "no casco": 1,
+      "no casco": 0,
       "no chaleco": 0,
       "no guante": 0
     },
     "isCompliant": false,
     "missingItems": [
-      "Detectado: No-Casco",
-      "Falta Guantes"
+      "Falta Casco"
     ]
   },
   {
-    "timestamp": "2025-11-24T04:54:24.497Z",
-    "imageUrl": "/static/epp-images/epp_1763960062017.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1763960062017.jpg",
+    "timestamp": "2025-12-02T16:04:58.636Z",
+    "imageUrl": "/static/epp-images/epp_1764691493658.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691493658.jpg",
     "detections": {
       "casco": 0,
       "chaleco": 1,
       "guante": 0,
       "zapato": 0,
-      "no casco": 1,
-      "no chaleco": 0,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Casco",
-      "Falta Guantes"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T04:54:19.481Z",
-    "imageUrl": "/static/epp-images/epp_1763960056795.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1763960056795.jpg",
-    "detections": {
-      "casco": 0,
-      "chaleco": 1,
-      "guante": 0,
-      "zapato": 0,
-      "no casco": 1,
-      "no chaleco": 0,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Casco",
-      "Falta Guantes"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T04:54:12.548Z",
-    "imageUrl": "/static/epp-images/epp_1763960049822.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1763960049822.jpg",
-    "detections": {
-      "casco": 0,
-      "chaleco": 1,
-      "guante": 0,
-      "zapato": 0,
-      "no casco": 1,
-      "no chaleco": 0,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Casco",
-      "Falta Guantes"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T04:54:05.281Z",
-    "imageUrl": "/static/epp-images/epp_1763960042502.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1763960042502.jpg",
-    "detections": {
-      "casco": 0,
-      "chaleco": 3,
-      "guante": 0,
-      "zapato": 0,
-      "no casco": 1,
+      "no casco": 0,
       "no chaleco": 0,
       "no guante": 1
     },
     "isCompliant": false,
     "missingItems": [
-      "Detectado: No-Casco",
+      "Falta Casco",
       "Detectado: No-Guante"
     ]
   },
   {
-    "timestamp": "2025-11-24T04:53:58.084Z",
-    "imageUrl": "/static/epp-images/epp_1763960035639.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1763960035639.jpg",
+    "timestamp": "2025-12-02T16:04:48.678Z",
+    "imageUrl": "/static/epp-images/epp_1764691484085.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691484085.jpg",
     "detections": {
       "casco": 0,
-      "chaleco": 2,
-      "guante": 0,
+      "chaleco": 1,
+      "guante": 2,
       "zapato": 0,
-      "no casco": 1,
+      "no casco": 0,
       "no chaleco": 0,
       "no guante": 0
     },
     "isCompliant": false,
     "missingItems": [
-      "Detectado: No-Casco",
-      "Falta Guantes"
+      "Falta Casco"
     ]
   },
   {
-    "timestamp": "2025-11-24T04:53:52.866Z",
-    "imageUrl": "/static/epp-images/epp_1763960030195.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1763960030195.jpg",
-    "detections": {
-      "casco": 1,
-      "chaleco": 2,
-      "guante": 0,
-      "zapato": 0,
-      "no casco": 1,
-      "no chaleco": 0,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Casco",
-      "Falta Guantes"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T04:53:48.322Z",
-    "imageUrl": "/static/epp-images/epp_1763960025147.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1763960025147.jpg",
+    "timestamp": "2025-12-02T16:04:41.204Z",
+    "imageUrl": "/static/epp-images/epp_1764691476661.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691476661.jpg",
     "detections": {
       "casco": 0,
       "chaleco": 1,
@@ -1431,11 +1698,11 @@
     ]
   },
   {
-    "timestamp": "2025-11-24T04:53:43.849Z",
-    "imageUrl": "/static/epp-images/epp_1763960021220.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1763960021220.jpg",
+    "timestamp": "2025-12-02T16:04:33.934Z",
+    "imageUrl": "/static/epp-images/epp_1764691469680.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691469680.jpg",
     "detections": {
-      "casco": 1,
+      "casco": 0,
       "chaleco": 1,
       "guante": 0,
       "zapato": 0,
@@ -1445,17 +1712,55 @@
     },
     "isCompliant": false,
     "missingItems": [
+      "Falta Casco",
       "Falta Guantes"
     ]
   },
   {
-    "timestamp": "2025-11-24T04:53:35.586Z",
-    "imageUrl": "/static/epp-images/epp_1763960012882.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1763960012882.jpg",
+    "timestamp": "2025-12-02T16:04:25.631Z",
+    "imageUrl": "/static/epp-images/epp_1764691461643.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691461643.jpg",
     "detections": {
       "casco": 0,
       "chaleco": 1,
-      "guante": 0,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 1
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Detectado: No-Guante"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:04:18.244Z",
+    "imageUrl": "/static/epp-images/epp_1764691454319.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691454319.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 3,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:04:10.745Z",
+    "imageUrl": "/static/epp-images/epp_1764691446741.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691446741.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 2,
       "zapato": 0,
       "no casco": 1,
       "no chaleco": 0,
@@ -1463,134 +1768,168 @@
     },
     "isCompliant": false,
     "missingItems": [
-      "Detectado: No-Casco",
-      "Falta Guantes"
+      "Detectado: No-Casco"
     ]
   },
   {
-    "timestamp": "2025-11-24T04:53:27.818Z",
-    "imageUrl": "/static/epp-images/epp_1763960005256.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1763960005256.jpg",
+    "timestamp": "2025-12-02T16:04:04.811Z",
+    "imageUrl": "/static/epp-images/epp_1764691440840.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691440840.jpg",
     "detections": {
       "casco": 0,
       "chaleco": 1,
       "guante": 0,
       "zapato": 0,
-      "no casco": 1,
+      "no casco": 0,
       "no chaleco": 0,
       "no guante": 0
     },
     "isCompliant": false,
     "missingItems": [
-      "Detectado: No-Casco",
+      "Falta Casco",
       "Falta Guantes"
     ]
   },
   {
-    "timestamp": "2025-11-24T04:53:20.801Z",
-    "imageUrl": "/static/epp-images/epp_1763959998408.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1763959998408.jpg",
+    "timestamp": "2025-12-02T16:03:59.268Z",
+    "imageUrl": "/static/epp-images/epp_1764691435312.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691435312.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:03:54.593Z",
+    "imageUrl": "/static/epp-images/epp_1764691430491.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691430491.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:03:47.727Z",
+    "imageUrl": "/static/epp-images/epp_1764691423392.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691423392.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 2,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:03:43.272Z",
+    "imageUrl": "/static/epp-images/epp_1764691419093.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691419093.jpg",
     "detections": {
       "casco": 0,
       "chaleco": 0,
       "guante": 1,
       "zapato": 0,
-      "no casco": 1,
+      "no casco": 0,
       "no chaleco": 0,
       "no guante": 0
     },
     "isCompliant": false,
     "missingItems": [
-      "Detectado: No-Casco",
+      "Falta Casco",
       "Falta Chaleco"
     ]
   },
   {
-    "timestamp": "2025-11-24T04:32:25.920Z",
-    "imageUrl": "/static/epp-images/epp_1763958743336.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1763958743336.jpg",
-    "detections": {
-      "casco": 1,
-      "chaleco": 0,
-      "guante": 0,
-      "zapato": 0,
-      "no casco": 1,
-      "no chaleco": 1,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Casco",
-      "Detectado: No-Chaleco",
-      "Falta Guantes"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T04:31:54.843Z",
-    "imageUrl": "/static/epp-images/epp_1763958712409.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1763958712409.jpg",
+    "timestamp": "2025-12-02T16:03:30.290Z",
+    "imageUrl": "/static/epp-images/epp_1764691406313.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691406313.jpg",
     "detections": {
       "casco": 0,
       "chaleco": 1,
       "guante": 0,
       "zapato": 0,
-      "no casco": 1,
+      "no casco": 0,
       "no chaleco": 0,
       "no guante": 0
     },
     "isCompliant": false,
     "missingItems": [
-      "Detectado: No-Casco",
+      "Falta Casco",
       "Falta Guantes"
     ]
   },
   {
-    "timestamp": "2025-11-24T04:31:48.378Z",
-    "imageUrl": "/static/epp-images/epp_1763958705668.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1763958705668.jpg",
+    "timestamp": "2025-12-02T16:02:22.502Z",
+    "imageUrl": "/static/epp-images/epp_1764691338422.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691338422.jpg",
     "detections": {
-      "casco": 2,
+      "casco": 0,
       "chaleco": 0,
-      "guante": 0,
+      "guante": 2,
       "zapato": 0,
-      "no casco": 2,
+      "no casco": 0,
       "no chaleco": 0,
-      "no guante": 2
+      "no guante": 0
     },
     "isCompliant": false,
     "missingItems": [
-      "Detectado: No-Casco",
+      "Falta Casco",
+      "Falta Chaleco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:02:14.079Z",
+    "imageUrl": "/static/epp-images/epp_1764691330107.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691330107.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 3,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 1
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
       "Falta Chaleco",
       "Detectado: No-Guante"
     ]
   },
   {
-    "timestamp": "2025-11-24T04:31:42.962Z",
-    "imageUrl": "/static/epp-images/epp_1763958700494.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1763958700494.jpg",
+    "timestamp": "2025-12-02T16:02:08.500Z",
+    "imageUrl": "/static/epp-images/epp_1764691324374.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691324374.jpg",
     "detections": {
       "casco": 0,
-      "chaleco": 1,
-      "guante": 0,
-      "zapato": 0,
-      "no casco": 1,
-      "no chaleco": 0,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Detectado: No-Casco",
-      "Falta Guantes"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T04:31:37.721Z",
-    "imageUrl": "/static/epp-images/epp_1763958695363.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1763958695363.jpg",
-    "detections": {
-      "casco": 1,
-      "chaleco": 1,
-      "guante": 0,
+      "chaleco": 0,
+      "guante": 2,
       "zapato": 0,
       "no casco": 0,
       "no chaleco": 0,
@@ -1598,151 +1937,14 @@
     },
     "isCompliant": false,
     "missingItems": [
-      "Falta Guantes"
+      "Falta Casco",
+      "Falta Chaleco"
     ]
   },
   {
-    "timestamp": "2025-11-24T04:31:32.635Z",
-    "imageUrl": "/static/epp-images/epp_1763958690228.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1763958690228.jpg",
-    "detections": {
-      "casco": 2,
-      "chaleco": 1,
-      "guante": 0,
-      "zapato": 0,
-      "no casco": 0,
-      "no chaleco": 0,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Falta Guantes"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T04:31:27.399Z",
-    "imageUrl": "/static/epp-images/epp_1763958684996.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1763958684996.jpg",
-    "detections": {
-      "casco": 1,
-      "chaleco": 1,
-      "guante": 0,
-      "zapato": 0,
-      "no casco": 0,
-      "no chaleco": 0,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Falta Guantes"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T04:31:20.253Z",
-    "imageUrl": "/static/epp-images/epp_1763958677426.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1763958677426.jpg",
-    "detections": {
-      "casco": 1,
-      "chaleco": 2,
-      "guante": 0,
-      "zapato": 0,
-      "no casco": 0,
-      "no chaleco": 0,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Falta Guantes"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T04:31:12.705Z",
-    "imageUrl": "/static/epp-images/epp_1763958669834.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1763958669834.jpg",
-    "detections": {
-      "casco": 2,
-      "chaleco": 1,
-      "guante": 0,
-      "zapato": 0,
-      "no casco": 0,
-      "no chaleco": 0,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Falta Guantes"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T04:31:05.198Z",
-    "imageUrl": "/static/epp-images/epp_1763958662760.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1763958662760.jpg",
-    "detections": {
-      "casco": 2,
-      "chaleco": 1,
-      "guante": 1,
-      "zapato": 0,
-      "no casco": 0,
-      "no chaleco": 0,
-      "no guante": 0
-    },
-    "isCompliant": true,
-    "missingItems": []
-  },
-  {
-    "timestamp": "2025-11-24T04:30:59.914Z",
-    "imageUrl": "/static/epp-images/epp_1763958657523.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1763958657523.jpg",
-    "detections": {
-      "casco": 2,
-      "chaleco": 1,
-      "guante": 1,
-      "zapato": 0,
-      "no casco": 0,
-      "no chaleco": 0,
-      "no guante": 0
-    },
-    "isCompliant": true,
-    "missingItems": []
-  },
-  {
-    "timestamp": "2025-11-24T04:30:52.424Z",
-    "imageUrl": "/static/epp-images/epp_1763958650101.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1763958650101.jpg",
-    "detections": {
-      "casco": 2,
-      "chaleco": 1,
-      "guante": 1,
-      "zapato": 0,
-      "no casco": 0,
-      "no chaleco": 0,
-      "no guante": 0
-    },
-    "isCompliant": true,
-    "missingItems": []
-  },
-  {
-    "timestamp": "2025-11-24T04:30:48.652Z",
-    "imageUrl": "/static/epp-images/epp_1763958646351.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1763958646351.jpg",
-    "detections": {
-      "casco": 2,
-      "chaleco": 1,
-      "guante": 0,
-      "zapato": 0,
-      "no casco": 0,
-      "no chaleco": 0,
-      "no guante": 0
-    },
-    "isCompliant": false,
-    "missingItems": [
-      "Falta Guantes"
-    ]
-  },
-  {
-    "timestamp": "2025-11-24T04:30:40.098Z",
-    "imageUrl": "/static/epp-images/epp_1763958637739.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1763958637739.jpg",
+    "timestamp": "2025-12-02T16:02:02.931Z",
+    "imageUrl": "/static/epp-images/epp_1764691317936.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691317936.jpg",
     "detections": {
       "casco": 0,
       "chaleco": 1,
@@ -1759,12 +1961,1710 @@
     ]
   },
   {
-    "timestamp": "2025-11-24T04:30:35.552Z",
-    "imageUrl": "/static/epp-images/epp_1763958632573.jpg",
-    "processedImageUrl": "/static/epp-images/epp_1763958632573.jpg",
+    "timestamp": "2025-12-02T16:01:55.880Z",
+    "imageUrl": "/static/epp-images/epp_1764691311635.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691311635.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:01:50.716Z",
+    "imageUrl": "/static/epp-images/epp_1764691306562.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691306562.jpg",
     "detections": {
       "casco": 0,
       "chaleco": 1,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:01:42.685Z",
+    "imageUrl": "/static/epp-images/epp_1764691298523.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691298523.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:01:00.029Z",
+    "imageUrl": "/static/epp-images/epp_1764691255667.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691255667.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:00:53.045Z",
+    "imageUrl": "/static/epp-images/epp_1764691248989.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691248989.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:00:46.886Z",
+    "imageUrl": "/static/epp-images/epp_1764691242615.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691242615.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:00:39.031Z",
+    "imageUrl": "/static/epp-images/epp_1764691235047.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691235047.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:00:33.400Z",
+    "imageUrl": "/static/epp-images/epp_1764691229190.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691229190.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:00:26.014Z",
+    "imageUrl": "/static/epp-images/epp_1764691221715.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691221715.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 1,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Detectado: No-Chaleco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:00:19.638Z",
+    "imageUrl": "/static/epp-images/epp_1764691215509.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691215509.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 1
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Detectado: No-Guante"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:00:16.096Z",
+    "imageUrl": "/static/epp-images/epp_1764691211955.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691211955.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T16:00:10.957Z",
+    "imageUrl": "/static/epp-images/epp_1764691202106.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691202106.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:59:50.547Z",
+    "imageUrl": "/static/epp-images/epp_1764691186653.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691186653.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:59:43.672Z",
+    "imageUrl": "/static/epp-images/epp_1764691179795.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691179795.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 2,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:59:37.071Z",
+    "imageUrl": "/static/epp-images/epp_1764691172868.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691172868.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 2,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:59:31.812Z",
+    "imageUrl": "/static/epp-images/epp_1764691167700.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691167700.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 4,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 1
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Detectado: No-Guante"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:59:23.124Z",
+    "imageUrl": "/static/epp-images/epp_1764691158111.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691158111.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 3,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:59:15.801Z",
+    "imageUrl": "/static/epp-images/epp_1764691151548.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691151548.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 4,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:59:09.299Z",
+    "imageUrl": "/static/epp-images/epp_1764691144097.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691144097.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:59:09.032Z",
+    "imageUrl": "/static/epp-images/epp_1764691143614.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691144097.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:58:57.643Z",
+    "imageUrl": "/static/epp-images/epp_1764691132218.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691132218.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 1
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Detectado: No-Guante"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:58:51.180Z",
+    "imageUrl": "/static/epp-images/epp_1764691123346.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691123346.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 6,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:58:41.079Z",
+    "imageUrl": "/static/epp-images/epp_1764691116233.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764691116233.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:55:17.868Z",
+    "imageUrl": "/static/epp-images/epp_1764690913877.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690913877.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:55:13.130Z",
+    "imageUrl": "/static/epp-images/epp_1764690908713.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690908713.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:55:07.724Z",
+    "imageUrl": "/static/epp-images/epp_1764690903612.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690903612.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:55:01.741Z",
+    "imageUrl": "/static/epp-images/epp_1764690897803.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690897803.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:54:56.720Z",
+    "imageUrl": "/static/epp-images/epp_1764690892755.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690892755.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:54:51.939Z",
+    "imageUrl": "/static/epp-images/epp_1764690887126.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690887126.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:54:44.834Z",
+    "imageUrl": "/static/epp-images/epp_1764690880060.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690880060.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:54:34.541Z",
+    "imageUrl": "/static/epp-images/epp_1764690869777.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690869777.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:54:29.693Z",
+    "imageUrl": "/static/epp-images/epp_1764690864696.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690864696.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:54:25.019Z",
+    "imageUrl": "/static/epp-images/epp_1764690859351.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690859351.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:54:20.928Z",
+    "imageUrl": "/static/epp-images/epp_1764690854236.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690854236.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:54:16.269Z",
+    "imageUrl": "/static/epp-images/epp_1764690849059.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690849059.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:54:10.289Z",
+    "imageUrl": "/static/epp-images/epp_1764690843893.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690843893.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:54:04.571Z",
+    "imageUrl": "/static/epp-images/epp_1764690838443.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690838443.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:53:58.833Z",
+    "imageUrl": "/static/epp-images/epp_1764690833328.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690833328.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:53:52.348Z",
+    "imageUrl": "/static/epp-images/epp_1764690825516.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690825516.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:53:46.803Z",
+    "imageUrl": "/static/epp-images/epp_1764690820424.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690820424.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:53:39.526Z",
+    "imageUrl": "/static/epp-images/epp_1764690814530.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690814530.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:53:31.351Z",
+    "imageUrl": "/static/epp-images/epp_1764690806172.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690806172.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:53:22.461Z",
+    "imageUrl": "/static/epp-images/epp_1764690797973.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690797973.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:53:16.578Z",
+    "imageUrl": "/static/epp-images/epp_1764690792716.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690792716.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:53:11.749Z",
+    "imageUrl": "/static/epp-images/epp_1764690787740.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690787740.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:53:06.731Z",
+    "imageUrl": "/static/epp-images/epp_1764690780711.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690780711.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:53:03.269Z",
+    "imageUrl": "/static/epp-images/epp_1764690775582.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690775582.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:52:57.921Z",
+    "imageUrl": "/static/epp-images/epp_1764690770419.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690770419.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:52:52.567Z",
+    "imageUrl": "/static/epp-images/epp_1764690765287.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690765287.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:52:41.711Z",
+    "imageUrl": "/static/epp-images/epp_1764690756885.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690756885.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:52:36.767Z",
+    "imageUrl": "/static/epp-images/epp_1764690751722.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690751722.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 1,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Detectado: No-Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:52:31.746Z",
+    "imageUrl": "/static/epp-images/epp_1764690746571.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690746571.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:52:26.089Z",
+    "imageUrl": "/static/epp-images/epp_1764690741071.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690741071.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:52:21.686Z",
+    "imageUrl": "/static/epp-images/epp_1764690735911.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690735911.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:52:15.588Z",
+    "imageUrl": "/static/epp-images/epp_1764690730810.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690730810.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:52:09.378Z",
+    "imageUrl": "/static/epp-images/epp_1764690725030.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690725030.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:52:05.239Z",
+    "imageUrl": "/static/epp-images/epp_1764690719613.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690719613.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:51:56.522Z",
+    "imageUrl": "/static/epp-images/epp_1764690711976.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690711976.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:51:53.863Z",
+    "imageUrl": "/static/epp-images/epp_1764690709177.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690709177.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:51:45.590Z",
+    "imageUrl": "/static/epp-images/epp_1764690700824.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690700824.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:51:37.774Z",
+    "imageUrl": "/static/epp-images/epp_1764690692875.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690692875.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 1,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Detectado: No-Casco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:51:31.009Z",
+    "imageUrl": "/static/epp-images/epp_1764690685523.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690685523.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 1,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Detectado: No-Casco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:51:19.275Z",
+    "imageUrl": "/static/epp-images/epp_1764690675123.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690675123.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 2,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:51:13.948Z",
+    "imageUrl": "/static/epp-images/epp_1764690669849.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690669849.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:51:08.680Z",
+    "imageUrl": "/static/epp-images/epp_1764690664159.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690664159.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:51:01.987Z",
+    "imageUrl": "/static/epp-images/epp_1764690657973.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690657973.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 2,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:50:56.626Z",
+    "imageUrl": "/static/epp-images/epp_1764690652731.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690652731.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 2,
+      "guante": 3,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:50:51.585Z",
+    "imageUrl": "/static/epp-images/epp_1764690647513.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690647513.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 2,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:50:42.043Z",
+    "imageUrl": "/static/epp-images/epp_1764690637674.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690637674.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 1
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Detectado: No-Guante"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:50:36.650Z",
+    "imageUrl": "/static/epp-images/epp_1764690632013.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690632013.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:50:29.650Z",
+    "imageUrl": "/static/epp-images/epp_1764690625018.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690625018.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 2,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:50:18.863Z",
+    "imageUrl": "/static/epp-images/epp_1764690614553.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690614553.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:50:12.522Z",
+    "imageUrl": "/static/epp-images/epp_1764690607713.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690607713.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 2,
+      "zapato": 0,
+      "no casco": 1,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Detectado: No-Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:50:04.371Z",
+    "imageUrl": "/static/epp-images/epp_1764690598922.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690598922.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 2,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:49:57.576Z",
+    "imageUrl": "/static/epp-images/epp_1764690593766.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690593766.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 2,
+      "guante": 2,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:49:52.493Z",
+    "imageUrl": "/static/epp-images/epp_1764690588510.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690588510.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 2,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 1
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Detectado: No-Guante"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:49:45.995Z",
+    "imageUrl": "/static/epp-images/epp_1764690581550.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690581550.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 2,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:49:39.768Z",
+    "imageUrl": "/static/epp-images/epp_1764690575440.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690575440.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 2,
+      "guante": 2,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:49:32.402Z",
+    "imageUrl": "/static/epp-images/epp_1764690567670.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690567670.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 3,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:49:26.842Z",
+    "imageUrl": "/static/epp-images/epp_1764690562556.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690562556.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 2,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:49:18.463Z",
+    "imageUrl": "/static/epp-images/epp_1764690554616.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690554616.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:49:10.402Z",
+    "imageUrl": "/static/epp-images/epp_1764690546439.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690546439.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:49:04.230Z",
+    "imageUrl": "/static/epp-images/epp_1764690539717.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690539717.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 2,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:48:58.818Z",
+    "imageUrl": "/static/epp-images/epp_1764690534500.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690534500.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:48:53.544Z",
+    "imageUrl": "/static/epp-images/epp_1764690529163.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690529163.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 0,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Falta Guantes"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:48:48.380Z",
+    "imageUrl": "/static/epp-images/epp_1764690523988.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690523988.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 1,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:48:38.282Z",
+    "imageUrl": "/static/epp-images/epp_1764690513748.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690513748.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 1,
+      "guante": 3,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 0
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:48:32.704Z",
+    "imageUrl": "/static/epp-images/epp_1764690508551.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690508551.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 0,
+      "guante": 2,
+      "zapato": 0,
+      "no casco": 0,
+      "no chaleco": 0,
+      "no guante": 1
+    },
+    "isCompliant": false,
+    "missingItems": [
+      "Falta Casco",
+      "Falta Chaleco",
+      "Detectado: No-Guante"
+    ]
+  },
+  {
+    "timestamp": "2025-12-02T15:48:27.740Z",
+    "imageUrl": "/static/epp-images/epp_1764690498026.jpg",
+    "processedImageUrl": "/static/epp-images/epp_1764690501671.jpg",
+    "detections": {
+      "casco": 0,
+      "chaleco": 2,
       "guante": 0,
       "zapato": 0,
       "no casco": 0,

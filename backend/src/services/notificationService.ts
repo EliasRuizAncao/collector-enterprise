@@ -325,3 +325,167 @@ export const deleteNotification = async (notificationId: string, userId: string)
   return { success: true }
 }
 
+/**
+ * Crea una notificación cuando hay una solicitud de materiales pendiente de autorización
+ * @param supervisorId - ID del supervisor que debe autorizar
+ * @param requesterId - ID del usuario que solicitó
+ * @param requestId - ID de la solicitud
+ */
+export const notifyMaterialRequestPending = async (
+  supervisorId: string,
+  requesterId: string,
+  requestId: string,
+) => {
+  console.info('[notificationService] notifyMaterialRequestPending', {
+    supervisorId,
+    requesterId,
+    requestId,
+  })
+
+  const supervisor = await prisma.user.findUnique({ where: { id: supervisorId } })
+  if (!supervisor) {
+    throw new Error('SUPERVISOR_NOT_FOUND')
+  }
+
+  const requester = await prisma.user.findUnique({ where: { id: requesterId } })
+  if (!requester) {
+    throw new Error('USER_NOT_FOUND')
+  }
+
+  const request = await prisma.materialRequest.findUnique({
+    where: { id: requestId },
+    include: { items: { include: { product: true } } },
+  })
+  if (!request) {
+    throw new Error('REQUEST_NOT_FOUND')
+  }
+
+  const itemsSummary = request.items
+    .map((item: { quantity: number; product: { unit: string; name: string } }) => 
+      `${item.quantity} ${item.product.unit} de ${item.product.name}`
+    )
+    .join(', ')
+
+  const notification = await prisma.notification.create({
+    data: {
+      userId: supervisorId,
+      title: 'Solicitud de materiales pendiente',
+      message: `${requester.name} ha solicitado materiales: ${itemsSummary}. Por favor, revisa y autoriza la solicitud.`,
+      type: NotificationType.MATERIAL_REQUEST_PENDING,
+      read: false,
+      link: `/admin/warehouse/requests/${requestId}`,
+    },
+  })
+
+  console.info('[notificationService] notification created', notification.id)
+  return notification
+}
+
+/**
+ * Crea una notificación cuando una solicitud de materiales es aprobada
+ * @param requesterId - ID del usuario que solicitó
+ * @param requestId - ID de la solicitud
+ */
+export const notifyMaterialRequestApproved = async (requesterId: string, requestId: string) => {
+  console.info('[notificationService] notifyMaterialRequestApproved', { requesterId, requestId })
+
+  const requester = await prisma.user.findUnique({ where: { id: requesterId } })
+  if (!requester) {
+    throw new Error('USER_NOT_FOUND')
+  }
+
+  const request = await prisma.materialRequest.findUnique({ where: { id: requestId } })
+  if (!request) {
+    throw new Error('REQUEST_NOT_FOUND')
+  }
+
+  const notification = await prisma.notification.create({
+    data: {
+      userId: requesterId,
+      title: 'Solicitud de materiales aprobada',
+      message: `Tu solicitud ${request.requestNumber} ha sido aprobada. Presenta el código QR en bodega para recibir los materiales.`,
+      type: NotificationType.MATERIAL_REQUEST_APPROVED,
+      read: false,
+      link: `/mobile/warehouse/requests/${requestId}`,
+    },
+  })
+
+  console.info('[notificationService] notification created', notification.id)
+  return notification
+}
+
+/**
+ * Crea una notificación cuando una solicitud de materiales es rechazada
+ * @param requesterId - ID del usuario que solicitó
+ * @param requestId - ID de la solicitud
+ * @param reason - Razón del rechazo
+ */
+export const notifyMaterialRequestRejected = async (
+  requesterId: string,
+  requestId: string,
+  reason: string,
+) => {
+  console.info('[notificationService] notifyMaterialRequestRejected', {
+    requesterId,
+    requestId,
+    reason,
+  })
+
+  const requester = await prisma.user.findUnique({ where: { id: requesterId } })
+  if (!requester) {
+    throw new Error('USER_NOT_FOUND')
+  }
+
+  const request = await prisma.materialRequest.findUnique({ where: { id: requestId } })
+  if (!request) {
+    throw new Error('REQUEST_NOT_FOUND')
+  }
+
+  const notification = await prisma.notification.create({
+    data: {
+      userId: requesterId,
+      title: 'Solicitud de materiales rechazada',
+      message: `Tu solicitud ${request.requestNumber} ha sido rechazada. Razón: ${reason}`,
+      type: NotificationType.MATERIAL_REQUEST_REJECTED,
+      read: false,
+      link: `/mobile/warehouse/requests/${requestId}`,
+    },
+  })
+
+  console.info('[notificationService] notification created', notification.id)
+  return notification
+}
+
+/**
+ * Crea una notificación cuando una solicitud está lista para recoger
+ * @param requesterId - ID del usuario que solicitó
+ * @param requestId - ID de la solicitud
+ */
+export const notifyMaterialRequestReady = async (requesterId: string, requestId: string) => {
+  console.info('[notificationService] notifyMaterialRequestReady', { requesterId, requestId })
+
+  const requester = await prisma.user.findUnique({ where: { id: requesterId } })
+  if (!requester) {
+    throw new Error('USER_NOT_FOUND')
+  }
+
+  const request = await prisma.materialRequest.findUnique({ where: { id: requestId } })
+  if (!request) {
+    throw new Error('REQUEST_NOT_FOUND')
+  }
+
+  const notification = await prisma.notification.create({
+    data: {
+      userId: requesterId,
+      title: 'Materiales listos para recoger',
+      message: `Los materiales de tu solicitud ${request.requestNumber} están listos. Acude a bodega con tu código QR.`,
+      type: NotificationType.MATERIAL_REQUEST_READY,
+      read: false,
+      link: `/mobile/warehouse/requests/${requestId}`,
+    },
+  })
+
+  console.info('[notificationService] notification created', notification.id)
+  return notification
+}
+

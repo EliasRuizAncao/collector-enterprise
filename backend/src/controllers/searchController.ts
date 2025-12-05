@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { PrismaClient, Role } from '@prisma/client'
+import { PrismaClient } from '@prisma/client'
 import { z } from 'zod'
 
 import { AuthRequest } from '@/middleware/auth'
@@ -29,7 +29,7 @@ export const globalSearch = async (req: Request, res: Response, next: NextFuncti
     const parsed = searchQuerySchema.parse(req.query)
     const authReq = req as AuthRequest
     const currentUserId = authReq.user?.id
-    const isAdmin = authReq.user?.role === Role.ADMIN
+    const isAdmin = authReq.user?.role === 'ADMIN'
 
     const query = parsed.q.toLowerCase().trim()
     const types = parsed.types || ['assignment', 'form', 'history']

@@ -1,4 +1,7 @@
-Error executing C:\Users\ruesc\Desktop\collector-enterprise\collector-enterprise\backend\reconocimiento\structure_detect.py:
-No Python at '"C:\Users\milla\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe'
+Error executing C:\Users\Rafaa\Desktop\Inacap\2025\segundo_semestre\proyecto_de_titulo\collector-enterprise\backend\reconocimiento\structure_detect.py:
+Traceback (most recent call last):
+  File "C:\Users\Rafaa\Desktop\Inacap\2025\segundo_semestre\proyecto_de_titulo\collector-enterprise\backend\reconocimiento\structure_detect.py", line 4, in <module>
+    import cv2
+ModuleNotFoundError: No module named 'cv2'
 
 

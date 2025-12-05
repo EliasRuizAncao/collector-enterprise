@@ -285,13 +285,18 @@ export const HelpCenter = ({ open, onOpenChange }: HelpCenterProps) => {
  */
 export const HelpButton = () => {
   const [open, setOpen] = useState(false)
+  const location = useLocation()
+  
+  // Ajustar posición si estamos en la página de solicitud de materiales (donde hay botón fijo de envío)
+  const isMaterialRequestPage = location.pathname.includes('/warehouse/request')
+  const bottomPosition = isMaterialRequestPage ? 'bottom-32' : 'bottom-24'
 
   return (
     <>
       <Button
         variant="ghost"
         size="icon"
-        className="fixed bottom-24 right-4 h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-lg z-50"
+        className={`fixed ${bottomPosition} right-4 h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-lg z-[70]`}
         onClick={() => setOpen(true)}
       >
         <HelpCircle className="h-5 w-5" />

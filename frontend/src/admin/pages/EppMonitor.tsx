@@ -1,16 +1,17 @@
 import { useState, useEffect, useRef } from 'react'
-import { Camera, HardHat, Shield, Hand, AlertTriangle, CheckCircle2 } from 'lucide-react'
+import { Camera, HardHat, Shield, Hand, AlertTriangle, CheckCircle2, Loader2 } from 'lucide-react'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/card'
 import { Badge } from '@/shared/components/ui/badge'
 import { Alert, AlertDescription, AlertTitle } from '@/shared/components/ui/alert'
+import { Skeleton } from '@/shared/components/ui/skeleton'
 import { cn } from '@/shared/lib/utils'
 import api from '@/shared/lib/api'
-import LoadingOverlay from '@/shared/components/common/LoadingOverlay'
 import { useToast } from '@/shared/components/ui/use-toast'
 import { ToastAction } from '@/shared/components/ui/toast'
+import PageLoader from '@/shared/components/common/PageLoader'
 
 
 // Interfaz actualizada con clases en español del modelo de Roboflow
@@ -385,6 +386,29 @@ const EppMonitor = () => {
     { casco: 0, chaleco: 0, guante: 0, 'no casco': 0, 'no chaleco': 0, 'no guante': 0 },
   )
 
+  // Mostrar loader inicial si está cargando y no hay estado
+  if (loading && !status && images.length === 0) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
+              <Camera className="h-8 w-8 text-primary" />
+              Centro de Control EPP
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              Monitoreo en tiempo real de Equipos de Protección Personal
+            </p>
+          </div>
+        </div>
+        <PageLoader
+          message="Cargando estado del sistema EPP..."
+          icon={<Camera className="h-12 w-12 text-primary" />}
+        />
+      </div>
+    )
+  }
+
   return (
     <div className={cn('space-y-6', status && !status.isCompliant && 'ring-4 ring-red-500/20 rounded-lg p-2')}>
       {/* Header */}
@@ -743,7 +767,9 @@ const EppMonitor = () => {
             <p className="ml-3 text-muted-foreground">Cargando estado del sistema...</p>
           </CardContent>
         </Card>
-{/* Historial de Detecciones EPP */}
+      )}
+
+      {/* Historial de Detecciones EPP */}
       {history.length > 0 && (
         <div className="mt-8">
           <h2 className="text-2xl font-bold mb-4">Historial de Detecciones</h2>
@@ -1048,7 +1074,6 @@ const EppMonitor = () => {
             </div>
           </div>
         </div>
-      )}
       )}
 
       {/* Error state */}

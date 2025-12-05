@@ -77,6 +77,7 @@ export const useUsers = () => {
       try {
         setLoading(true)
         setError(null)
+        // El payload ya viene con roleId desde UserDialog (convertido de role a roleId)
         const { data } = await api.post<UserSummary>(`/users`, payload)
         setUsers((prev) => [data, ...prev])
         toast({

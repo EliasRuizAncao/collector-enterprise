@@ -69,7 +69,7 @@ export const getNotifications = async (
     if (error instanceof z.ZodError) {
       return res.status(400).json({
         error: 'Parámetros inválidos',
-        details: error.errors,
+        details: error.issues,
       })
     }
 
@@ -106,7 +106,7 @@ export const markNotificationAsRead = async (
     if (error instanceof z.ZodError) {
       return res.status(400).json({
         error: 'ID de notificación inválido',
-        details: error.errors,
+        details: error.issues,
       })
     }
 
@@ -238,7 +238,7 @@ export const deleteNotificationById = async (
     if (error instanceof z.ZodError) {
       return res.status(400).json({
         error: 'ID de notificación inválido',
-        details: error.errors,
+        details: error.issues,
       })
     }
 

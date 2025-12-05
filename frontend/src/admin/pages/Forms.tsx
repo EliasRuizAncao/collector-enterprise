@@ -12,7 +12,13 @@ import {
   MoreHorizontal,
   Calendar,
   Hash,
+  Trash2,
 } from 'lucide-react'
+
+import FormPreview from '@/admin/components/form-builder/FormPreview'
+import { type Form } from '@/shared/types/formBuilder'
+import api from '@/shared/lib/api'
+import { useToast } from '@/shared/components/ui/use-toast'
 
 import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
@@ -36,6 +42,9 @@ import ConfirmDialog from '@/shared/components/common/ConfirmDialog'
 import useForms, { type FormSummary } from '@/shared/hooks/useForms'
 import { type FormStatus } from '@/shared/types/formBuilder'
 import { useAuthStore } from '@/shared/store/authStore'
+import { usePermission } from '@/shared/hooks/usePermission'
+import { Permission } from '@/shared/types/permissions'
+import PageLoader from '@/shared/components/common/PageLoader'
 
 const FORMS_PER_PAGE = 12
 
@@ -66,15 +75,20 @@ const statusBadgeVariants: Record<
  */
 const Forms = () => {
   const navigate = useNavigate()
-  const { forms, loading, error, pagination, fetchForms, archiveForm, duplicateForm } = useForms()
+  const { forms, loading, error, pagination, fetchForms, archiveForm, deleteForm, duplicateForm } = useForms()
   const user = useAuthStore((state) => state.user)
-  const isAdminOrManager = user?.role === 'ADMIN' || user?.role === 'MANAGER'
+  const { hasPermission } = usePermission()
+  const canManageForms = hasPermission(Permission.FORMS_CREATE) || hasPermission(Permission.FORMS_EDIT) || hasPermission(Permission.FORMS_DELETE)
+  const { toast } = useToast()
 
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<'all' | FormStatus>('all')
   const [currentPage, setCurrentPage] = useState(1)
 
   const [confirmArchive, setConfirmArchive] = useState<FormSummary | null>(null)
+  const [confirmDelete, setConfirmDelete] = useState<FormSummary | null>(null)
+  const [previewForm, setPreviewForm] = useState<FormSummary | null>(null)
+  const [loadingPreview, setLoadingPreview] = useState(false)
 
   /**
    * Aplica los filtros y búsqueda
@@ -128,6 +142,20 @@ const Forms = () => {
   }
 
   /**
+   * Maneja la eliminación permanente de un formulario
+   */
+  const handleDelete = async () => {
+    if (!confirmDelete) return
+
+    try {
+      await deleteForm(confirmDelete.id)
+      setConfirmDelete(null)
+    } catch (error) {
+      console.error('Error al eliminar formulario:', error)
+    }
+  }
+
+  /**
    * Obtiene la cantidad de campos de un formulario
    */
   const getFieldsCount = (form: FormSummary): number => {
@@ -154,6 +182,27 @@ const Forms = () => {
     }
   }
 
+  /**
+   * Obtiene el formulario completo para la vista previa
+   */
+  const handlePreview = async (form: FormSummary) => {
+    setLoadingPreview(true)
+    try {
+      const response = await api.get<Form>(`/forms/${form.id}`)
+      // El Form ya tiene la estructura correcta para el preview
+      setPreviewForm(response.data as unknown as FormSummary)
+    } catch (error) {
+      console.error('Error al cargar formulario para vista previa:', error)
+      toast({
+        title: 'Error',
+        description: 'No se pudo cargar el formulario para la vista previa',
+        variant: 'destructive',
+      })
+    } finally {
+      setLoadingPreview(false)
+    }
+  }
+
   // Calcular total de páginas
   const totalPages = pagination?.totalPages ?? 1
 
@@ -164,12 +213,12 @@ const Forms = () => {
         <div>
           <h1 className="text-2xl font-bold text-foreground">Formularios</h1>
           <p className="text-sm text-muted-foreground">
-            {isAdminOrManager
+            {canManageForms
               ? 'Gestiona y organiza todos tus formularios dinámicos'
               : 'Visualiza los formularios disponibles'}
           </p>
         </div>
-        {isAdminOrManager && (
+        {hasPermission(Permission.FORMS_CREATE) && (
           <Button onClick={() => navigate('/admin/formularios/nuevo')} className="gap-2">
             <Plus className="h-4 w-4" />
             Nuevo Formulario
@@ -224,22 +273,10 @@ const Forms = () => {
 
       {/* Contenido */}
       {loading && forms.length === 0 ? (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, index) => (
-            <Card key={index} className="animate-pulse">
-              <CardHeader>
-                <div className="h-4 w-3/4 rounded bg-muted" />
-                <div className="mt-2 h-3 w-1/2 rounded bg-muted" />
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <div className="h-3 w-full rounded bg-muted" />
-                  <div className="h-3 w-2/3 rounded bg-muted" />
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <PageLoader
+          message="Cargando formularios..."
+          icon={<FileText className="h-12 w-12 text-primary" />}
+        />
       ) : error ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
@@ -288,7 +325,7 @@ const Forms = () => {
                         </CardDescription>
                       )}
                     </div>
-                    {isAdminOrManager && (
+                    {canManageForms && (
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button
@@ -311,6 +348,10 @@ const Forms = () => {
                             <Copy className="mr-2 h-4 w-4" />
                             Duplicar
                           </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handlePreview(form)}>
+                            <Eye className="mr-2 h-4 w-4" />
+                            Vista previa
+                          </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => navigate(`/admin/formularios/${form.id}/respuestas`)}
                           >
@@ -320,10 +361,17 @@ const Forms = () => {
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
                             onClick={() => setConfirmArchive(form)}
-                            className="text-destructive focus:text-destructive"
+                            className="text-amber-600 focus:text-amber-600 dark:text-amber-400"
                           >
                             <Archive className="mr-2 h-4 w-4" />
                             Archivar
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => setConfirmDelete(form)}
+                            className="text-destructive focus:text-destructive"
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Eliminar
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -351,16 +399,37 @@ const Forms = () => {
                     </div>
                   </div>
 
-                  {/* Botón de acción principal (solo para ADMIN/MANAGER) */}
-                  {isAdminOrManager && (
-                    <Button
-                      variant="outline"
-                      className="w-full"
-                      onClick={() => navigate(`/admin/formularios/${form.id}`)}
-                    >
-                      <Edit className="mr-2 h-4 w-4" />
-                      Editar formulario
-                    </Button>
+                  {/* Botones de acción (solo para ADMIN/MANAGER) */}
+                  {canManageForms && (
+                    <div className="flex flex-col gap-2">
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          className="flex-1"
+                          onClick={() => handlePreview(form)}
+                          disabled={loadingPreview}
+                        >
+                          <Eye className="mr-2 h-4 w-4" />
+                          Vista previa
+                        </Button>
+                        <Button
+                          variant="outline"
+                          className="flex-1"
+                          onClick={() => navigate(`/admin/formularios/${form.id}/respuestas`)}
+                        >
+                          <Eye className="mr-2 h-4 w-4" />
+                          Respuestas
+                        </Button>
+                      </div>
+                      <Button
+                        variant="default"
+                        className="w-full"
+                        onClick={() => navigate(`/admin/formularios/${form.id}`)}
+                      >
+                        <Edit className="mr-2 h-4 w-4" />
+                        Editar
+                      </Button>
+                    </div>
                   )}
                 </CardContent>
               </Card>
@@ -427,8 +496,34 @@ const Forms = () => {
         description={`¿Estás seguro de que deseas archivar "${confirmArchive?.title}"? El formulario ya no estará disponible para los usuarios, pero podrás restaurarlo más tarde.`}
         confirmText="Archivar"
         cancelText="Cancelar"
+        variant="default"
+      />
+
+      {/* Diálogo de confirmación para eliminar permanentemente */}
+      <ConfirmDialog
+        open={Boolean(confirmDelete)}
+        onClose={() => setConfirmDelete(null)}
+        onConfirm={handleDelete}
+        title="Eliminar formulario permanentemente"
+        description={`¿Estás completamente seguro de que deseas eliminar "${confirmDelete?.title}"? Esta acción NO se puede deshacer. El formulario será eliminado permanentemente de la base de datos.`}
+        confirmText="Sí, eliminar permanentemente"
+        cancelText="Cancelar"
         variant="destructive"
       />
+
+      {/* Vista previa del formulario */}
+      {previewForm && (
+        <FormPreview
+          form={previewForm as unknown as Form}
+          asSheet={false}
+          open={Boolean(previewForm)}
+          onOpenChange={(open) => {
+            if (!open) {
+              setPreviewForm(null)
+            }
+          }}
+        />
+      )}
     </div>
   )
 }

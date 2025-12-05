@@ -38,20 +38,23 @@ const BottomNav = () => {
   useEffect(() => {
     const loadPendingCount = async () => {
       try {
-        // TODO: Reemplazar con endpoint real cuando esté disponible
-        const response = await api.get('/assignments/stats')
+        const response = await api.get('/assignments/stats', { timeout: 5000 })
         const data = response.data
 
         setPendingCount(data.pending || 0)
         setHasNotifications(data.notifications || false)
       } catch (error: any) {
-        // En desarrollo, usar valores mock
-        if (import.meta.env.DEV) {
-          setPendingCount(3)
+        // Si falla (404, timeout, etc.), usar valores por defecto
+        if (error?.response?.status === 404 || error?.code === 'ECONNABORTED') {
+          setPendingCount(0)
+          setHasNotifications(false)
+        } else if (import.meta.env.DEV) {
+          // En desarrollo, usar valores mock solo si no es un error conocido
+          setPendingCount(0)
           setHasNotifications(false)
         }
-        // Solo loggear errores que no sean 404 (endpoint no implementado aún)
-        if (error?.response?.status !== 404) {
+        // Solo loggear errores inesperados
+        if (error?.response?.status && error.response.status !== 404) {
           console.error('Error loading pending count:', error)
         }
       }

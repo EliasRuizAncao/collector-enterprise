@@ -17,6 +17,9 @@ import structureRoutes from './routes/structure.routes'
 import reportRoutes from './routes/report.routes'
 import notificationRoutes from './routes/notification.routes'
 import auditLogRoutes from './routes/auditLog.routes'
+import roleRoutes from './routes/role.routes'
+import warehouseRoutes from './routes/warehouse.routes'
+import pushRoutes from './routes/push.routes'
 
 import { errorHandler } from './middleware/errorHandler'
 import path from 'path'
@@ -50,6 +53,10 @@ devOrigins.forEach(origin => {
   }
 })
 
+// En desarrollo, permitir orígenes de la red local (IPs privadas)
+const isDevelopment = process.env.NODE_ENV !== 'production'
+const localNetworkPattern = /^http:\/\/(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.|localhost)/i
+
 const corsOptions: CorsOptions = {
   origin: (origin, callback) => {
     if (!origin) {
@@ -58,6 +65,12 @@ const corsOptions: CorsOptions = {
     }
 
     if (allowedOrigins.includes(origin)) {
+      callback(null, true)
+      return
+    }
+
+    // En desarrollo, permitir cualquier origen de la red local
+    if (isDevelopment && localNetworkPattern.test(origin)) {
       callback(null, true)
       return
     }
@@ -123,6 +136,9 @@ app.use('/api/v1/epp', eppLimiter, eppRoutes) // Rutas de EPP con rate limiter e
 app.use('/api/v1/structure', structureRoutes) // Rutas de Estructura
 app.use('/api/notifications', notificationRoutes) // Notificaciones
 app.use('/api/audit-logs', auditLogRoutes) // Logs de auditoría (solo ADMIN)
+app.use('/api', roleRoutes) // Gestión de roles y permisos
+app.use('/api/warehouse', warehouseRoutes) // Gestión de bodega y solicitudes
+app.use('/api/push', pushRoutes) // Notificaciones push (FCM)
 
 // Error handler (debe ser el último middleware)
 app.use(errorHandler)

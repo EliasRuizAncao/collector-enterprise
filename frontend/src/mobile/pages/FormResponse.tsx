@@ -696,15 +696,19 @@ const MobileFormResponse = () => {
         }
 
         // Cargar desde API
-        const [assignmentRes, formRes] = await Promise.all([
-          api.get(`/assignments/${assignmentId}`),
-          api.get(`/forms/${assignmentId}/form`).catch(() => {
-            // Si falla, intentar obtener el formId de la asignación
-            return null
-          }),
-        ])
-
+        const assignmentRes = await api.get(`/assignments/${assignmentId}`, { timeout: 10000 })
         const assignment = assignmentRes.data
+
+        // Obtener el formulario usando el formId de la asignación
+        let formRes = null
+        if (assignment?.formId) {
+          try {
+            formRes = await api.get(`/forms/${assignment.formId}`, { timeout: 10000 })
+          } catch (error: any) {
+            console.warn('Error al cargar formulario:', error)
+            // Continuar sin el formulario si falla
+          }
+        }
 
         // Verificar que esté asignado al usuario actual
         if (assignment.userId !== user?.id) {
@@ -716,10 +720,10 @@ const MobileFormResponse = () => {
         let form: Form
         if (formRes?.data) {
           form = formRes.data
-        } else {
+        } else if (assignment?.formId) {
           // Obtener formulario por formId
           try {
-            const formResponse = await api.get(`/forms/${assignment.formId}`)
+            const formResponse = await api.get(`/forms/${assignment.formId}`, { timeout: 10000 })
             form = formResponse.data
           } catch (e: any) {
             // Si falla con 404, usar datos mock o mostrar error
